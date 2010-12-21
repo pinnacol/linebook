@@ -76,6 +76,18 @@ class LinebookTest < Test::Unit::TestCase
     )
   end
   
+  def test_line_book_allows_hash_patterns
+    assert_equal MANIFEST_ONE, Linebook(
+      'patterns' => { 'base' => '*.txt:*/*.txt' },
+      'paths'    => DIR_ONE
+    )
+    
+    assert_equal MANIFEST_ONE, Linebook(
+      'patterns' => { 'base' => ['*.txt', '*/*.txt'] },
+      'paths'    => DIR_ONE
+    )
+  end
+  
   #
   # __manifest test
   #
@@ -130,6 +142,43 @@ class LinebookTest < Test::Unit::TestCase
   
   def test__paths_assumes_no_patterns
     assert_equal [], __paths('paths' => [DIR_ONE, DIR_TWO])
+  end
+  
+  #
+  # __normalize_patterns test
+  #
+
+  def test__normalize_patterns_returns_array_patterns
+    assert_equal [
+      ['base', 'pattern']
+    ], __normalize_patterns([
+      ['base', 'pattern']
+    ])
+  end
+  
+  def test__normalize_patterns_arrayifies_hash_patterns
+    assert_equal [
+      ['base', 'pattern'],
+      ['BASE', 'PATTERN']
+    ].sort, __normalize_patterns({
+      'base' => ['pattern'],
+      'BASE' => ['PATTERN']
+    }).sort
+  end
+  
+  def test__normalize_patterns_splits_string_values_in_hash_patterns
+    assert_equal [
+      ['base', 'pattern'],
+      ['base', 'PATTERN']
+    ], __normalize_patterns({
+      'base' => 'pattern:PATTERN'
+    })
+  end
+  
+  def test__normalize_raises_error_for_non_hash_or_array_patterns
+    obj = Object.new
+    err = assert_raises(RuntimeError) { __normalize_patterns(obj) }
+    assert_equal "invalid patterns: #{obj.inspect}", err.message
   end
   
   #
