@@ -29,7 +29,7 @@ task :print_manifest do
   # included already (marking by the absence
   # of a label)
   Dir.glob('**/*').each do |file|
-    next if file =~ /^(rdoc|pkg|coverage|config|test|vendor)/ || File.directory?(file)
+    next if file =~ /^(rdoc|pkg|coverage|test)/ || File.directory?(file)
     
     path = File.expand_path(file)
     files[path] = ['', file] unless files.has_key?(path)
@@ -58,42 +58,6 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
 end
 
 #
-# Dependency tasks
-#
-
-# Xpromote raises an error if it finds output on stderr. Unfortunately the sh
-# from Rake will print the cmd on stderr, so use this method instead for
-# commands that run during promotion.
-def stdout_sh(cmd)
-  puts cmd
-  system(cmd) or raise("command failed: #{cmd}")
-end
-
-desc 'Checkout submodules'
-task :submodules do
-  output = `git submodule status 2>&1`
-  
-  if output =~ /^-/m
-    puts "Missing submodules:\n#{output}"
-    stdout_sh "git submodule init"
-    stdout_sh "git submodule update"
-    puts
-  end
-end
-
-desc 'Bundle dependencies'
-task :bundle => :submodules do
-  opts = %w{prd acp qa tst}.include?(ENV['WCIS_ENV']) ? ' --without=development' : ''
-  output = `bundle check 2>&1`
-  
-  unless $?.to_i == 0
-    puts output
-    stdout_sh "bundle install#{opts} 2>&1"
-    puts
-  end
-end
-
-#
 # Test tasks
 #
 
@@ -101,7 +65,7 @@ desc 'Default: Run tests.'
 task :default => :test
 
 desc 'Run the tests'
-task :test => :bundle do
+task :test do
   tests = Dir.glob('test/**/*_test.rb')
   
   if ENV['RCOV'] == 'true'
