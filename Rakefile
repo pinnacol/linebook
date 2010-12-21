@@ -70,9 +70,9 @@ task :test do
   
   if ENV['RCOV'] == 'true'
     FileUtils.rm_rf File.expand_path('../coverage', __FILE__)
-    sh('rcov', '-w', '--text-report', '--exclude', '^/', *tests)
+    sh('rcov', '-w', '-Ilib', '--text-report', '--exclude', '^/', *tests)
   else
-    sh('ruby', '-w', '-e', 'ARGV.dup.each {|test| load test}', *tests)
+    sh('ruby', '-w', '-Ilib', '-e', 'ARGV.dup.each {|test| load test}', *tests)
   end
 end
 
