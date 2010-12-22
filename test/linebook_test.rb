@@ -192,40 +192,34 @@ class LinebookTest < Test::Unit::TestCase
   end
   
   #
-  # __normalize_patterns test
+  # __parse_patterns test
   #
 
-  def test__normalize_patterns_returns_array_patterns
+  def test__parse_patterns_returns_array_patterns
     assert_equal [
       ['base', 'pattern']
-    ], __normalize_patterns([
+    ], __parse_patterns([
       ['base', 'pattern']
     ])
   end
   
-  def test__normalize_patterns_arrayifies_hash_patterns
+  def test__parse_patterns_arrayifies_hash_patterns
     assert_equal [
       ['base', 'pattern'],
       ['BASE', 'PATTERN']
-    ].sort, __normalize_patterns({
+    ].sort, __parse_patterns({
       'base' => ['pattern'],
       'BASE' => ['PATTERN']
     }).sort
   end
   
-  def test__normalize_patterns_splits_string_values_in_hash_patterns
+  def test__parse_patterns_splits_string_values_in_hash_patterns
     assert_equal [
       ['base', 'pattern'],
       ['base', 'PATTERN']
-    ], __normalize_patterns({
+    ], __parse_patterns({
       'base' => 'pattern:PATTERN'
     })
-  end
-  
-  def test__normalize_raises_error_for_non_hash_or_array_patterns
-    obj = Object.new
-    err = assert_raises(RuntimeError) { __normalize_patterns(obj) }
-    assert_equal "invalid patterns: #{obj.inspect}", err.message
   end
   
   #
@@ -252,11 +246,5 @@ class LinebookTest < Test::Unit::TestCase
       [['base', 'pattern']],
       ['dir', ['DIR', 'BASE', 'PATTERN']]
     )
-  end
-  
-  def test__combine_raises_error_for_non_string_or_array_path
-    obj = Object.new
-    err = assert_raises(RuntimeError) { __combine([], [obj]) }
-    assert_equal "invalid path: #{obj.inspect}", err.message
   end
 end

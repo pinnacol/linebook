@@ -20,74 +20,51 @@ module Linebook
   end
   
   def __paths(config)
-    paths    = __normalize_paths(config['paths'] || [])
-    patterns = __normalize_patterns(config['patterns'] || [])
-    patterns = patterns.collect {|pattern| __normalize_pattern(pattern) }
+    paths    = __parse_paths(config['paths'] || [])
+    patterns = __parse_patterns(config['patterns'] || [])
     
     __combine(patterns, paths)
   end
   
-  def __normalize_paths(paths)
-    case paths
-    when Array  then paths
-    when String then __split(paths)
-    else raise "invalid paths: #{paths.inspect}"
-    end
+  def __parse_paths(paths)
+    paths.kind_of?(String) ? __split(paths) : paths
   end
   
-  def __normalize_patterns(patterns)
+  def __parse_patterns(patterns)
     case patterns
-    when Array  then patterns
     when String then __split(patterns)
     when Hash   then __flatten(patterns)
-    else raise "invalid patterns: #{patterns.inspect}"
-    end
-  end
-  
-  def __normalize_pattern(pattern)
-    case pattern
-    when Array  then pattern
-    when String then __divide(pattern)
-    else raise "invalid pattern: #{pattern.inspect}"
-    end
+    else patterns
+    end.collect {|pattern| __divide(pattern) }
   end
   
   def __split(str)
-    str.split(':')
+    str.kind_of?(String) ? str.split(':') : str
   end
   
-  def __divide(str)
-    str.split('/', 2)
+  def __divide(pattern)
+    pattern.kind_of?(String) ? pattern.split('/', 2) : pattern
   end
   
   def __flatten(hash)
-    results = []
-    hash.each_pair do |base, patterns|
-      if patterns.kind_of?(String)
-        patterns = __split(patterns)
-      end
-      
-      patterns.each do |pattern|
-        results << [base, pattern]
+    patterns = []
+    hash.each_pair do |base, value|
+      __split(value).each do |pattern|
+        patterns << [base, pattern]
       end
     end
-    results
+    patterns
   end
   
   def __combine(patterns, paths)
     combinations = []
     paths.each do |path|
-      case path
-      when Array
-        combinations << path
-        
-      when String
+      if path.kind_of?(String)
         patterns.each do |(base, pattern)|
           combinations << [path, base, pattern]
         end
-        
       else
-        raise "invalid path: #{path.inspect}"
+        combinations << path
       end
     end
     combinations
