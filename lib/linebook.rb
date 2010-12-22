@@ -1,6 +1,4 @@
 module Linebook
-  module_function
-  
   def __manifest(config)
     manifest  = {}
     overrides = config['manifest'] || {}
@@ -72,5 +70,6 @@ module Linebook
 end
 
 def Linebook(config)
-  Linebook.__manifest(config)
+  obj = Object.new.extend(Linebook)
+  obj.__manifest(config)
 end
