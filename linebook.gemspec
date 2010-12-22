@@ -9,11 +9,11 @@ Gem::Specification.new do |s|
   s.author   = 'Simon Chiang'
   s.email    = 'simon.a.chiang@gmail.com'
   s.homepage = 'http://rubygems.org/gems/linebook'
-  s.summary  = 'Quick and easy manifests.'
+  s.summary  = 'Cookbooks for Linecook'
   s.description = %q{
-Linebook aggregates files spread across multiple directories and generates a 
-manifest for lookup using relative paths. Manifests simplify the use of
-resources distributed as gems, or developed in multiple directories.
+Linebook is the namespace for distributing files uses by Linecook. Linebook
+aggregates files from multiple directories and generates a manifest for lookup
+using relative paths.
 }.strip
 
   s.rubyforge_project = ''
