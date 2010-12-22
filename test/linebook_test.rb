@@ -69,14 +69,43 @@ class LinebookTest < Test::Unit::TestCase
     )
   end
   
-  def test_line_book_allows_mixed_path_and_pattern_inputs
+  #
+  # README tests
+  #
+  
+  def test_line_book_string_form
     assert_equal NEST_MANIFEST, Linebook(
-      'patterns' => ['base/*.txt', ['base', '*/*.txt']],
-      'paths'    => [DIR_ONE, [DIR_TWO, 'base', '**/*.txt']]
+      'patterns' => 'base/*.txt:base/*/*.txt',
+      'paths'    => "#{DIR_ONE}:#{DIR_TWO}"
     )
   end
   
-  def test_line_book_allows_hash_patterns
+  def test_line_book_split_form
+    assert_equal NEST_MANIFEST, Linebook(
+      'patterns' => ['base/*.txt', 'base/*/*.txt'],
+      'paths'    => [DIR_ONE, DIR_TWO]
+    )
+  end
+  
+  def test_line_book_paths_form
+    assert_equal NEST_MANIFEST, Linebook(
+      'paths' => [
+        [DIR_ONE, 'base', '*.txt'],
+        [DIR_ONE, 'base', '*/*.txt'],
+        [DIR_TWO, 'base', '*.txt'],
+        [DIR_TWO, 'base', '*/*.txt']
+      ]
+    )
+  end
+  
+  def test_line_book_hash_patterns
+    assert_equal MANIFEST, Linebook(
+      'patterns' => { 'base' => '*.txt' },
+      'paths'    => [DIR_ONE, DIR_TWO]
+    )
+  end
+  
+  def test_line_book_multiple_hash_patterns
     assert_equal MANIFEST_ONE, Linebook(
       'patterns' => { 'base' => '*.txt:*/*.txt' },
       'paths'    => DIR_ONE
@@ -85,6 +114,13 @@ class LinebookTest < Test::Unit::TestCase
     assert_equal MANIFEST_ONE, Linebook(
       'patterns' => { 'base' => ['*.txt', '*/*.txt'] },
       'paths'    => DIR_ONE
+    )
+  end
+  
+  def test_line_book_allows_mixed_path_and_pattern_inputs
+    assert_equal NEST_MANIFEST, Linebook(
+      'patterns' => ['base/*.txt', ['base', '*/*.txt']],
+      'paths'    => [DIR_ONE, [DIR_TWO, 'base', '**/*.txt']]
     )
   end
   
