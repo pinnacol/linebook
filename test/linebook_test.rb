@@ -124,6 +124,17 @@ class LinebookTest < Test::Unit::TestCase
     )
   end
   
+  def test_line_book_overrides_results_with_manifest
+    assert_equal MANIFEST_ONE, Linebook(
+      'patterns' => { 'base' => '*/*.txt' },
+      'paths'    => DIR_ONE,
+      'manifest' => {
+        'a.txt' => File.join(DIR_ONE, 'base/a.txt'),
+        'b.txt' => File.join(DIR_ONE, 'base/b.txt'),
+      }
+    )
+  end
+  
   #
   # __manifest test
   #

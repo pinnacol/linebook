@@ -2,7 +2,8 @@ module Linebook
   module_function
   
   def __manifest(config)
-    manifest = {}
+    manifest  = {}
+    overrides = config['manifest'] || {}
     
     __paths(config).each do |(dir, base, pattern)|
       base_path = File.expand_path(File.join(dir, base))
@@ -14,6 +15,7 @@ module Linebook
       end
     end
     
+    manifest.merge!(overrides)
     manifest
   end
   
