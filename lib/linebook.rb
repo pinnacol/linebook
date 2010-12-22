@@ -19,13 +19,28 @@ module Linebook
   
   def __paths(config)
     paths    = __parse_paths(config['paths'] || [])
+    gems     = __parse_gems(config['gems'] || [])
     patterns = __parse_patterns(config['patterns'] || [])
     
-    __combine(patterns, paths)
+    __combine(patterns, gems + paths)
   end
   
   def __parse_paths(paths)
     paths.kind_of?(String) ? __split(paths) : paths
+  end
+  
+  def __parse_gems(gems)
+    gems = gems.kind_of?(String) ? __split(gems) : gems
+    
+    unless gems.empty?
+      specs = __latest_specs
+      gems  = gems.collect do |name| 
+        spec = specs[name] or raise "no such gem: #{name.inspect}"
+        spec.full_gem_path
+      end
+    end
+    
+    gems
   end
   
   def __parse_patterns(patterns)
@@ -66,6 +81,14 @@ module Linebook
       end
     end
     combinations
+  end
+  
+  def __latest_specs
+    latest = {}
+    Gem.source_index.latest_specs.each do |spec|
+      latest[spec.name] = spec
+    end
+    latest
   end
 end
 

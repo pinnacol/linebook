@@ -36,6 +36,19 @@ class LinebookTest < Test::Unit::TestCase
   }
   
   #
+  # Gem mocks
+  #
+  
+  MockSpec = Struct.new(:full_gem_path)
+  
+  def __latest_specs
+    {
+      'one' => MockSpec.new(DIR_ONE),
+      'two' => MockSpec.new(DIR_TWO)
+    }
+  end
+  
+  #
   # Linebook test
   #
   
@@ -155,6 +168,13 @@ class LinebookTest < Test::Unit::TestCase
     )
   end
   
+  def test__manifest_resolves_gems
+    assert_equal MANIFEST, __manifest(
+      'patterns' => 'base/*.txt',
+      'gems'     => 'one:two'
+    )
+  end
+  
   #
   # __paths test
   #
@@ -220,6 +240,15 @@ class LinebookTest < Test::Unit::TestCase
     ], __parse_patterns({
       'base' => 'pattern:PATTERN'
     })
+  end
+  
+  #
+  # __parse_gems test
+  #
+  
+  def test__parse_gems_raises_error_for_unknown_gem
+    err = assert_raises(RuntimeError) { __parse_gems('three') }
+    assert_equal 'no such gem: "three"', err.message
   end
   
   #
