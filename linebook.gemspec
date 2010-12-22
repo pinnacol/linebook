@@ -11,9 +11,9 @@ Gem::Specification.new do |s|
   s.homepage = 'http://rubygems.org/gems/linebook'
   s.summary  = 'Cookbooks for Linecook'
   s.description = %q{
-Linebook is the namespace for distributing files uses by Linecook. Linebook
-aggregates files from multiple directories and generates a manifest for lookup
-using relative paths.
+Linebook is a distribution module used by Linecook. Linebook aggregates files
+from multiple directories and generates a manifest for lookup using relative
+paths.
 }.strip
 
   s.rubyforge_project = ''
@@ -30,5 +30,7 @@ using relative paths.
   
   # list the files you want to include here.
   s.files = %W{
+    lib/linebook.rb
+    lib/linebook/version.rb
   }
 end
