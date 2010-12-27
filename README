@@ -5,27 +5,12 @@ Cookbooks for {Linecook}[http://gemcutter.org/gems/linecook].
 == Description
 
 Linebook is a distribution module used by
-{Linecook}[http://gemcutter.org/gems/linecook]. Linebook aggregates files from
-multiple directories and generates a manifest for lookup using relative paths.
+{Linecook}[http://gemcutter.org/gems/linecook]. Linebook has no content and
+exists solely to claim the namespace.
 
 == Usage
 
-Given these files:
-
-  /pwd/lib/one.rb
-  /gem/a/lib/two.rb
-  /gem/b/lib/three.rb
-
-Linebook generates a manifest by specifying the paths and patterns to glob:
-
-  Linebook('patterns' => 'lib/*/**.rb', 'paths' => '/pwd', 'gems' => 'a:b')
-  # => {
-  #   'one.rb'   => '/pwd/lib/one.rb', 
-  #   'two.rb'   => '/gem/a/lib/two.rb',
-  #   'three.rb' => '/gem/b/lib/three.rb'
-  # }
-
-See Linebook for config details.
+None!
 
 == Installation
 
