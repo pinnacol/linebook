@@ -1,3 +1,7 @@
+== 0.2.0 2010/12/27
+
+Cleared everything out to make Linebook purely a distribution module.
+
 == 0.1.0 2010/12/22
 
 Initial release.

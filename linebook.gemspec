@@ -10,11 +10,7 @@ Gem::Specification.new do |s|
   s.email    = 'simon.a.chiang@gmail.com'
   s.homepage = 'http://rubygems.org/gems/linebook'
   s.summary  = 'Cookbooks for Linecook'
-  s.description = %q{
-Linebook is a distribution module used by Linecook. Linebook aggregates files
-from multiple directories and generates a manifest for lookup using relative
-paths.
-}.strip
+  s.description = 'Linebook is a distribution module used by Linecook.'
 
   s.rubyforge_project = ''
   s.require_path = 'lib'
