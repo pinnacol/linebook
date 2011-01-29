@@ -191,9 +191,11 @@ module Linebook
         #  <% indent { yield } %>
         #  set $LINECOOK_OPTIONS > /dev/null<% end %>
         #  
+        #  
         _erbout.concat "set +x +v";  if block_given? ; _erbout.concat "\n"
         indent { yield } 
         _erbout.concat "set $LINECOOK_OPTIONS > /dev/null";  end ; _erbout.concat "\n"
+        _erbout.concat "\n"
         nil
       end
       
@@ -235,8 +237,10 @@ module Linebook
         #  <% n = (76 - comment.length)/2 %>
         #  <%= "#" * n %><%= comment %><%= "#" * n %>
         #  
+        #  
         n = (76 - comment.length)/2 
         _erbout.concat(( "#" * n ).to_s); _erbout.concat(( comment ).to_s); _erbout.concat(( "#" * n ).to_s)
+        _erbout.concat "\n"
         nil
       end
       
@@ -250,7 +254,7 @@ module Linebook
       def shebang()
         @target_format = '$LINECOOK_DIR/%s'
         #  #! <%= shell_path %>
-        #  <%= section %>
+        #  <% section %>
         #  <%= check_status_function %>
         #  
         #  export -f check_status
@@ -273,10 +277,11 @@ module Linebook
         #  done
         #  
         #  set $LINECOOK_OPTIONS > /dev/null
-        #  <%= section " #{target_name} " %>
+        #  <% section " #{target_name} " %>
+        #  
         #  
         _erbout.concat "#! "; _erbout.concat(( shell_path ).to_s); _erbout.concat "\n"
-        _erbout.concat(( section ).to_s)
+        section 
         _erbout.concat(( check_status_function ).to_s)
         _erbout.concat "\n"
         _erbout.concat "export -f check_status\n"
@@ -299,7 +304,8 @@ module Linebook
         _erbout.concat "done\n"
         _erbout.concat "\n"
         _erbout.concat "set $LINECOOK_OPTIONS > /dev/null\n"
-        _erbout.concat(( section " #{target_name} " ).to_s)
+        section " #{target_name} " 
+        _erbout.concat "\n"
         nil
       end
       
@@ -312,9 +318,11 @@ module Linebook
         #  <% indent { yield } %>
         #  set $LINECOOK_OPTIONS > /dev/null<% end %>
         #  
+        #  
         _erbout.concat "set -v";  if block_given? ; _erbout.concat "\n"
         indent { yield } 
         _erbout.concat "set $LINECOOK_OPTIONS > /dev/null";  end ; _erbout.concat "\n"
+        _erbout.concat "\n"
         nil
       end
       
@@ -327,9 +335,11 @@ module Linebook
         #  <% indent { yield } %>
         #  set $LINECOOK_OPTIONS > /dev/null<% end %>
         #  
+        #  
         _erbout.concat "set -x";  if block_given? ; _erbout.concat "\n"
         indent { yield } 
         _erbout.concat "set $LINECOOK_OPTIONS > /dev/null";  end ; _erbout.concat "\n"
+        _erbout.concat "\n"
         nil
       end
       

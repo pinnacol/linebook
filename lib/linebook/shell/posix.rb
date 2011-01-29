@@ -88,12 +88,15 @@ module Linebook
         #  <% indent { yield } %>
         #  <% unset(*env.collect {|(k,v)| k }) %>
         #  <% end %>
+        #  
+        #  
         env.to_a.each do |(key, value)| 
         _erbout.concat "export "; _erbout.concat(( key ).to_s); _erbout.concat "="; _erbout.concat(( value ).to_s); _erbout.concat "\n"
         end ;  if block_given? 
         indent { yield } 
         unset(*env.collect {|(k,v)| k }) 
-        end ;
+        end 
+        _erbout.concat "\n"
         nil
       end
       
@@ -143,10 +146,12 @@ module Linebook
         #  <% indent { yield } %>
         #  fi
         #  
+        #  
         _erbout.concat "if "; _erbout.concat(( cmd ).to_s); _erbout.concat "\n"
         _erbout.concat "then\n"
         indent { yield } 
         _erbout.concat "fi\n"
+        _erbout.concat "\n"
         nil
       end
       

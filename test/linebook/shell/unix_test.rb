@@ -97,6 +97,7 @@ class UnixTest < Test::Unit::TestCase
   def test_quiet_turns_off_verbose_and_xtrace
     assert_recipe %q{
       set +x +v
+      
     } do
       quiet
     end
@@ -107,6 +108,7 @@ class UnixTest < Test::Unit::TestCase
       set +x +v
         echo a
       set $LINECOOK_OPTIONS > /dev/null
+      
     } do
       quiet do
         target.puts 'echo a'
@@ -121,6 +123,7 @@ class UnixTest < Test::Unit::TestCase
   def test_verbose_turns_on_verbose
     assert_recipe %q{
       set -v
+      
     } do
       verbose
     end
@@ -131,6 +134,7 @@ class UnixTest < Test::Unit::TestCase
       set -v
         echo a
       set $LINECOOK_OPTIONS > /dev/null
+      
     } do
       verbose do
         target.puts 'echo a'
@@ -145,6 +149,7 @@ class UnixTest < Test::Unit::TestCase
   def test_xtrace_turns_on_xtrace
     assert_recipe %q{
       set -x
+      
     } do
       xtrace
     end
@@ -155,6 +160,7 @@ class UnixTest < Test::Unit::TestCase
       set -x
         echo a
       set $LINECOOK_OPTIONS > /dev/null
+      
     } do
       xtrace do
         target.puts 'echo a'

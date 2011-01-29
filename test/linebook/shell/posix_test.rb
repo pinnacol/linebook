@@ -97,6 +97,7 @@ class PosixTest < Test::Unit::TestCase
     assert_recipe %q{
       export ONE=A
       export TWO=B
+      
     } do
       export [
         ['ONE', 'A'],
@@ -112,6 +113,7 @@ class PosixTest < Test::Unit::TestCase
         # content
       unset ONE
       unset TWO
+      
     } do
       export [
         ['ONE', 'A'],
@@ -193,6 +195,7 @@ class PosixTest < Test::Unit::TestCase
       if ! condition
       then
       fi
+      
     } do
       not_if('condition') {}
     end
@@ -208,6 +211,7 @@ class PosixTest < Test::Unit::TestCase
       then
         content
       fi
+      
     } do
       only_if('condition') { target << 'content' }
     end
