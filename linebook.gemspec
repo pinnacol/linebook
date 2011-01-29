@@ -29,7 +29,14 @@ Gem::Specification.new do |s|
   
   # list the files you want to include here.
   s.files = %W{
+    attributes/linebook/shell.rb
+    cookbook
     lib/linebook.rb
+    lib/linebook/os/ubuntu.rb
+    lib/linebook/shell.rb
+    lib/linebook/shell/bash.rb
+    lib/linebook/shell/posix.rb
+    lib/linebook/shell/unix.rb
     lib/linebook/version.rb
   }
 end

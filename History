@@ -1,3 +1,7 @@
+== 0.3.0 2011/01/28
+
+Added back everything to make Linebook a base distribution module.
+
 == 0.2.0 2010/12/27
 
 Cleared everything out to make Linebook purely a distribution module.
