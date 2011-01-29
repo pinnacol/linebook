@@ -1,0 +1,9 @@
+Execute a command and check the output status.
+(cmd, *args)
+  args.compact!
+  args = args.collect! {|arg| arg[0] == ?- ? arg : quote(arg) }
+  args.unshift(cmd)
+--
+<%= args.join(' ') %>
+
+<% check_status %>

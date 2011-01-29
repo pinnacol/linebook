@@ -1,0 +1,6 @@
+Sets the options to on (true) or off (false) as specified.
+(options)
+--
+<% options.keys.sort_by {|opt| opt.to_s }.each do |opt| %>
+set <%= options[opt] ? '-' : '+' %>o <%= opt %>
+<% end %>

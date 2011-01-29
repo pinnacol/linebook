@@ -1,0 +1,6 @@
+(user, group, target)
+--
+<% if user || group %>
+chown <%= user %>:<%= group %> <%= quote target %>
+<% check_status %>
+<% end %>

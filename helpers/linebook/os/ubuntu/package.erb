@@ -1,0 +1,4 @@
+(name, version=nil)
+--
+apt-get -q install <%= name %><%= blank?(version) ? nil : "=#{version}" %>
+<%= check_status %>

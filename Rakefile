@@ -3,11 +3,14 @@ require 'rake/rdoctask'
 require 'rake/gempackagetask'
 
 #
-# Gem specification
+# Gem tasks
 #
 
 def gemspec
-  @gemspec ||= eval(File.read('linebook.gemspec'), TOPLEVEL_BINDING)
+  @gemspec ||= begin
+    gemspec_path = File.expand_path('../linebook.gemspec', __FILE__)
+    eval(File.read(gemspec_path), TOPLEVEL_BINDING)
+  end
 end
 
 Rake::GemPackageTask.new(gemspec) do |pkg|
@@ -16,21 +19,16 @@ end
 
 desc 'Prints the gemspec manifest.'
 task :print_manifest do
-  # collect files from the gemspec, labeling 
-  # with true or false corresponding to the
-  # file existing or not
   files = gemspec.files.inject({}) do |files, file|
     files[File.expand_path(file)] = [File.exists?(file), file]
     files
   end
   
-  # gather non-rdoc/pkg files for the project
-  # and add to the files list if they are not
-  # included already (marking by the absence
-  # of a label)
-  Dir.glob('**/*').each do |file|
-    next if file =~ /^(rdoc|pkg|coverage|test)/ || File.directory?(file)
-    
+  cookbook_files = Dir.glob('{attributes,files,lib,recipes,templates}/**/*')
+  cookbook_file  = Dir.glob('*')
+  
+  (cookbook_files + cookbook_file).each do |file|
+    next unless File.file?(file)
     path = File.expand_path(file)
     files[path] = ['', file] unless files.has_key?(path)
   end
@@ -51,10 +49,101 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   
   rdoc.rdoc_dir = 'rdoc'
   rdoc.options.concat(spec.rdoc_options)
-  rdoc.rdoc_files.include( spec.extra_rdoc_files )
+  rdoc.rdoc_files.include(spec.extra_rdoc_files)
   
   files = spec.files.select {|file| file =~ /^lib.*\.rb$/}
   rdoc.rdoc_files.include( files )
+end
+
+#
+# Dependency tasks
+#
+
+desc 'Bundle dependencies'
+task :bundle do
+  output = `bundle check 2>&1`
+  
+  unless $?.to_i == 0
+    puts output
+    sh "bundle install 2>&1"
+    puts
+  end
+end
+
+#
+# Linecook Helpers
+#
+
+force       = ENV['FORCE'] == 'true'
+lib_dir     = File.expand_path("../lib", __FILE__)
+helpers_dir = File.expand_path("../helpers", __FILE__)
+
+sources = {}
+helpers = []
+
+Dir.glob("#{helpers_dir}/*/**/*").each do |source|
+  next if File.directory?(source)
+  (sources[File.dirname(source)] ||= []) << source
+end
+
+sources.each_pair do |dir, sources|
+  name = dir[(helpers_dir.length + 1)..-1]
+  target = File.join(lib_dir, "#{name}.rb")
+  
+  if force && File.exists?(target)
+    FileUtils.rm(target)
+  end
+  
+  file target => sources + [dir] do
+    sh "bundle exec linecook helper '#{name}' --force"
+  end
+  
+  helpers << target
+end
+
+desc "generate helpers"
+task :helpers => [:bundle] + helpers
+
+#
+# Linecook Packages
+#
+
+packages_dir = File.expand_path("../packages", __FILE__)
+packages     = Dir.glob("#{packages_dir}/*.yml")
+dependencies = Dir.glob('{attributes,files,recipes,templates}/**/*')
+
+packages.each do |source|
+  target = source.chomp('.yml')
+  name   = File.basename(target)
+  
+  namespace :packages do
+    file target => dependencies + [source] + helpers do
+      sh "bundle exec linecook package '#{source}' '#{target}' --force"
+    end
+    
+    desc "generate the package: #{name}"
+    task name => [:bundle, target]
+  end
+  
+  task :packages => "packages:#{name}"
+end
+
+desc "generate packages"
+task :packages
+
+#
+# VM Tasks
+#
+
+namespace :vm do
+  task :setup => :bundle do
+    sh 'bundle exec linecook reset'
+    sh 'bundle exec linecook share vbox'
+  end
+  
+  task :teardown => :bundle do
+    sh 'bundle exec linecook stop'
+  end
 end
 
 #
@@ -64,20 +153,27 @@ end
 desc 'Default: Run tests.'
 task :default => :test
 
-desc 'Run the tests'
-task :test do
+desc 'Run the tests assuming the vm is running'
+task :quicktest => [:helpers] do
   tests = Dir.glob('test/**/*_test.rb')
   
   if ENV['RCOV'] == 'true'
     FileUtils.rm_rf File.expand_path('../coverage', __FILE__)
-    sh('rcov', '-w', '-Ilib', '--text-report', '--exclude', '^/', *tests)
+    sh('rcov', '-w', '--text-report', '--exclude', '^/', *tests)
   else
-    sh('ruby', '-w', '-Ilib', '-e', 'ARGV.dup.each {|test| load test}', *tests)
+    sh('ruby', '-w', '-e', 'ARGV.dup.each {|test| load test}', *tests)
   end
 end
 
-desc 'Run the cc tests'
-task :cc => :test
+desc 'Run the tests'
+task :test do
+  begin
+    Rake::Task["vm:setup"].invoke
+    Rake::Task["quicktest"].invoke
+  ensure
+    Rake::Task["vm:teardown"].execute(nil)
+  end
+end
 
 desc 'Run rcov'
 task :rcov do

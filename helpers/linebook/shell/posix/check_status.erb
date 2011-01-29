@@ -1,0 +1,11 @@
+Adds a check that ensures the last exit status is as indicated. Note that no
+check will be added unless check_status_function is added beforehand.
+
+(status=0)
+  @check_status ||= false
+
+--
+<% if @check_status %>
+check_status <%= status %> $? $LINENO
+
+<% end %>
