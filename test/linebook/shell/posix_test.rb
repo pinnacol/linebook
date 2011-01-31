@@ -46,7 +46,7 @@ class PosixTest < Test::Unit::TestCase
     
     assert_script %{
       % sh package/recipe
-      [0] package/recipe:10
+      [0] package/recipe:13
     } 
     
     build do
@@ -57,7 +57,7 @@ class PosixTest < Test::Unit::TestCase
     
     assert_script %{
       % sh package/recipe # [1]
-      [1] package/recipe:10
+      [1] package/recipe:13
     } 
   end
   

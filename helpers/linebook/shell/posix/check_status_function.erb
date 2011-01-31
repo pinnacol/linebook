@@ -2,11 +2,14 @@ Adds the check status function.
 ()
   @check_status = true
 --
-check_status () { 
-  if [ $1 -ne $2 ]
+check_status () {
+  expected=$1; actual=$2; lineno=$3
+
+  if [ $actual -ne $expected ]
   then
-    echo "[$2] $0:$3"
-    exit $2
+    echo "[$actual] $0:$lineno"
+    exit $actual
   fi
-  return $1
+
+  return $actual
 }
