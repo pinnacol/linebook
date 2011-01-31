@@ -1,3 +1,9 @@
+== 0.3.1 2011/01/31
+
+* cleaned up formatting of check_status_function
+* made Shell.extend include os/shell helpers
+* bug in target_path
+
 == 0.3.0 2011/01/28
 
 Added back everything to make Linebook a base distribution module.
