@@ -17,6 +17,30 @@ class ShellTest < Test::Unit::TestCase
   end
   
   #
+  # extended test
+  #
+  
+  def test_extending_with_shell_add_os_helper_if_specifed_in_attrs
+    recipe = setup_package('linebook' => {'os' => nil}).recipe
+    recipe.extend Linebook::Shell
+    assert_equal false, setup_recipe.kind_of?(Linebook::Os::Ubuntu)
+    
+    recipe = setup_package('linebook' => {'os' => 'linebook/os/ubuntu'}).recipe
+    recipe.extend Linebook::Shell
+    assert_equal true, setup_recipe.kind_of?(Linebook::Os::Ubuntu)
+  end
+  
+  def test_extending_with_shell_add_shell_helper_if_specifed_in_attrs
+    recipe = setup_package('linebook' => {'shell' => nil}).recipe
+    recipe.extend Linebook::Shell
+    assert_equal false, setup_recipe.kind_of?(Linebook::Shell::Bash)
+    
+    recipe = setup_package('linebook' => {'shell' => 'linebook/shell/bash'}).recipe
+    recipe.extend Linebook::Shell
+    assert_equal true, setup_recipe.kind_of?(Linebook::Shell::Bash)
+  end
+  
+  #
   # backup test
   #
   

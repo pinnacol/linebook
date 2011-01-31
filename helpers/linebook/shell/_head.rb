@@ -1,15 +1,15 @@
 require 'linebook/shell/unix'
 include Unix
 
-def shebang
-  attributes 'linebook/shell'
+def self.extended(base)
+  base.attributes 'linebook/shell'
   
-  if shell = attrs['linebook']['shell']
-    helpers shell
+  if shell = base.attrs['linebook']['shell']
+    base.helpers shell
   end
   
-  if os = attrs['linebook']['os']
-    helpers os
+  if os = base.attrs['linebook']['os']
+    base.helpers os
   end
   
   super
