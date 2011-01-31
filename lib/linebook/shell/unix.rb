@@ -16,7 +16,7 @@ module Linebook
       end
       
       def target_format
-        "%s"
+        @target_format ||= "%s"
       end
       
       def target_path(source_path)
