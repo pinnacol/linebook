@@ -15,7 +15,7 @@ class PosixTest < Test::Unit::TestCase
   def test_check_status_only_prints_if_check_status_function_is_present
     assert_recipe('') { check_status } 
     
-    assert_recipe_match /check_status 0 \$\? \$LINENO/ do
+    assert_recipe_match(/check_status 0 \$\? \$LINENO/) do
       check_status_function
       check_status
     end
