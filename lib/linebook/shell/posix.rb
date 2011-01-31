@@ -40,9 +40,23 @@ module Linebook
       # Adds the check status function.
       def check_status_function()
         @check_status = true
-        #  check_status () { if [ $1 -ne $2 ]; then echo "[$2] $0:$3"; exit $2; else return $1; fi }
+        #  check_status () { 
+        #    if [ $1 -ne $2 ]
+        #    then
+        #      echo "[$2] $0:$3"
+        #      exit $2
+        #    fi
+        #    return $1
+        #  }
         #  
-        _erbout.concat "check_status () { if [ $1 -ne $2 ]; then echo \"[$2] $0:$3\"; exit $2; else return $1; fi }\n"
+        _erbout.concat "check_status () { \n"
+        _erbout.concat "  if [ $1 -ne $2 ]\n"
+        _erbout.concat "  then\n"
+        _erbout.concat "    echo \"[$2] $0:$3\"\n"
+        _erbout.concat "    exit $2\n"
+        _erbout.concat "  fi\n"
+        _erbout.concat "  return $1\n"
+        _erbout.concat "}\n"
         nil
       end
       
