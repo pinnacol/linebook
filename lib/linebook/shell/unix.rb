@@ -100,6 +100,15 @@ module Linebook
         capture { cp_r(*args, &block) }
       end
       
+      def cp_rf(source, target)
+        cmd 'cp', '-r', '-f', source, target
+        nil
+      end
+      
+      def _cp_rf(*args, &block) # :nodoc:
+        capture { cp_rf(*args, &block) }
+      end
+      
       def directory?(path)
         #  [ -d "<%= path %>" ]
         _erbout.concat "[ -d \""; _erbout.concat(( path ).to_s); _erbout.concat "\" ]";

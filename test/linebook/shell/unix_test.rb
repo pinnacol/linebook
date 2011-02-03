@@ -62,11 +62,27 @@ class UnixTest < Test::Unit::TestCase
     end
   end
   
+  def test_cp_f
+    assert_recipe %q{
+      cp -f "source" "target"
+    } do
+      cp_f 'source', 'target'
+    end
+  end
+  
   def test_cp_r
     assert_recipe %q{
       cp -r "source" "target"
     } do
       cp_r 'source', 'target'
+    end
+  end
+  
+  def test_cp_rf
+    assert_recipe %q{
+      cp -r -f "source" "target"
+    } do
+      cp_rf 'source', 'target'
     end
   end
   
