@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.rdoc_options.concat %W{--main README -S -N --title Linebook}
   
   # add dependencies
-  s.add_dependency('linecook', '~> 0.11.0')
+  s.add_dependency('linecook', '~> 0.12.0')
   
   # list extra rdoc files here.
   s.extra_rdoc_files = %W{

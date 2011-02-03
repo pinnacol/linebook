@@ -22,7 +22,7 @@ class PosixTest < Test::Unit::TestCase
   end
   
   def test_check_status_silently_passes_if_error_status_is_as_expected
-    build do
+    build_package do
       check_status_function
       
       target.puts 'true'
@@ -32,30 +32,30 @@ class PosixTest < Test::Unit::TestCase
       check_status 1
     end
     
-    assert_script %Q{
+    check_package %Q{
       % sh package/recipe # [1]
     }
   end
   
   def test_check_status_exits_with_error_status_if_status_is_not_as_expected
-    build do
+    build_package do
       check_status_function
       target.puts 'true'
       check_status 1
     end
     
-    assert_script %{
+    check_package %{
       % sh package/recipe
       [0] package/recipe:13
     } 
     
-    build do
+    build_package do
       check_status_function
       target.puts 'false'
       check_status
     end
     
-    assert_script %{
+    check_package %{
       % sh package/recipe # [1]
       [1] package/recipe:13
     } 
@@ -169,14 +169,14 @@ class PosixTest < Test::Unit::TestCase
   end
   
   def test_heredoc_works_as_a_heredoc
-    build do
+    build_package do
       target << 'cat '
       heredoc {
         target.puts 'content'
       }
     end
     
-    assert_script %Q{
+    check_package %Q{
       % sh package/recipe
       content
     }
@@ -227,7 +227,7 @@ class PosixTest < Test::Unit::TestCase
   end
   
   def test_set_options_functions_to_set_options
-    build do
+    build_package do
       target.puts 'echo a'
       set_options(:verbose => true)
       target.puts 'echo b'
@@ -235,7 +235,7 @@ class PosixTest < Test::Unit::TestCase
       target.puts 'echo c'
     end
     
-    assert_script %Q{
+    check_package %Q{
       % sh package/recipe 2>&1
       a
       echo b
