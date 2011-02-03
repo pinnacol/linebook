@@ -87,6 +87,18 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
+  # echo test
+  #
+  
+  def test_echo
+    assert_recipe(%{
+      echo 'a b c'
+    }){
+      echo 'a', 'b c'
+    }
+  end
+  
+  #
   # ln test
   #
   

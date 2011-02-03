@@ -119,6 +119,18 @@ module Linebook
         capture { directory?(*args, &block) }
       end
       
+      # Echo the args.
+      def echo(*args)
+        #  echo '<%= args.join(' ') %>'
+        #  
+        _erbout.concat "echo '"; _erbout.concat(( args.join(' ') ).to_s); _erbout.concat "'\n"
+        nil
+      end
+      
+      def _echo(*args, &block) # :nodoc:
+        capture { echo(*args, &block) }
+      end
+      
       def exists?(path)
         #  [ -e "<%= path %>" ]
         _erbout.concat "[ -e \""; _erbout.concat(( path ).to_s); _erbout.concat "\" ]";
