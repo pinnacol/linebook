@@ -18,7 +18,7 @@ class UnixTest < Test::Unit::TestCase
     File.chmod(0644, target)
     assert_equal "100644", sprintf("%o", File.stat(target).mode)
     
-    package = build { chmod 600, target }
+    package = build_package { chmod 600, target }
     sh "sh #{package['recipe']}"
     
     assert_equal "100600", sprintf("%o", File.stat(target).mode)
@@ -176,7 +176,7 @@ class UnixTest < Test::Unit::TestCase
     target = prepare('target')
     assert_equal true, File.exists?(target)
     
-    package = build { rm target }
+    package = build_package { rm target }
     sh "sh #{package['recipe']}"
     
     assert_equal false, File.exists?(target)

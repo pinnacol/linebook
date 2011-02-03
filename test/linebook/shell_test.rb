@@ -12,10 +12,6 @@ class ShellTest < Test::Unit::TestCase
     super.extend Linebook::Shell
   end
   
-  def build_options
-    super.merge(:chdir => path('package'))
-  end
-  
   #
   # backup test
   #
@@ -24,8 +20,8 @@ class ShellTest < Test::Unit::TestCase
     target = prepare('target', 'content')
     File.chmod(0754, target)
     
-    build { backup target }
-    assert_script "sh recipe"
+    build_package { backup target }
+    assert_script "sh #{package['recipe']}"
     
     assert_equal '100644', sprintf("%o", File.stat("#{target}.bak").mode)
   end
@@ -33,8 +29,8 @@ class ShellTest < Test::Unit::TestCase
   def test_backup_will_copy_if_specified
     target = prepare('target', 'content')
     
-    build { backup target, :mv => false }
-    assert_script "sh recipe"
+    build_package { backup target, :mv => false }
+    assert_script "sh #{package['recipe']}"
     
     assert_equal 'content', File.read(target)
     assert_equal 'content', File.read("#{target}.bak")
@@ -48,8 +44,8 @@ class ShellTest < Test::Unit::TestCase
     target = path('target')
     assert_equal false, File.exists?(target)
     
-    build { directory target }
-    assert_script "sh recipe"
+    build_package { directory target }
+    assert_script "sh #{package['recipe']}"
     
     assert_equal true, File.directory?(target)
   end
@@ -57,8 +53,8 @@ class ShellTest < Test::Unit::TestCase
   def test_directory_makes_parent_dirs_as_needed
     target = path('target/dir')
     
-    build { directory target }
-    assert_script "sh recipe"
+    build_package { directory target }
+    assert_script "sh #{package['recipe']}"
     
     assert_equal true, File.directory?(target)
   end
@@ -66,8 +62,8 @@ class ShellTest < Test::Unit::TestCase
   def test_directory_sets_mode
     target = path('target')
     
-    build { directory target, :mode => 700 }
-    assert_script "sh recipe"
+    build_package { directory target, :mode => 700 }
+    assert_script "sh #{package['recipe']}"
     
     assert_equal '40700', sprintf("%o", File.stat(target).mode)
   end
@@ -80,7 +76,9 @@ class ShellTest < Test::Unit::TestCase
     prepare('files/file.txt', 'content')
     target = path('target/file.txt')
     
-    build { file target }
+    build_package { file target }
+    
+    Dir.chdir(path('package'))
     assert_script "sh recipe"
     
     assert_equal 'content', File.read(target)
@@ -90,7 +88,9 @@ class ShellTest < Test::Unit::TestCase
     prepare('files/source.txt', 'content')
     target = path('target.txt')
     
-    build { file target, :source => 'source.txt' }
+    build_package { file target, :source => 'source.txt' }
+    
+    Dir.chdir(path('package'))
     assert_script "sh recipe"
     
     assert_equal 'content', File.read(target)
@@ -104,7 +104,9 @@ class ShellTest < Test::Unit::TestCase
     prepare('templates/file.txt.erb', 'got <%= key %>')
     target = path('target/file.txt')
     
-    build { template target, :locals => {:key => 'value'} }
+    build_package { template target, :locals => {:key => 'value'} }
+    
+    Dir.chdir(path('package'))
     assert_script "sh recipe"
     
     assert_equal 'got value', File.read(target)
@@ -114,7 +116,9 @@ class ShellTest < Test::Unit::TestCase
     prepare('templates/source.txt.erb', 'got <%= key %>')
     target = path('target.txt')
     
-    build { template target, :source => 'source.txt', :locals => {:key => 'value'} }
+    build_package { template target, :source => 'source.txt', :locals => {:key => 'value'} }
+    
+    Dir.chdir(path('package'))
     assert_script "sh recipe"
     
     assert_equal 'got value', File.read(target)
@@ -128,8 +132,8 @@ class ShellTest < Test::Unit::TestCase
     source = prepare('source', 'content')
     target = path('target')
     
-    build { install source, target }
-    assert_script "sh recipe"
+    build_package { install source, target }
+    assert_script "sh #{package['recipe']}"
     
     assert_equal 'content', File.read(source)
     assert_equal 'content', File.read(target)
@@ -139,8 +143,8 @@ class ShellTest < Test::Unit::TestCase
     source = prepare('source', 'new')
     target = prepare('target', 'old')
     
-    build { install source, target }
-    assert_script "sh recipe"
+    build_package { install source, target }
+    assert_script "sh #{package['recipe']}"
     
     assert_equal 'new', File.read(target)
     assert_equal 'old', File.read("#{target}.bak")
@@ -150,8 +154,8 @@ class ShellTest < Test::Unit::TestCase
     source = prepare('source', 'new')
     target = prepare('target', 'old')
     
-    build { install source, target, :backup => false }
-    assert_script "sh recipe"
+    build_package { install source, target, :backup => false }
+    assert_script "sh #{package['recipe']}"
     
     assert_equal false, File.exists?("#{target}.bak")
   end
@@ -160,8 +164,8 @@ class ShellTest < Test::Unit::TestCase
     source = prepare('source', 'content')
     target = path('target/file')
     
-    build { install source, target }
-    assert_script "sh recipe"
+    build_package { install source, target }
+    assert_script "sh #{package['recipe']}"
     
     assert_equal 'content', File.read(target)
   end
@@ -170,8 +174,8 @@ class ShellTest < Test::Unit::TestCase
     source = prepare('source', 'content')
     target = path('target/file')
     
-    build { install source, target, :directory => {:mode => 700} }
-    assert_script "sh recipe"
+    build_package { install source, target, :directory => {:mode => 700} }
+    assert_script "sh #{package['recipe']}"
     
     assert_equal '40700', sprintf("%o", File.stat(path('target')).mode)
   end
@@ -180,8 +184,8 @@ class ShellTest < Test::Unit::TestCase
     source = prepare('source', 'content')
     target = path('target')
     
-    build { install source, target, :mode => 600 }
-    assert_script "sh recipe"
+    build_package { install source, target, :mode => 600 }
+    assert_script "sh #{package['recipe']}"
     
     assert_equal '100600', sprintf("%o", File.stat(target).mode)
   end
