@@ -13,8 +13,8 @@ def target_format
   @target_format ||= "%s"
 end
 
-def target_path(source_path)
-  target_format % super(source_path)
+def target_path(target_name)
+  target_format % super(target_name)
 end
 
 def close

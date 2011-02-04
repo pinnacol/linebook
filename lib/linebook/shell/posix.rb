@@ -40,29 +40,9 @@ module Linebook
       # Adds the check status function.
       def check_status_function()
         @check_status = true
-        #  check_status () {
-        #    expected=$1; actual=$2; lineno=$3
+        #  check_status () { if [ $2 -ne $1 ]; then echo "[$2] $0:$3"; exit $2; else return $2; fi }
         #  
-        #    if [ $actual -ne $expected ]
-        #    then
-        #      echo "[$actual] $0:$lineno"
-        #      exit $actual
-        #    fi
-        #  
-        #    return $actual
-        #  }
-        #  
-        _erbout.concat "check_status () {\n"
-        _erbout.concat "  expected=$1; actual=$2; lineno=$3\n"
-        _erbout.concat "\n"
-        _erbout.concat "  if [ $actual -ne $expected ]\n"
-        _erbout.concat "  then\n"
-        _erbout.concat "    echo \"[$actual] $0:$lineno\"\n"
-        _erbout.concat "    exit $actual\n"
-        _erbout.concat "  fi\n"
-        _erbout.concat "\n"
-        _erbout.concat "  return $actual\n"
-        _erbout.concat "}\n"
+        _erbout.concat "check_status () { if [ $2 -ne $1 ]; then echo \"[$2] $0:$3\"; exit $2; else return $2; fi }\n"
         nil
       end
       
