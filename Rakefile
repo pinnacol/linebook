@@ -74,74 +74,32 @@ end
 # Linecook Helpers
 #
 
-force       = ENV['FORCE'] == 'true'
-lib_dir     = File.expand_path("../lib", __FILE__)
-helpers_dir = File.expand_path("../helpers", __FILE__)
-
-sources = {}
-helpers = []
-
-Dir.glob("#{helpers_dir}/*/**/*").each do |source|
-  next if File.directory?(source)
-  (sources[File.dirname(source)] ||= []) << source
+desc "build helpers and packages"
+task :build => :bundle do
+  force = (ENV['FORCE'] == 'true')
+  sh "bundle exec linecook build #{force ? '--force' : nil}"
 end
-
-sources.each_pair do |dir, sources|
-  name = dir[(helpers_dir.length + 1)..-1]
-  target = File.join(lib_dir, "#{name}.rb")
-  
-  if force && File.exists?(target)
-    FileUtils.rm(target)
-  end
-  
-  file target => sources + [dir] do
-    sh "bundle exec linecook helper '#{name}' --force"
-  end
-  
-  helpers << target
-end
-
-desc "generate helpers"
-task :helpers => [:bundle] + helpers
-
-#
-# Linecook Packages
-#
-
-packages_dir = File.expand_path("../packages", __FILE__)
-packages     = Dir.glob("#{packages_dir}/*.yml")
-dependencies = Dir.glob('{attributes,files,recipes,templates}/**/*')
-
-packages.each do |source|
-  target = source.chomp('.yml')
-  name   = File.basename(target)
-  
-  namespace :packages do
-    file target => dependencies + [source] + helpers do
-      sh "bundle exec linecook package '#{source}' '#{target}' --force"
-    end
-    
-    desc "generate the package: #{name}"
-    task name => [:bundle, target]
-  end
-  
-  task :packages => "packages:#{name}"
-end
-
-desc "generate packages"
-task :packages
-
-#
-# VM Tasks
-#
 
 namespace :vm do
-  task :setup => :bundle do
-    sh 'bundle exec linecook reset'
-    sh 'bundle exec linecook share vbox'
+  desc "start each vm at CURRENT and share vm directory"
+  task :start => :bundle do
+    sh 'bundle exec linecook start --socket --snapshot CURRENT'
+    sh 'bundle exec linecook share'
   end
   
-  task :teardown => :bundle do
+  desc "snapshot each vm to a new CURRENT"
+  task :snapshot => :bundle do
+    sh 'bundle exec linecook snapshot CURRENT'
+  end
+  
+  desc "reset each vm to BASE and share vm directory"
+  task :reset => :bundle do
+    sh 'bundle exec linecook start --socket --snapshot BASE'
+    sh 'bundle exec linecook share'
+  end
+  
+  desc "stop each vm"
+  task :stop => :bundle do
     sh 'bundle exec linecook stop'
   end
 end
@@ -153,9 +111,10 @@ end
 desc 'Default: Run tests.'
 task :default => :test
 
-desc 'Run the tests assuming the vm is running'
-task :quicktest => [:helpers] do
+desc 'Run the tests assuming each vm is setup'
+task :quicktest => :build do
   tests = Dir.glob('test/**/*_test.rb')
+  tests.delete_if {|test| test =~ /_test\/test_/ }
   
   if ENV['RCOV'] == 'true'
     FileUtils.rm_rf File.expand_path('../coverage', __FILE__)
@@ -168,10 +127,10 @@ end
 desc 'Run the tests'
 task :test do
   begin
-    Rake::Task["vm:setup"].invoke
+    Rake::Task["vm:start"].invoke
     Rake::Task["quicktest"].invoke
   ensure
-    Rake::Task["vm:teardown"].execute(nil)
+    Rake::Task["vm:stop"].execute(nil)
   end
 end
 

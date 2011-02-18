@@ -17,17 +17,19 @@ module Linebook
         opts && block_given? ? yield(opts) : opts
       end
       
+      
       # Adds a check that ensures the last exit status is as indicated. Note that no
+      
       # check will be added unless check_status_function is added beforehand.
-      # 
-      def check_status(status=0)
+      def check_status(expect_status=0, fail_status='$?')
         @check_status ||= false
+        
         #  <% if @check_status %>
-        #  check_status <%= status %> $? $LINENO
+        #  check_status <%= expect_status %> $? <%= fail_status %> $LINENO
         #  
         #  <% end %>
         if @check_status 
-        _erbout.concat "check_status "; _erbout.concat(( status ).to_s); _erbout.concat " $? $LINENO\n"
+        _erbout.concat "check_status "; _erbout.concat(( expect_status ).to_s); _erbout.concat " $? "; _erbout.concat(( fail_status ).to_s); _erbout.concat " $LINENO\n"
         _erbout.concat "\n"
         end ;
         nil
@@ -40,9 +42,9 @@ module Linebook
       # Adds the check status function.
       def check_status_function()
         @check_status = true
-        #  check_status () { if [ $2 -ne $1 ]; then echo "[$2] $0:$3"; exit $2; else return $2; fi }
+        #  check_status () { if [ $2 -ne $1 ]; then echo "[$2] $0:${4:-?}"; exit $3; else return $2; fi }
         #  
-        _erbout.concat "check_status () { if [ $2 -ne $1 ]; then echo \"[$2] $0:$3\"; exit $2; else return $2; fi }\n"
+        _erbout.concat "check_status () { if [ $2 -ne $1 ]; then echo \"[$2] $0:${4:-?}\"; exit $3; else return $2; fi }\n"
         nil
       end
       
@@ -105,11 +107,14 @@ module Linebook
       end
       
       # Makes a heredoc statement surrounding the contents of the block.  Options:
+      
       # 
+      
       #   delimiter   the delimiter used, by default HEREDOC_n where n increments
+      
       #   indent      add '-' before the delimiter
+      
       #   quote       quotes the delimiter
-      # 
       def heredoc(options={})
         delimiter = options[:delimiter] || begin
           @heredoc_count ||= -1
@@ -130,7 +135,6 @@ module Linebook
       def _heredoc(*args, &block) # :nodoc:
         capture { heredoc(*args, &block) }
       end
-      
       def not_if(cmd, &block)
         only_if("! #{cmd}", &block)
         nil
@@ -139,7 +143,6 @@ module Linebook
       def _not_if(*args, &block) # :nodoc:
         capture { not_if(*args, &block) }
       end
-      
       def only_if(cmd)
         #  if <%= cmd %>
         #  then

@@ -23,9 +23,9 @@ module Linebook
       end
       
       def package(name, version=nil)
-        #  apt-get -q install <%= name %><%= blank?(version) ? nil : "=#{version}" %>
+        #  apt-get -q -y install <%= name %><%= blank?(version) ? nil : "=#{version}" %>
         #  <%= check_status %>
-        _erbout.concat "apt-get -q install "; _erbout.concat(( name ).to_s); _erbout.concat(( blank?(version) ? nil : "=#{version}" ).to_s); _erbout.concat "\n"
+        _erbout.concat "apt-get -q -y install "; _erbout.concat(( name ).to_s); _erbout.concat(( blank?(version) ? nil : "=#{version}" ).to_s); _erbout.concat "\n"
         _erbout.concat(( check_status ).to_s);
         nil
       end

@@ -4,8 +4,10 @@ require 'linebook/shell/posix'
 class PosixTest < Test::Unit::TestCase
   include Linecook::Test
   
-  def setup_recipe(target_path='recipe')
-    super.extend Linebook::Shell::Posix
+  def setup
+    super
+    setup_host 'abox'
+    setup_helpers Linebook::Shell::Posix
   end
   
   #
@@ -13,52 +15,69 @@ class PosixTest < Test::Unit::TestCase
   #
   
   def test_check_status_only_prints_if_check_status_function_is_present
-    assert_recipe('') { check_status } 
+    assert_recipe %q{
+    } do
+      check_status
+    end
     
-    assert_recipe_match(/check_status 0 \$\? \$LINENO/) do
+    assert_recipe_matches %q{
+      check_status 0 $? $? $LINENO
+    } do
       check_status_function
       check_status
     end
   end
   
   def test_check_status_silently_passes_if_error_status_is_as_expected
-    build_package do
+    setup_recipe 'pass_true' do
       check_status_function
       
       target.puts 'true'
       check_status
       
-      target.puts 'false'
-      check_status 1
+      target.puts 'echo pass_true'
     end
     
-    check_package %Q{
-      % sh package/recipe # [1]
-    }
+    setup_recipe 'pass_false' do
+      check_status_function
+      
+      target.puts 'false'
+      check_status 1
+      
+      target.puts 'echo pass_false'
+    end
+    
+    assert_output_equal %{
+      pass_true
+      pass_false
+    }, *run_package
   end
   
   def test_check_status_exits_with_error_status_if_status_is_not_as_expected
-    build_package do
+    setup_recipe 'fail_true' do
       check_status_function
+      
       target.puts 'true'
       check_status 1
+      
+      target.puts 'echo flunk'
     end
     
-    check_package %{
-      % sh package/recipe
-      [0] package/recipe:13
-    } 
-    
-    build_package do
+    setup_recipe 'fail_false' do
       check_status_function
+      
       target.puts 'false'
-      check_status
+      check_status 0
+      
+      target.puts 'echo flunk'
     end
     
-    check_package %{
-      % sh package/recipe # [1]
-      [1] package/recipe:13
-    } 
+    # note the LINENO output is not directly tested here because as of 10.10
+    # sh on Ubuntu does not support LINENO
+    assert_alike %{
+      [0] ./fail_true:...:
+      [1] ./fail_false:...:
+    }, *run_package
   end
   
   #
@@ -168,19 +187,19 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
-  def test_heredoc_works_as_a_heredoc
-    build_package do
-      target << 'cat '
-      heredoc {
-        target.puts 'content'
-      }
-    end
-    
-    check_package %Q{
-      % sh package/recipe
-      content
-    }
-  end
+  # def test_heredoc_works_as_a_heredoc
+  #   build_package do
+  #     target << 'cat '
+  #     heredoc {
+  #       target.puts 'content'
+  #     }
+  #   end
+  #   
+  #   check_package %Q{
+  #     % sh package/recipe
+  #     content
+  #   }
+  # end
   
   #
   # not_if test
@@ -226,24 +245,24 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
-  def test_set_options_functions_to_set_options
-    build_package do
-      target.puts 'echo a'
-      set_options(:verbose => true)
-      target.puts 'echo b'
-      set_options(:verbose => false)
-      target.puts 'echo c'
-    end
-    
-    check_package %Q{
-      % sh package/recipe 2>&1
-      a
-      echo b
-      b
-      set +o verbose
-      c
-    } 
-  end
+  # def test_set_options_functions_to_set_options
+  #   build_package do
+  #     target.puts 'echo a'
+  #     set_options(:verbose => true)
+  #     target.puts 'echo b'
+  #     set_options(:verbose => false)
+  #     target.puts 'echo c'
+  #   end
+  #   
+  #   check_package %Q{
+  #     % sh package/recipe 2>&1
+  #     a
+  #     echo b
+  #     b
+  #     set +o verbose
+  #     c
+  #   } 
+  # end
   
   #
   # unset test
