@@ -8,12 +8,13 @@ module Linebook
         @shell_path ||= '/bin/bash'
       end
       
+      
       # Switches to a different user for the duration of a block.
-      def su(user=nil, &block)
-        #  su <%= user %> "<%= capture_path(user, &block) %>"
+      def su(user_name, target_name=user_name, &block)
+        #  su <%= user_name %> "<%= capture_path(target_name, &block) %>"
         #  <% check_status %>
         #  
-        _erbout.concat "su "; _erbout.concat(( user ).to_s); _erbout.concat " \""; _erbout.concat(( capture_path(user, &block) ).to_s); _erbout.concat "\"\n"
+        _erbout.concat "su "; _erbout.concat(( user_name ).to_s); _erbout.concat " \""; _erbout.concat(( capture_path(target_name, &block) ).to_s); _erbout.concat "\"\n"
         check_status
         nil
       end

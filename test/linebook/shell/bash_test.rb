@@ -5,10 +5,10 @@ require 'linebook/shell/bash'
 class BashTest < Test::Unit::TestCase
   include Linecook::Test
   
-  def setup_recipe(target_path='recipe')
-    recipe = super
-    recipe.extend Linebook::Shell
-    recipe.extend Linebook::Shell::Bash
+  def setup
+    super
+    setup_host 'abox'
+    setup_helpers Linebook::Shell, Linebook::Shell::Bash
   end
   
   #
@@ -37,20 +37,28 @@ class BashTest < Test::Unit::TestCase
   
   def test_su_wraps_block_content_in_a_recipe
     assert_recipe(%{
-      su root "recipe.d/root"
+      su user "target"
     }){ 
-      su('root') do 
+      su('user', 'target') do 
         comment('content')
       end
     }
     
-    assert_equal "# content\n", package.content('recipe.d/root')
+    assert_equal "# content\n", package.content('target')
+  end
+  
+  def test_su_uses_user_name_as_default_target_name
+    assert_recipe(%{
+      su user "user"
+    }){ 
+      su('user') {}
+    }
   end
   
   def test_nested_su
     assert_recipe %q{
       # +A
-      su a "recipe.d/a"
+      su a "a"
       # -A
     } do
       comment('+A')
@@ -71,19 +79,19 @@ class BashTest < Test::Unit::TestCase
     
     assert_output_equal %q{
       # +B
-      su b "recipe.d/b"
+      su b "b"
       # -B
-    }, package.content('recipe.d/a')
+    }, package.content('a')
     
     assert_output_equal %q{
       # +C
-      su c "recipe.d/c"
+      su c "c"
       # -C
-    }, package.content('recipe.d/b')
+    }, package.content('b')
     
     assert_output_equal %q{
       # +D
       # -D
-    }, package.content('recipe.d/c')
+    }, package.content('c')
   end
 end

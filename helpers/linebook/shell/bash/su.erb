@@ -1,5 +1,5 @@
 Switches to a different user for the duration of a block.
-(user=nil, &block)
+(user_name, target_name=user_name, &block)
 --
-su <%= user %> "<%= capture_path(user, &block) %>"
+su <%= user_name %> "<%= capture_path(target_name, &block) %>"
 <% check_status %>

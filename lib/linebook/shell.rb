@@ -20,6 +20,7 @@ module Linebook
       super
     end
     
+    
     # Backup a file.
     def backup(path, options={})
       backup_path = "#{path}.bak"
@@ -30,14 +31,12 @@ module Linebook
       end
       
       chmod 644, backup_path
-    
       nil
     end
     
     def _backup(*args, &block) # :nodoc:
       capture { backup(*args, &block) }
     end
-    
     def directory(target, options={})
       not_if _directory?(target) do 
         mkdir_p target
@@ -50,7 +49,6 @@ module Linebook
     def _directory(*args, &block) # :nodoc:
       capture { directory(*args, &block) }
     end
-    
     def execute(cmd)
       #  <%= cmd %>
       #  
@@ -76,7 +74,15 @@ module Linebook
     def _file(*args, &block) # :nodoc:
       capture { file(*args, &block) }
     end
+    def group?(name)
+      #  grep "^<%= name %>:" /etc/group
+      _erbout.concat "grep \"^"; _erbout.concat(( name ).to_s); _erbout.concat ":\" /etc/group";
+      nil
+    end
     
+    def _group?(*args, &block) # :nodoc:
+      capture { group?(*args, &block) }
+    end
     def group(name, options={})
       not_if _group?(name) do
         addgroup name
@@ -86,16 +92,6 @@ module Linebook
     
     def _group(*args, &block) # :nodoc:
       capture { group(*args, &block) }
-    end
-    
-    def group?(name)
-      #  grep "^<%= name %>:" /etc/group
-      _erbout.concat "grep \"^"; _erbout.concat(( name ).to_s); _erbout.concat ":\" /etc/group";
-      nil
-    end
-    
-    def _group?(*args, &block) # :nodoc:
-      capture { group?(*args, &block) }
     end
     
     # Installs a file
@@ -113,14 +109,12 @@ module Linebook
       cp source, target
       chmod options[:mode], target
       chown options[:user], options[:group], target
-    
       nil
     end
     
     def _install(*args, &block) # :nodoc:
       capture { install(*args, &block) }
     end
-    
     def package(name, version=nil)
       raise NotImplementedError
       nil
@@ -129,7 +123,6 @@ module Linebook
     def _package(*args, &block) # :nodoc:
       capture { package(*args, &block) }
     end
-    
     def recipe(name)
       #  "<%= env_path %>" - "<%= shell_path %>" "<%= recipe_path(name) %>" $*
       #  <% check_status %>
@@ -155,7 +148,6 @@ module Linebook
     def _template(*args, &block) # :nodoc:
       capture { template(*args, &block) }
     end
-    
     def user(name, options={})
       not_if _user?(name) do
         adduser name
@@ -165,16 +157,6 @@ module Linebook
     
     def _user(*args, &block) # :nodoc:
       capture { user(*args, &block) }
-    end
-    
-    def user?(name)
-      #  grep "^<%= name %>:" /etc/passwd
-      _erbout.concat "grep \"^"; _erbout.concat(( name ).to_s); _erbout.concat ":\" /etc/passwd";
-      nil
-    end
-    
-    def _user?(*args, &block) # :nodoc:
-      capture { user?(*args, &block) }
     end
   end
 end
