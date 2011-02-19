@@ -8,7 +8,6 @@ module Linebook
         @shell_path ||= '/bin/bash'
       end
       
-      
       # Switches to a different user for the duration of a block.
       def su(user_name, target_name=user_name, &block)
         #  su <%= user_name %> "<%= capture_path(target_name, &block) %>"

@@ -207,7 +207,7 @@ module Linebook
         capture { mv_f(*args, &block) }
       end
       
-      def quiet
+      def quiet()
         #  set +x +v<% if block_given? %>
         #  <% indent { yield } %>
         #  set $LINECOOK_OPTIONS > /dev/null<% end %>
@@ -271,7 +271,6 @@ module Linebook
       
       # == Notes
       # Use dev/null on set such that no options will not dump ENV into stdout.
-      # 
       def shebang()
         @target_format = '$LINECOOK_DIR/%s'
         #  #! <%= shell_path %>
@@ -334,7 +333,7 @@ module Linebook
         capture { shebang(*args, &block) }
       end
       
-      def verbose
+      def verbose()
         #  set -v<% if block_given? %>
         #  <% indent { yield } %>
         #  set $LINECOOK_OPTIONS > /dev/null<% end %>
@@ -351,7 +350,7 @@ module Linebook
         capture { verbose(*args, &block) }
       end
       
-      def xtrace
+      def xtrace()
         #  set -x<% if block_given? %>
         #  <% indent { yield } %>
         #  set $LINECOOK_OPTIONS > /dev/null<% end %>

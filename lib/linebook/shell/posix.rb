@@ -17,9 +17,7 @@ module Linebook
         opts && block_given? ? yield(opts) : opts
       end
       
-      
       # Adds a check that ensures the last exit status is as indicated. Note that no
-      
       # check will be added unless check_status_function is added beforehand.
       def check_status(expect_status=0, fail_status='$?')
         @check_status ||= false
@@ -107,13 +105,9 @@ module Linebook
       end
       
       # Makes a heredoc statement surrounding the contents of the block.  Options:
-      
       # 
-      
       #   delimiter   the delimiter used, by default HEREDOC_n where n increments
-      
       #   indent      add '-' before the delimiter
-      
       #   quote       quotes the delimiter
       def heredoc(options={})
         delimiter = options[:delimiter] || begin
@@ -135,6 +129,7 @@ module Linebook
       def _heredoc(*args, &block) # :nodoc:
         capture { heredoc(*args, &block) }
       end
+      
       def not_if(cmd, &block)
         only_if("! #{cmd}", &block)
         nil
@@ -143,6 +138,7 @@ module Linebook
       def _not_if(*args, &block) # :nodoc:
         capture { not_if(*args, &block) }
       end
+      
       def only_if(cmd)
         #  if <%= cmd %>
         #  then
