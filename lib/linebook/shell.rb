@@ -145,7 +145,7 @@ module Linebook
       
       not_if %{grep -xqs "#{recipe_name}" "#{runlist}"} do
         target.puts %{echo "#{recipe_name}" >> "#{runlist}"}
-        target.puts %{"#{env_path}" - "#{shell_path}" "#{recipe_path}" $*}
+        target.puts %{"#{shell_path}" "#{recipe_path}" $*}
         check_status
       end
       nil
