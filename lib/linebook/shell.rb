@@ -20,6 +20,10 @@ module Linebook
       super
     end
     
+    def guess_target_name(source_name)
+      next_target_name File.join("#{target_name}.d", File.basename(source_name))
+    end
+    
     # Backup a file.
     def backup(path, options={})
       backup_path = "#{path}.bak"
@@ -66,8 +70,8 @@ module Linebook
     end
     
     # Installs a file from the package.
-    def file(target, options={})
-      source = file_path(options[:source] || File.basename(target))
+    def file(file_name, target, options={})
+      source = file_path(file_name, guess_target_name(target))
       install(source, target, options)
       nil
     end
@@ -128,10 +132,11 @@ module Linebook
       capture { package(*args, &block) }
     end
     
-    def recipe(name)
-      #  "<%= env_path %>" - "<%= shell_path %>" "<%= recipe_path(name) %>" $*
+    def recipe(recipe_name)
+      target_name = File.join('recipes', recipe_name)
+      #  "<%= env_path %>" - "<%= shell_path %>" "<%= recipe_path(recipe_name, target_name) %>" $*
       #  <% check_status %>
-      _erbout.concat "\""; _erbout.concat(( env_path ).to_s); _erbout.concat "\" - \""; _erbout.concat(( shell_path ).to_s); _erbout.concat "\" \""; _erbout.concat(( recipe_path(name) ).to_s); _erbout.concat "\" $*\n"
+      _erbout.concat "\""; _erbout.concat(( env_path ).to_s); _erbout.concat "\" - \""; _erbout.concat(( shell_path ).to_s); _erbout.concat "\" \""; _erbout.concat(( recipe_path(recipe_name, target_name) ).to_s); _erbout.concat "\" $*\n"
       check_status ;
       nil
     end
@@ -141,11 +146,9 @@ module Linebook
     end
     
     # Installs a template from the package.
-    def template(target, options={})
-      template_name = options[:source] || File.basename(target)
+    def template(template_name, target, options={})
       locals = options[:locals] || {}
-      
-      source = template_path(template_name, locals)
+      source = template_path(template_name, guess_target_name(target), locals)
       install(source, target, options)
       nil
     end

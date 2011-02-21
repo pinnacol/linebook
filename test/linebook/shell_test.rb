@@ -13,6 +13,20 @@ class ShellTest < Test::Unit::TestCase
   end
   
   #
+  # guess_target_name test
+  #
+  
+  def test_guess_target_name_is_the_base_name_of_the_source_under_the_target_name_directory
+    recipe = setup_recipe 'recipe'
+    assert_equal 'recipe.d/name.txt', recipe.guess_target_name('source/name.txt')
+  end
+  
+  def test_guess_target_name_preserves_nested_recipe_names
+    recipe = setup_recipe 'nest/recipe'
+    assert_equal 'nest/recipe.d/name.txt', recipe.guess_target_name('source/name.txt')
+  end
+  
+  #
   # extended test
   #
   
@@ -67,131 +81,161 @@ class ShellTest < Test::Unit::TestCase
   #   assert_equal 'content', File.read(target)
   #   assert_equal 'content', File.read("#{target}.bak")
   # end
-  # 
-  # #
-  # # directory test
-  # #
-  # 
-  # def test_directory_makes_the_target_directory
-  #   target = path('target')
-  #   assert_equal false, File.exists?(target)
-  #   
-  #   build_package { directory target }
-  #   assert_script "sh #{package['recipe']}"
-  #   
-  #   assert_equal true, File.directory?(target)
-  # end
-  # 
-  # def test_directory_makes_parent_dirs_as_needed
-  #   target = path('target/dir')
-  #   
-  #   build_package { directory target }
-  #   assert_script "sh #{package['recipe']}"
-  #   
-  #   assert_equal true, File.directory?(target)
-  # end
-  # 
-  # def test_directory_sets_mode
-  #   target = path('target')
-  #   
-  #   build_package { directory target, :mode => 700 }
-  #   assert_script "sh #{package['recipe']}"
-  #   
-  #   assert_equal '40700', sprintf("%o", File.stat(target).mode)
-  # end
-  # 
-  # #
-  # # file test
-  # #
-  # 
-  # def test_file_installs_the_corresponding_package_file_to_target
-  #   prepare('files/file.txt', 'content')
-  #   target = path('target/file.txt')
-  #   
-  #   build_package { file target }
-  #   
-  #   Dir.chdir(path('package'))
-  #   assert_script "sh recipe"
-  #   
-  #   assert_equal 'content', File.read(target)
-  # end
-  # 
-  # def test_file_can_specify_an_alternate_source
-  #   prepare('files/source.txt', 'content')
-  #   target = path('target.txt')
-  #   
-  #   build_package { file target, :source => 'source.txt' }
-  #   
-  #   Dir.chdir(path('package'))
-  #   assert_script "sh recipe"
-  #   
-  #   assert_equal 'content', File.read(target)
-  # end
-  # 
-  # #
-  # # template test
-  # #
-  # 
-  # def test_template_builds_and_installs_the_corresponding_template_to_target
-  #   prepare('templates/file.txt.erb', 'got <%= key %>')
-  #   target = path('target/file.txt')
-  #   
-  #   build_package { template target, :locals => {:key => 'value'} }
-  #   
-  #   Dir.chdir(path('package'))
-  #   assert_script "sh recipe"
-  #   
-  #   assert_equal 'got value', File.read(target)
-  # end
-  # 
-  # def test_template_can_specify_an_alternate_source
-  #   prepare('templates/source.txt.erb', 'got <%= key %>')
-  #   target = path('target.txt')
-  #   
-  #   build_package { template target, :source => 'source.txt', :locals => {:key => 'value'} }
-  #   
-  #   Dir.chdir(path('package'))
-  #   assert_script "sh recipe"
-  #   
-  #   assert_equal 'got value', File.read(target)
-  # end
-  # 
-  # #
-  # # install test
-  # #
-  # 
-  # def test_install_copies_source_to_target
-  #   source = prepare('source', 'content')
-  #   target = path('target')
-  #   
-  #   build_package { install source, target }
-  #   assert_script "sh #{package['recipe']}"
-  #   
-  #   assert_equal 'content', File.read(source)
-  #   assert_equal 'content', File.read(target)
-  # end
-  # 
-  # def test_install_backs_up_existing_target
-  #   source = prepare('source', 'new')
-  #   target = prepare('target', 'old')
-  #   
-  #   build_package { install source, target }
-  #   assert_script "sh #{package['recipe']}"
-  #   
-  #   assert_equal 'new', File.read(target)
-  #   assert_equal 'old', File.read("#{target}.bak")
-  # end
-  # 
-  # def test_install_can_turn_off_backup
-  #   source = prepare('source', 'new')
-  #   target = prepare('target', 'old')
-  #   
-  #   build_package { install source, target, :backup => false }
-  #   assert_script "sh #{package['recipe']}"
-  #   
-  #   assert_equal false, File.exists?("#{target}.bak")
-  # end
-  # 
+  
+  #
+  # directory test
+  #
+  
+  def test_directory_makes_the_target_directory
+    setup_recipe do
+      target.puts 'rm -r target'
+      directory 'target'
+      target.puts 'ls -la .'
+    end
+    
+    assert_alike %{
+      drwxr-xr-x :...: target
+    }, *run_package
+  end
+  
+  def test_directory_makes_parent_dirs_as_needed
+    setup_recipe do
+      target.puts 'rm -r target'
+      directory 'target/dir'
+      target.puts 'ls -la target'
+    end
+    
+    assert_alike %{
+      drwxr-xr-x :...: dir
+    }, *run_package
+  end
+  
+  def test_directory_sets_mod
+    setup_recipe do
+      target.puts 'rm -r target'
+      directory 'target', :mode => 700
+      target.puts 'ls -la .'
+    end
+    
+    assert_alike %{
+      drwx------ :...: target
+    }, *run_package
+  end
+  
+  #
+  # file test
+  #
+  
+  def test_file_installs_the_source_file_in_package_to_target
+    prepare('files/source/file.txt', "content\n")
+    
+    setup_recipe 'recipe' do
+      target.puts 'rm -r target > /dev/null 2>&1'
+      file 'source/file.txt', 'target/file.txt'
+      target.puts 'cat target/file.txt'
+    end
+    
+    assert_output_equal %{
+      content
+    }, package.content('recipe.d/file.txt')
+    
+    assert_output_equal %{
+      content
+    }, *run_package
+  end
+  
+  #
+  # template test
+  #
+  
+  def test_template_builds_and_installs_the_corresponding_template_to_target
+    prepare('templates/source/file.txt.erb', "got <%= key %>\n")
+    
+    setup_recipe 'recipe' do
+      target.puts 'rm -r target > /dev/null 2>&1'
+      template 'source/file.txt', 'target/file.txt', :locals => {:key => 'value'}
+      target.puts 'cat target/file.txt'
+    end
+    
+    assert_output_equal %{
+      got value
+    }, package.content('recipe.d/file.txt')
+    
+    assert_output_equal %{
+      got value
+    }, *run_package
+  end
+  
+  #
+  # recipe test
+  #
+  
+  def test_recipe_builds_and_executes_recipe
+    prepare('recipes/source/recipe.rb', "target.puts 'echo success'")
+    
+    setup_recipe do
+      recipe 'source/recipe'
+    end
+    
+    assert_output_equal %{
+      echo success
+    }, package.content('recipes/source/recipe')
+    
+    assert_output_equal %{
+      success
+    }, *run_package
+  end
+  
+  #
+  # install test
+  #
+  
+  def test_install_copies_source_to_target
+    setup_recipe 'recipe' do
+      target.puts 'echo content > source'
+      
+      install 'source', 'target'
+      
+      target.puts 'cat target'
+    end
+    
+    assert_output_equal %{
+      content
+    }, *run_package
+  end
+  
+  def test_install_backs_up_existing_target
+    setup_recipe 'recipe' do
+      target.puts 'echo new > source'
+      target.puts 'echo old > target'
+      
+      install 'source', 'target'
+      
+      target.puts 'cat target.bak'
+      target.puts 'cat target'
+    end
+    
+    assert_output_equal %{
+      old
+      new
+    }, *run_package
+  end
+  
+  def test_install_can_turn_off_backup
+    setup_recipe 'recipe' do
+      target.puts 'echo new > source'
+      target.puts 'echo old > target'
+      
+      install 'source', 'target', :backup => false
+      
+      target.puts 'if ! [ -e target.bak ]; then echo pass; fi'
+    end
+    
+    assert_output_equal %{
+      pass
+    }, *run_package
+  end
+  
   def test_install_makes_parent_dirs_as_needed
     setup_recipe do
       target.puts 'echo content > source'

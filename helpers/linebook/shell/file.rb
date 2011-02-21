@@ -1,5 +1,5 @@
 Installs a file from the package.
-(target, options={})
+(file_name, target, options={})
+  source = file_path(file_name, guess_target_name(target))
 --
-  source = file_path(options[:source] || File.basename(target))
   install(source, target, options)

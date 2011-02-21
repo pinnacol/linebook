@@ -1,8 +1,6 @@
 Installs a template from the package.
-(target, options={})
---
-  template_name = options[:source] || File.basename(target)
+(template_name, target, options={})
   locals = options[:locals] || {}
-  
-  source = template_path(template_name, locals)
+  source = template_path(template_name, guess_target_name(target), locals)
+--
   install(source, target, options)
