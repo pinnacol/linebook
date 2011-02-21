@@ -24,6 +24,10 @@ module Linebook
       next_target_name File.join("#{target_name}.d", File.basename(source_name))
     end
     
+    def log_dir
+      '/var/log/linecook'
+    end
+    
     # Backup a file.
     def backup(path, options={})
       backup_path = "#{path}.bak"
@@ -134,10 +138,16 @@ module Linebook
     
     def recipe(recipe_name)
       target_name = File.join('recipes', recipe_name)
-      #  "<%= env_path %>" - "<%= shell_path %>" "<%= recipe_path(recipe_name, target_name) %>" $*
-      #  <% check_status %>
-      _erbout.concat "\""; _erbout.concat(( env_path ).to_s); _erbout.concat "\" - \""; _erbout.concat(( shell_path ).to_s); _erbout.concat "\" \""; _erbout.concat(( recipe_path(recipe_name, target_name) ).to_s); _erbout.concat "\" $*\n"
-      check_status ;
+      runlist = target_path "runlist.log"
+      recipe_path = @package.registry.has_key?(target_name) ? 
+        target_path(target_name) : 
+        self.recipe_path(recipe_name, target_name)
+      
+      not_if "grep -xqs '#{recipe_name}' '#{runlist}'" do
+        target.puts %{echo '#{recipe_name}' >> '#{runlist}'} 
+        target.puts %{"#{env_path}" - "#{shell_path}" "#{recipe_path}" $*}
+        check_status
+      end
       nil
     end
     

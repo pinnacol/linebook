@@ -186,6 +186,66 @@ class ShellTest < Test::Unit::TestCase
     }, *run_package
   end
   
+  def test_recipe_only_builds_once
+    prepare('recipes/source/recipe.rb', "target.puts 'echo success'")
+    
+    setup_recipe 'a' do
+      recipe 'source/recipe'
+      recipe 'source/recipe'
+    end
+    
+    setup_recipe 'b' do
+      recipe 'source/recipe'
+    end
+    
+    assert_equal %w{
+      a
+      b
+      recipes/source/recipe
+    }, package.registry.keys.sort
+  end
+  
+  def test_recipe_only_runs_once
+    prepare('recipes/source/recipe.rb', "target.puts 'echo success'")
+    
+    setup_recipe 'a' do
+      target.puts "echo a"
+      recipe 'source/recipe'
+    end
+    
+    setup_recipe 'b' do
+      target.puts "echo b"
+      recipe 'source/recipe'
+    end
+    
+    assert_output_equal %{
+      a
+      success
+      b
+    }, *run_package
+  end
+  
+  def test_recipe_can_be_run_from_any_file_that_declares_it
+    prepare('recipes/source/recipe.rb', "target.puts 'echo success'")
+    
+    setup_recipe 'a' do
+      target.puts "echo a"
+      recipe 'source/recipe'
+    end
+    
+    setup_recipe 'b' do
+      target.puts "echo b"
+      recipe 'source/recipe'
+    end
+    
+    runlist = prepare('runlist') {|io| io.puts "b" }
+    
+    assert_output_equal %{
+      b
+      success
+    }, *run_package('runlist' => runlist)
+  end
+  
   #
   # install test
   #
