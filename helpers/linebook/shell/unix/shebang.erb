@@ -11,6 +11,7 @@ Use dev/null on set such that no options will not dump ENV into stdout.
 export -f check_status
 export LINECOOK_DIR=$(dirname $0)
 export LINECOOK_OPTIONS=
+export PATH
 
 while getopts bhvx opt
 do
