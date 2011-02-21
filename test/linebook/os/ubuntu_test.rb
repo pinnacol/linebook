@@ -29,7 +29,7 @@ class OsTest < Test::Unit::TestCase
   
   def test_package_creates_commands_to_install_package_with_apt_get
     assert_recipe %q{
-      apt-get -q -y install name
+      sudo apt-get -q -y install name
     } do
       package 'name'
     end
@@ -37,7 +37,7 @@ class OsTest < Test::Unit::TestCase
   
   def test_package_adds_version_request_if_specified
     assert_recipe %q{
-      apt-get -q -y install name=1.0.0
+      sudo apt-get -q -y install name=1.0.0
     } do
       package 'name', '1.0.0'
     end
