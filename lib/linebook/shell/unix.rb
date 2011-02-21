@@ -280,7 +280,7 @@ module Linebook
         #  export -f check_status
         #  export LINECOOK_DIR=$(dirname $0)
         #  export LINECOOK_OPTIONS=
-        #  export PATH
+        #  export PWD USER HOME PATH
         #  
         #  while getopts bhvx opt
         #  do
@@ -308,7 +308,7 @@ module Linebook
         _erbout.concat "export -f check_status\n"
         _erbout.concat "export LINECOOK_DIR=$(dirname $0)\n"
         _erbout.concat "export LINECOOK_OPTIONS=\n"
-        _erbout.concat "export PATH\n"
+        _erbout.concat "export PWD USER HOME PATH\n"
         _erbout.concat "\n"
         _erbout.concat "while getopts bhvx opt\n"
         _erbout.concat "do\n"
