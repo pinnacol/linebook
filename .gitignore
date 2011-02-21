@@ -4,5 +4,4 @@ pkg/*
 rdoc/
 coverage/
 Gemfile.lock
-vm/test
-vm/pkg
+vm
