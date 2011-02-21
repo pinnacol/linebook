@@ -240,4 +240,42 @@ class UnixTest < Test::Unit::TestCase
       rm_rf 'target'
     end
   end
+  
+  #
+  # shebang test
+  #
+  
+  def test_shebang_exports_LINECOOK_DIR
+    setup_recipe 'recipe' do
+      shebang
+      target.puts 'echo recipe'
+      target.puts 'echo "$LINECOOK_DIR"'
+      
+      script = capture_path('script') do
+        target.puts 'echo script'
+        target.puts 'echo "$LINECOOK_DIR"'
+      end
+      
+      target.puts %{sh "#{script}"}
+    end
+    
+    assert_output_equal %{
+      recipe
+      /home/linecook/vm/test/linebook/shell/unix_test/test_shebang_exports_LINECOOK_DIR/abox
+      script
+      /home/linecook/vm/test/linebook/shell/unix_test/test_shebang_exports_LINECOOK_DIR/abox
+    }, *run_package
+  end
+  
+  def test_shebang_uses_LINECOOK_DIR_if_set
+    setup_recipe 'recipe' do
+      target.puts "LINECOOK_DIR=current"
+      shebang
+      target.puts 'echo "$LINECOOK_DIR"'
+    end
+    
+    assert_output_equal %{
+      current
+    }, *run_package
+  end
 end

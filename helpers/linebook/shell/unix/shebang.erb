@@ -8,8 +8,7 @@ Use dev/null on set such that no options will not dump ENV into stdout.
 <% section %>
 <%= check_status_function %>
 
-export -f check_status
-export LINECOOK_DIR=$(dirname $0)
+export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}
 export LINECOOK_OPTIONS=
 
 while getopts bhvx opt

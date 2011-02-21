@@ -277,8 +277,7 @@ module Linebook
         #  <% section %>
         #  <%= check_status_function %>
         #  
-        #  export -f check_status
-        #  export LINECOOK_DIR=$(dirname $0)
+        #  export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}
         #  export LINECOOK_OPTIONS=
         #  
         #  while getopts bhvx opt
@@ -304,8 +303,7 @@ module Linebook
         section 
         _erbout.concat(( check_status_function ).to_s)
         _erbout.concat "\n"
-        _erbout.concat "export -f check_status\n"
-        _erbout.concat "export LINECOOK_DIR=$(dirname $0)\n"
+        _erbout.concat "export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}\n"
         _erbout.concat "export LINECOOK_OPTIONS=\n"
         _erbout.concat "\n"
         _erbout.concat "while getopts bhvx opt\n"
