@@ -1,7 +1,7 @@
 == Notes
 Use dev/null on set such that no options will not dump ENV into stdout.
 
-()
+(options={})
   @target_format = '$LINECOOK_DIR/%s'
 --
 #! <%= shell_path %>
@@ -31,6 +31,13 @@ do
 done
 shift $(($OPTIND - 1))
 
+<% if options[:info] %>
+echo >&2
+echo "###############################################################################" >&2
+echo "# $SHELL" >&2
+echo "# $(whoami)@$(hostname):$(pwd)" >&2
+
+<% end %>
 set $LINECOOK_OPTS > /dev/null
 <% section " #{target_name} " %>
 

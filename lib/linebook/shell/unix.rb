@@ -257,12 +257,9 @@ module Linebook
       def section(comment="")
         n = (78 - comment.length)/2
         str = "-" * n
-        #  <%  %>
         #  #<%= str %><%= comment %><%= str %><%= "-" if comment.length % 2 == 1 %>
         #  
-        #  
         _erbout.concat "#"; _erbout.concat(( str ).to_s); _erbout.concat(( comment ).to_s); _erbout.concat(( str ).to_s); _erbout.concat(( "-" if comment.length % 2 == 1 ).to_s); _erbout.concat "\n"
-        _erbout.concat "\n"
         nil
       end
       
@@ -272,7 +269,7 @@ module Linebook
       
       # == Notes
       # Use dev/null on set such that no options will not dump ENV into stdout.
-      def shebang()
+      def shebang(options={})
         @target_format = '$LINECOOK_DIR/%s'
         #  #! <%= shell_path %>
         #  <% section %>
@@ -301,6 +298,13 @@ module Linebook
         #  done
         #  shift $(($OPTIND - 1))
         #  
+        #  <% if options[:info] %>
+        #  echo >&2
+        #  echo "###############################################################################" >&2
+        #  echo "# $SHELL" >&2
+        #  echo "# $(whoami)@$(hostname):$(pwd)" >&2
+        #  
+        #  <% end %>
         #  set $LINECOOK_OPTS > /dev/null
         #  <% section " #{target_name} " %>
         #  
@@ -332,6 +336,13 @@ module Linebook
         _erbout.concat "done\n"
         _erbout.concat "shift $(($OPTIND - 1))\n"
         _erbout.concat "\n"
+        if options[:info] 
+        _erbout.concat "echo >&2\n"
+        _erbout.concat "echo \"###############################################################################\" >&2\n"
+        _erbout.concat "echo \"# $SHELL\" >&2\n"
+        _erbout.concat "echo \"# $(whoami)@$(hostname):$(pwd)\" >&2\n"
+        _erbout.concat "\n"
+        end 
         _erbout.concat "set $LINECOOK_OPTS > /dev/null\n"
         section " #{target_name} " 
         _erbout.concat "\n"
