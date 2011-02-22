@@ -80,11 +80,15 @@ task :build => :bundle do
   sh "bundle exec linecook build #{force ? '--force' : nil}"
 end
 
+desc "run packages"
+task :run => :build do
+  sh "bundle exec linecook run"
+end
+
 namespace :vm do
-  desc "start each vm at CURRENT and share vm directory"
+  desc "start each vm at CURRENT"
   task :start => :bundle do
     sh 'bundle exec linecook start --socket --snapshot CURRENT'
-    sh 'bundle exec linecook share'
   end
   
   desc "snapshot each vm to a new CURRENT"
@@ -92,10 +96,10 @@ namespace :vm do
     sh 'bundle exec linecook snapshot CURRENT'
   end
   
-  desc "reset each vm to BASE and share vm directory"
+  desc "reset each vm to BASE"
   task :reset => :bundle do
-    sh 'bundle exec linecook start --socket --snapshot BASE'
-    sh 'bundle exec linecook share'
+    sh 'bundle exec linecook snapshot --reset BASE'
+    sh 'bundle exec linecook snapshot CURRENT'
   end
   
   desc "stop each vm"
