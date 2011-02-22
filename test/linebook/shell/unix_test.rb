@@ -41,7 +41,7 @@ class UnixTest < Test::Unit::TestCase
   
   def test_chown_sets_up_file_chown
     assert_recipe_matches %q{
-      chown user:group "target"
+      chown "user:group" "target"
     } do
       chown 'user', 'group', 'target'
     end
@@ -51,6 +51,16 @@ class UnixTest < Test::Unit::TestCase
     assert_recipe %q{
     } do
       chown nil, nil, 'target'
+    end
+  end
+  
+  def test_chown_may_prefix
+    assert_recipe %q{
+      sudo chown "user:group" "target"
+    } do
+      with_cmd_prefix 'sudo ' do
+        chown 'user', 'group', 'target'
+      end
     end
   end
   

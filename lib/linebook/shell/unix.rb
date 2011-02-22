@@ -42,14 +42,9 @@ module Linebook
       end
       
       def chmod(mode, target)
-        #  <% if mode %>
-        #  chmod <%= mode %> <%= quote(target) %>
-        #  <% check_status %>
-        #  <% end %>
-        if mode 
-        _erbout.concat "chmod "; _erbout.concat(( mode ).to_s); _erbout.concat " "; _erbout.concat(( quote(target) ).to_s); _erbout.concat "\n"
-        check_status 
-        end ;
+        if mode
+          cmd 'chmod', mode, target
+        end
         nil
       end
       
@@ -58,14 +53,9 @@ module Linebook
       end
       
       def chown(user, group, target)
-        #  <% if user || group %>
-        #  chown <%= user %>:<%= group %> <%= quote target %>
-        #  <% check_status %>
-        #  <% end %>
-        if user || group 
-        _erbout.concat "chown "; _erbout.concat(( user ).to_s); _erbout.concat ":"; _erbout.concat(( group ).to_s); _erbout.concat " "; _erbout.concat(( quote target ).to_s); _erbout.concat "\n"
-        check_status 
-        end ;
+        if user || group
+          cmd 'chown', "#{user}:#{group}", target
+        end
         nil
       end
       

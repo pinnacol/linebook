@@ -17,6 +17,30 @@ module Linebook
         opts && block_given? ? yield(opts) : opts
       end
       
+      attr_accessor :cmd_prefix
+      
+      def with_cmd_prefix(prefix)
+        current = cmd_prefix
+        begin
+          self.cmd_prefix = prefix
+          yield
+        ensure
+          self.cmd_prefix = current
+        end
+      end
+      
+      attr_accessor :cmd_suffix
+      
+      def with_cmd_suffix(suffix)
+        current = cmd_suffix
+        begin
+          self.cmd_suffix = suffix
+          yield
+        ensure
+          self.cmd_suffix = current
+        end
+      end
+      
       # Adds a check that ensures the last exit status is as indicated. Note that no
       # check will be added unless check_status_function is added beforehand.
       def check_status(expect_status=0, fail_status='$?')
@@ -55,10 +79,10 @@ module Linebook
         args.compact!
         args = args.collect! {|arg| arg[0] == ?- ? arg : quote(arg) }
         args.unshift(cmd)
-        #  <%= args.join(' ') %>
+        #  <%= cmd_prefix %><%= args.join(' ') %><%= cmd_suffix %>
         #  
         #  <% check_status %>
-        _erbout.concat(( args.join(' ') ).to_s)
+        _erbout.concat(( cmd_prefix ).to_s); _erbout.concat(( args.join(' ') ).to_s); _erbout.concat(( cmd_suffix ).to_s)
         _erbout.concat "\n"
         check_status ;
         nil

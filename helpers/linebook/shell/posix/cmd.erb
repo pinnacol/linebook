@@ -4,6 +4,6 @@ Execute a command and check the output status.
   args = args.collect! {|arg| arg[0] == ?- ? arg : quote(arg) }
   args.unshift(cmd)
 --
-<%= args.join(' ') %>
+<%= cmd_prefix %><%= args.join(' ') %><%= cmd_suffix %>
 
 <% check_status %>

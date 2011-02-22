@@ -21,6 +21,16 @@ module Linebook
       def _su(*args, &block) # :nodoc:
         capture { su(*args, &block) }
       end
+      
+      # Switches to sudo for a block.
+      def sudo()
+        with_cmd_prefix('sudo ') { yield }
+        nil
+      end
+      
+      def _sudo(*args, &block) # :nodoc:
+        capture { sudo(*args, &block) }
+      end
     end
   end
 end
