@@ -255,12 +255,13 @@ module Linebook
       end
       
       def section(comment="")
-        #  <% n = (76 - comment.length)/2 %>
-        #  <%= "#" * n %><%= comment %><%= "#" * n %>
+        n = (78 - comment.length)/2
+        str = "-" * n
+        #  <%  %>
+        #  #<%= str %><%= comment %><%= str %><%= "-" if comment.length % 2 == 1 %>
         #  
         #  
-        n = (76 - comment.length)/2 
-        _erbout.concat(( "#" * n ).to_s); _erbout.concat(( comment ).to_s); _erbout.concat(( "#" * n ).to_s)
+        _erbout.concat "#"; _erbout.concat(( str ).to_s); _erbout.concat(( comment ).to_s); _erbout.concat(( str ).to_s); _erbout.concat(( "-" if comment.length % 2 == 1 ).to_s); _erbout.concat "\n"
         _erbout.concat "\n"
         nil
       end

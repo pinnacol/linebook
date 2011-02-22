@@ -1,5 +1,7 @@
 (comment="")
+  n = (78 - comment.length)/2
+  str = "-" * n
 --
-<% n = (76 - comment.length)/2 %>
-<%= "#" * n %><%= comment %><%= "#" * n %>
+<%  %>
+#<%= str %><%= comment %><%= str %><%= "-" if comment.length % 2 == 1 %>
 
