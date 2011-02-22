@@ -210,12 +210,12 @@ module Linebook
       def quiet()
         #  set +x +v<% if block_given? %>
         #  <% indent { yield } %>
-        #  set $LINECOOK_OPTIONS > /dev/null<% end %>
+        #  set $LINECOOK_OPTS > /dev/null<% end %>
         #  
         #  
         _erbout.concat "set +x +v";  if block_given? ; _erbout.concat "\n"
         indent { yield } 
-        _erbout.concat "set $LINECOOK_OPTIONS > /dev/null";  end ; _erbout.concat "\n"
+        _erbout.concat "set $LINECOOK_OPTS > /dev/null";  end ; _erbout.concat "\n"
         _erbout.concat "\n"
         nil
       end
@@ -278,24 +278,29 @@ module Linebook
         #  <%= check_status_function %>
         #  
         #  export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}
-        #  export LINECOOK_OPTIONS=
+        #  export LINECOOK_OPTS=${LINECOOK_OPTS:--v}
         #  
-        #  while getopts bhvx opt
+        #  usage="usage: %s: [-hqvx]\n"
+        #  option="       %s   %s\n"
+        #  while getopts "hqvx" opt
         #  do
         #    case $opt in
-        #    v)  LINECOOK_OPTIONS="$LINECOOK_OPTIONS -v";;
-        #    x)  LINECOOK_OPTIONS="$LINECOOK_OPTIONS -x";;
-        #    h)  printf "Usage: %s: [-hvx]\n" $0
-        #        printf "  -h    prints this help\n"
-        #        printf "  -v    verbose (set -v)\n"
-        #        printf "  -x    xtrace  (set -x)\n"
-        #        exit 0;;
-        #    ?)  printf "Usage: %s: [-hvx]\n" $0
-        #        exit 2;;
+        #    h  )  printf "$usage" $0
+        #          printf "$option" "-h" "prints this help"
+        #          printf "$option" "-q" "quiet (set +v +x)"
+        #          printf "$option" "-v" "verbose (set -v)"
+        #          printf "$option" "-x" "xtrace (set -x)"
+        #          exit 0 ;;
+        #    q  )  LINECOOK_OPTS="$LINECOOK_OPTS +v +x";;
+        #    v  )  LINECOOK_OPTS="$LINECOOK_OPTS -v";;
+        #    x  )  LINECOOK_OPTS="$LINECOOK_OPTS -x";;
+        #    \? )  printf "$usage" $0
+        #          exit 2 ;;
         #    esac
         #  done
+        #  shift $(($OPTIND - 1))
         #  
-        #  set $LINECOOK_OPTIONS > /dev/null
+        #  set $LINECOOK_OPTS > /dev/null
         #  <% section " #{target_name} " %>
         #  
         #  
@@ -304,24 +309,29 @@ module Linebook
         _erbout.concat(( check_status_function ).to_s)
         _erbout.concat "\n"
         _erbout.concat "export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}\n"
-        _erbout.concat "export LINECOOK_OPTIONS=\n"
+        _erbout.concat "export LINECOOK_OPTS=${LINECOOK_OPTS:--v}\n"
         _erbout.concat "\n"
-        _erbout.concat "while getopts bhvx opt\n"
+        _erbout.concat "usage=\"usage: %s: [-hqvx]\\n\"\n"
+        _erbout.concat "option=\"       %s   %s\\n\"\n"
+        _erbout.concat "while getopts \"hqvx\" opt\n"
         _erbout.concat "do\n"
         _erbout.concat "  case $opt in\n"
-        _erbout.concat "  v)  LINECOOK_OPTIONS=\"$LINECOOK_OPTIONS -v\";;\n"
-        _erbout.concat "  x)  LINECOOK_OPTIONS=\"$LINECOOK_OPTIONS -x\";;\n"
-        _erbout.concat "  h)  printf \"Usage: %s: [-hvx]\\n\" $0\n"
-        _erbout.concat "      printf \"  -h    prints this help\\n\"\n"
-        _erbout.concat "      printf \"  -v    verbose (set -v)\\n\"\n"
-        _erbout.concat "      printf \"  -x    xtrace  (set -x)\\n\"\n"
-        _erbout.concat "      exit 0;;\n"
-        _erbout.concat "  ?)  printf \"Usage: %s: [-hvx]\\n\" $0\n"
-        _erbout.concat "      exit 2;;\n"
+        _erbout.concat "  h  )  printf \"$usage\" $0\n"
+        _erbout.concat "        printf \"$option\" \"-h\" \"prints this help\"\n"
+        _erbout.concat "        printf \"$option\" \"-q\" \"quiet (set +v +x)\"\n"
+        _erbout.concat "        printf \"$option\" \"-v\" \"verbose (set -v)\"\n"
+        _erbout.concat "        printf \"$option\" \"-x\" \"xtrace (set -x)\"\n"
+        _erbout.concat "        exit 0 ;;\n"
+        _erbout.concat "  q  )  LINECOOK_OPTS=\"$LINECOOK_OPTS +v +x\";;\n"
+        _erbout.concat "  v  )  LINECOOK_OPTS=\"$LINECOOK_OPTS -v\";;\n"
+        _erbout.concat "  x  )  LINECOOK_OPTS=\"$LINECOOK_OPTS -x\";;\n"
+        _erbout.concat "  \\? )  printf \"$usage\" $0\n"
+        _erbout.concat "        exit 2 ;;\n"
         _erbout.concat "  esac\n"
         _erbout.concat "done\n"
+        _erbout.concat "shift $(($OPTIND - 1))\n"
         _erbout.concat "\n"
-        _erbout.concat "set $LINECOOK_OPTIONS > /dev/null\n"
+        _erbout.concat "set $LINECOOK_OPTS > /dev/null\n"
         section " #{target_name} " 
         _erbout.concat "\n"
         nil
@@ -334,12 +344,12 @@ module Linebook
       def verbose()
         #  set -v<% if block_given? %>
         #  <% indent { yield } %>
-        #  set $LINECOOK_OPTIONS > /dev/null<% end %>
+        #  set $LINECOOK_OPTS > /dev/null<% end %>
         #  
         #  
         _erbout.concat "set -v";  if block_given? ; _erbout.concat "\n"
         indent { yield } 
-        _erbout.concat "set $LINECOOK_OPTIONS > /dev/null";  end ; _erbout.concat "\n"
+        _erbout.concat "set $LINECOOK_OPTS > /dev/null";  end ; _erbout.concat "\n"
         _erbout.concat "\n"
         nil
       end
@@ -351,12 +361,12 @@ module Linebook
       def xtrace()
         #  set -x<% if block_given? %>
         #  <% indent { yield } %>
-        #  set $LINECOOK_OPTIONS > /dev/null<% end %>
+        #  set $LINECOOK_OPTS > /dev/null<% end %>
         #  
         #  
         _erbout.concat "set -x";  if block_given? ; _erbout.concat "\n"
         indent { yield } 
-        _erbout.concat "set $LINECOOK_OPTIONS > /dev/null";  end ; _erbout.concat "\n"
+        _erbout.concat "set $LINECOOK_OPTS > /dev/null";  end ; _erbout.concat "\n"
         _erbout.concat "\n"
         nil
       end

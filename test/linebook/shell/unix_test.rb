@@ -139,7 +139,7 @@ class UnixTest < Test::Unit::TestCase
     assert_recipe %q{
       set +x +v
         echo a
-      set $LINECOOK_OPTIONS > /dev/null
+      set $LINECOOK_OPTS > /dev/null
       
     } do
       quiet do
@@ -165,7 +165,7 @@ class UnixTest < Test::Unit::TestCase
     assert_recipe %q{
       set -v
         echo a
-      set $LINECOOK_OPTIONS > /dev/null
+      set $LINECOOK_OPTS > /dev/null
       
     } do
       verbose do
@@ -191,7 +191,7 @@ class UnixTest < Test::Unit::TestCase
     assert_recipe %q{
       set -x
         echo a
-      set $LINECOOK_OPTIONS > /dev/null
+      set $LINECOOK_OPTS > /dev/null
       
     } do
       xtrace do
@@ -245,37 +245,95 @@ class UnixTest < Test::Unit::TestCase
   # shebang test
   #
   
-  def test_shebang_exports_LINECOOK_DIR
-    setup_recipe 'recipe' do
-      shebang
-      target.puts 'echo recipe'
-      target.puts 'echo "$LINECOOK_DIR"'
-      
-      script = capture_path('script') do
-        target.puts 'echo script'
-        target.puts 'echo "$LINECOOK_DIR"'
-      end
-      
-      target.puts %{sh "#{script}"}
-    end
-    
-    assert_output_equal %{
-      recipe
-      /home/linecook/vm/test/linebook/shell/unix_test/test_shebang_exports_LINECOOK_DIR/abox
-      script
-      /home/linecook/vm/test/linebook/shell/unix_test/test_shebang_exports_LINECOOK_DIR/abox
-    }, *run_package
-  end
-  
   def test_shebang_uses_LINECOOK_DIR_if_set
     setup_recipe 'recipe' do
-      target.puts "LINECOOK_DIR=current"
+      target.puts "LINECOOK_DIR='current'"
       shebang
       target.puts 'echo "$LINECOOK_DIR"'
     end
     
     assert_output_equal %{
       current
+    }, *run_package
+  end
+  
+  def test_shebang_exports_LINECOOK_DIR
+    setup_recipe 'outer' do
+      target.puts "LINECOOK_DIR='current'"
+      shebang
+      target.puts 'echo outer'
+      target.puts 'echo "$LINECOOK_DIR"'
+      
+      capture_path('inner') do
+        target.puts 'echo inner'
+        target.puts 'echo "$LINECOOK_DIR"'
+      end
+      
+      target.puts %{sh "$(dirname $0)/inner"}
+    end
+    
+    assert_output_equal %{
+      outer
+      current
+      inner
+      current
+    }, *run_package
+  end
+  
+  def test_shebang_sets_LINECOOK_DIR_to_recipe_dirname
+    setup_recipe 'recipe' do
+      shebang
+      target.puts 'echo "$LINECOOK_DIR"'
+    end
+    
+    assert_output_equal %{
+      /home/linecook/test/linebook/shell/unix_test/test_shebang_sets_LINECOOK_DIR_to_recipe_dirname
+    }, *run_package
+  end
+  
+  def test_shebang_uses_LINECOOK_OPTS_if_set
+    setup_recipe 'recipe' do
+      target.puts "LINECOOK_OPTS='+v +x'"
+      shebang
+      target.puts 'echo "$LINECOOK_OPTS"'
+    end
+    
+    assert_output_equal %{
+      +v +x
+    }, *run_package
+  end
+  
+  def test_shebang_exports_LINECOOK_OPTS
+    setup_recipe 'outer' do
+      target.puts "LINECOOK_OPTS='+v +x'"
+      shebang
+      target.puts 'echo outer'
+      target.puts 'echo "$LINECOOK_OPTS"'
+      
+      capture_path('inner') do
+        target.puts 'echo inner'
+        target.puts 'echo "$LINECOOK_OPTS"'
+      end
+      
+      target.puts %{sh "$(dirname $0)/inner"}
+    end
+    
+    assert_output_equal %{
+      outer
+      +v +x
+      inner
+      +v +x
+    }, *run_package
+  end
+  
+  def test_shebang_sets_LINECOOK_OPTS_to_verbose
+    setup_recipe 'recipe' do
+      shebang
+      target.puts 'echo "$LINECOOK_OPTS"'
+    end
+    
+    assert_output_equal %{
+      -v
     }, *run_package
   end
 end

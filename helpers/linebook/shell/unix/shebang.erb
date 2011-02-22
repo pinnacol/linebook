@@ -9,23 +9,28 @@ Use dev/null on set such that no options will not dump ENV into stdout.
 <%= check_status_function %>
 
 export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}
-export LINECOOK_OPTIONS=
+export LINECOOK_OPTS=${LINECOOK_OPTS:--v}
 
-while getopts bhvx opt
+usage="usage: %s: [-hqvx]\n"
+option="       %s   %s\n"
+while getopts "hqvx" opt
 do
   case $opt in
-  v)  LINECOOK_OPTIONS="$LINECOOK_OPTIONS -v";;
-  x)  LINECOOK_OPTIONS="$LINECOOK_OPTIONS -x";;
-  h)  printf "Usage: %s: [-hvx]\n" $0
-      printf "  -h    prints this help\n"
-      printf "  -v    verbose (set -v)\n"
-      printf "  -x    xtrace  (set -x)\n"
-      exit 0;;
-  ?)  printf "Usage: %s: [-hvx]\n" $0
-      exit 2;;
+  h  )  printf "$usage" $0
+        printf "$option" "-h" "prints this help"
+        printf "$option" "-q" "quiet (set +v +x)"
+        printf "$option" "-v" "verbose (set -v)"
+        printf "$option" "-x" "xtrace (set -x)"
+        exit 0 ;;
+  q  )  LINECOOK_OPTS="$LINECOOK_OPTS +v +x";;
+  v  )  LINECOOK_OPTS="$LINECOOK_OPTS -v";;
+  x  )  LINECOOK_OPTS="$LINECOOK_OPTS -x";;
+  \? )  printf "$usage" $0
+        exit 2 ;;
   esac
 done
+shift $(($OPTIND - 1))
 
-set $LINECOOK_OPTIONS > /dev/null
+set $LINECOOK_OPTS > /dev/null
 <% section " #{target_name} " %>
 
