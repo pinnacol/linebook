@@ -4,24 +4,6 @@ require 'erb'
 module Linebook
   module Os
     module Ubuntu
-      def addgroup(name)
-        cmd 'addgroup', name
-        nil
-      end
-      
-      def _addgroup(*args, &block) # :nodoc:
-        capture { addgroup(*args, &block) }
-      end
-      
-      def adduser(name)
-        cmd 'adduser', name
-        nil
-      end
-      
-      def _adduser(*args, &block) # :nodoc:
-        capture { adduser(*args, &block) }
-      end
-      
       def package(name, version=nil)
         #  sudo apt-get -q -y install <%= name %><%= blank?(version) ? nil : "=#{version}" %>
         #  <%= check_status %>

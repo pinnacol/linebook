@@ -1,3 +1,0 @@
-(name)
---
-  cmd 'adduser', name

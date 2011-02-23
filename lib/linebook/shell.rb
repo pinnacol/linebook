@@ -28,6 +28,27 @@ module Linebook
       '/var/log/linecook'
     end
     
+    def format_opts(opts)
+      options = opts.collect do |(key, value)|
+        unless key.kind_of?(String)
+          key = key.to_s.gsub('_', '-')
+        end
+        
+        prefix = key.length == 1 ? '-' : '--'
+        
+        case value
+        when true
+          "#{prefix}#{key}"
+        when false, nil
+          nil
+        else
+          %{#{prefix}#{key} "#{value}"}
+        end
+      end
+      
+      options.compact.sort
+    end
+    
     # Backup a file.
     def backup(path, options={})
       backup_path = "#{path}.bak"
@@ -58,14 +79,12 @@ module Linebook
       capture { directory(*args, &block) }
     end
     
-    def execute(cmd)
-      #  <%= cmd %>
-      #  
-      #  <% check_status %>
-      #  
-      _erbout.concat(( cmd ).to_s)
-      _erbout.concat "\n"
-      check_status
+    def execute(command, *args)
+      if args.last.kind_of?(Hash)
+        opts = args.pop
+        args = format_opts(opts) + args
+      end
+      cmd command, *args
       nil
     end
     
@@ -85,8 +104,8 @@ module Linebook
     end
     
     def group?(name)
-      #  grep "^<%= name %>:" /etc/group
-      _erbout.concat "grep \"^"; _erbout.concat(( name ).to_s); _erbout.concat ":\" /etc/group";
+      #  grep "^<%= name %>:" /etc/group >/dev/null 2>&1
+      _erbout.concat "grep \"^"; _erbout.concat(( name ).to_s); _erbout.concat ":\" /etc/group >/dev/null 2>&1";
       nil
     end
     
@@ -96,13 +115,54 @@ module Linebook
     
     def group(name, options={})
       not_if _group?(name) do
-        addgroup name
+        groupadd name
       end
       nil
     end
     
     def _group(*args, &block) # :nodoc:
       capture { group(*args, &block) }
+    end
+    
+    def groupadd(name, options={})
+      execute 'groupadd', name, options
+      nil
+    end
+    
+    def _groupadd(*args, &block) # :nodoc:
+      capture { groupadd(*args, &block) }
+    end
+    
+    def groupdel(name, options={})
+      execute 'groupdel', name, options
+      nil
+    end
+    
+    def _groupdel(*args, &block) # :nodoc:
+      capture { groupdel(*args, &block) }
+    end
+    
+    def groupmod(name, options={})
+      execute 'groupmod', name, options
+      nil
+    end
+    
+    def _groupmod(*args, &block) # :nodoc:
+      capture { groupmod(*args, &block) }
+    end
+    
+    def groups(user, options={})
+      sep = option[:sep]
+      #  id -Gn <%= user %><% if sep %> | sed "s/ /<%= sep %>/g"<% end %>
+      #  
+      #  
+      _erbout.concat "id -Gn "; _erbout.concat(( user ).to_s);  if sep ; _erbout.concat " | sed \"s/ /"; _erbout.concat(( sep ).to_s); _erbout.concat "/g\"";  end ; _erbout.concat "\n"
+      _erbout.concat "\n"
+      nil
+    end
+    
+    def _groups(*args, &block) # :nodoc:
+      capture { groups(*args, &block) }
     end
     
     # Installs a file
@@ -145,7 +205,7 @@ module Linebook
       
       not_if %{grep -xqs "#{recipe_name}" "#{runlist}"} do
         target.puts %{echo "#{recipe_name}" >> "#{runlist}"}
-        target.puts %{#{shell_path} "#{recipe_path}" $*}
+        target.puts %{"#{shell_path}" "#{recipe_path}" $*}
         check_status
       end
       nil
@@ -167,15 +227,57 @@ module Linebook
       capture { template(*args, &block) }
     end
     
+    def user?(name)
+      #  grep "^<%= name %>" /etc/passwd >/dev/null 2>&1
+      _erbout.concat "grep \"^"; _erbout.concat(( name ).to_s); _erbout.concat "\" /etc/passwd >/dev/null 2>&1";
+      nil
+    end
+    
+    def _user?(*args, &block) # :nodoc:
+      capture { user?(*args, &block) }
+    end
+    
     def user(name, options={})
       not_if _user?(name) do
         adduser name
+      end
+      
+      groups = options[:groups]
+      if groups && !groups.empty?
+        usermod name, :groups => "#{groups.join(',')},$(#{_groups(name, :sep => ',')})"
       end
       nil
     end
     
     def _user(*args, &block) # :nodoc:
       capture { user(*args, &block) }
+    end
+    
+    def useradd(name, options={})
+      execute 'useradd', name, options
+      nil
+    end
+    
+    def _useradd(*args, &block) # :nodoc:
+      capture { useradd(*args, &block) }
+    end
+    
+    def userdel(name, options={})
+      execute 'userdel', name, options
+      nil
+    end
+    
+    def _userdel(*args, &block) # :nodoc:
+      capture { userdel(*args, &block) }
+    end
+    
+    def usermod(name, options={})
+      execute 'usermod', name, options
+      nil
+    end
+    
+    def _usermod(*args, &block) # :nodoc:
+      capture { usermod(*args, &block) }
     end
   end
 end

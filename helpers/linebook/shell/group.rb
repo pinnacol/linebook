@@ -1,5 +1,6 @@
 (name, options={})
 --
   not_if _group?(name) do
-    addgroup name
+    groupadd name
   end
+  

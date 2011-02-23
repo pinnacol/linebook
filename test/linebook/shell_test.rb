@@ -357,4 +357,28 @@ class ShellTest < Test::Unit::TestCase
     package.build_recipe('child')
     assert_equal 'content', package.content('child')
   end
+  
+  #
+  # groupadd test
+  #
+  
+  def test_groupadd_creates_commands_to_add_group
+    assert_recipe %q{
+      groupadd "name"
+    } do
+      groupadd 'name'
+    end
+  end
+  
+  #
+  # useradd test
+  #
+  
+  def test_useradd_creates_commands_to_add_user
+    assert_recipe %q{
+      useradd "name"
+    } do
+      useradd 'name'
+    end
+  end
 end

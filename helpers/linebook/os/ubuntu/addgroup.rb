@@ -1,3 +1,0 @@
-(name)
---
-  cmd 'addgroup', name

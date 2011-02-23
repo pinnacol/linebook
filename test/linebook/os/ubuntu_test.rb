@@ -12,18 +12,6 @@ class OsTest < Test::Unit::TestCase
   end
   
   #
-  # addgroup test
-  #
-  
-  def test_addgroup_creates_commands_to_add_group
-    assert_recipe %q{
-      addgroup "name"
-    } do
-      addgroup 'name'
-    end
-  end
-  
-  #
   # package test
   #
   
@@ -40,18 +28,6 @@ class OsTest < Test::Unit::TestCase
       sudo apt-get -q -y install name=1.0.0
     } do
       package 'name', '1.0.0'
-    end
-  end
-  
-  #
-  # adduser test
-  #
-  
-  def test_adduser_creates_commands_to_add_user
-    assert_recipe %q{
-      adduser "name"
-    } do
-      adduser 'name'
     end
   end
 end
