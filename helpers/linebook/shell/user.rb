@@ -1,10 +1,11 @@
 (name, options={})
 --
   not_if _user?(name) do
-    adduser name
+    useradd name
   end
   
-  groups = options[:groups]
-  if groups && !groups.empty?
-    usermod name, :groups => "#{groups.join(',')},$(#{_groups(name, :sep => ',')})"
+  
+  if groups = options[:groups]
+    groups = groups.gsub('*') { "$(#{_groups(name, :sep => ',')})" }
+    usermod name, :groups => groups
   end

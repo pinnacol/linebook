@@ -152,11 +152,11 @@ module Linebook
     end
     
     def groups(user, options={})
-      sep = option[:sep]
-      #  id -Gn <%= user %><% if sep %> | sed "s/ /<%= sep %>/g"<% end %>
+      sep = options[:sep]
+      #  id -Gn <%= quote(user) %><% if sep %> | sed "s/ /<%= sep %>/g"<% end %>
       #  
       #  
-      _erbout.concat "id -Gn "; _erbout.concat(( user ).to_s);  if sep ; _erbout.concat " | sed \"s/ /"; _erbout.concat(( sep ).to_s); _erbout.concat "/g\"";  end ; _erbout.concat "\n"
+      _erbout.concat "id -Gn "; _erbout.concat(( quote(user) ).to_s);  if sep ; _erbout.concat " | sed \"s/ /"; _erbout.concat(( sep ).to_s); _erbout.concat "/g\"";  end ; _erbout.concat "\n"
       _erbout.concat "\n"
       nil
     end
@@ -239,12 +239,13 @@ module Linebook
     
     def user(name, options={})
       not_if _user?(name) do
-        adduser name
+        useradd name
       end
       
-      groups = options[:groups]
-      if groups && !groups.empty?
-        usermod name, :groups => "#{groups.join(',')},$(#{_groups(name, :sep => ',')})"
+      
+      if groups = options[:groups]
+        groups = groups.gsub('*') { "$(#{_groups(name, :sep => ',')})" }
+        usermod name, :groups => groups
       end
       nil
     end
