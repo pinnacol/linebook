@@ -1,0 +1,53 @@
+* assume root shell, root ENV
+* make helpers to get one (like debug)
+* assume build-essentials, curl
+
+= Posix
+# common utilities
+
+cmd name, *args      # execute command, quote args unless char[0] is " ' or -
+execute name, *args  # execute with prefix/suffix (for su/sudo for example)
+                     # and format hash as options
+
+= Unix
+# lower level operations, add/rm
+
+mkdir target
+ln source target
+rm target
+cp source target
+
+= OS
+# user management, package name mappings?
+
+su user, *env     # obtain shell/env
+
+groupadd name    # add direction, literal
+groupdel name    # rm direction, literal
+
+useradd name     # add direction, literal
+userdel name     # rm direction, literal
+
+user? name
+group? name
+
+users group
+groups user
+
+= Shell
+# high level wrappers, generally add direction with idempotent checks
+
+install source target
+
+blob sha target
+file file_name target
+template template_name target
+package package_name           # map if possible, or use name
+recipe recipe_name
+capture target {|io| }
+
+backup target
+restore target
+
+group name    # add direction, incremental, :rm => true
+user name     # add direction, incremental, :rm => true
