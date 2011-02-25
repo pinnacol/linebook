@@ -1,7 +1,3 @@
-* assume root shell, root ENV
-* make helpers to get one (like debug)
-* assume build-essentials, curl
-
 = Posix
 # common utilities
 
@@ -16,17 +12,22 @@ mkdir target
 ln source target
 rm target
 cp source target
+shebang              # add hooks to define functions
+                     # add generic system to define 'require after'
+                     # patch modules... even as there are 'require before'
+                     # modules handled by extend
 
-= OS
+= OS - Generic ( this is an API overwrite as needed )
 # user management, package name mappings?
 
-su user, *env     # obtain shell/env
+su user, *env        # obtain shell/env
+prerequisites        # openssl, curl, perl
 
-groupadd name    # add direction, literal
-groupdel name    # rm direction, literal
+groupadd name        # add direction, literal
+groupdel name        # rm direction, literal
 
-useradd name     # add direction, literal
-userdel name     # rm direction, literal
+useradd name         # add direction, literal
+userdel name         # rm direction, literal
 
 user? name
 group? name
@@ -42,12 +43,36 @@ install source target
 blob sha target
 file file_name target
 template template_name target
-package package_name           # map if possible, or use name
+package package_name # map if possible, or use name
 recipe recipe_name
 capture target {|io| }
 
 backup target
 restore target
+validate target, sha
 
-group name    # add direction, incremental, :rm => true
-user name     # add direction, incremental, :rm => true
+group name           # add direction, incremental, :rm => true
+user name            # add direction, incremental, :rm => true
+system_user name
+
+(no such define service... just make a helper)
+
+= Test
+# assertions
+
+assert_script        # check stdout equal, exit status
+assert_script_match  # check grep of stdout, exit status
+
+assert_rm path        # check non-existence
+assert_sha sha, path  # check contents
+assert_file path, [{mode, user, group}]
+assert_dir path, [{mode, user, group}]
+
+
+=============================================================================
+# basic options... then on specific systems you can extend.
+# generic recipes should only do very generic things... no
+# skeleton dirs, etc. which can be implemented in other ways.
+#
+* add normal user [name, password, home_dir, comment, skel, shell, uid]
+* add system user [name, password, comment, shell, uid]
