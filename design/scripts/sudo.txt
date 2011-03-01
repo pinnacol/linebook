@@ -1,0 +1,38 @@
+# Always execute a script and not multiple commands because sudo
+# in different versions will and will not pass a '-' to the shell
+# such that these could be equivalent:
+#
+#   sudo -i -u linecook abc
+#   bash - abc
+#   bash abc
+#
+# Unfortunately the middle one will crap out on commands. Ex:
+#
+#   bash - env
+#   /usr/bin/env: /usr/bin/env: cannot execute binary file
+#
+
+# new env
+sudo -u linecook [script]
+
+# current env (not all sudo support -E)
+sudo -E -u linecook [script]
+
+# login env
+sudo -i -u linecook [script]
+
+# Note that there are equivalent commands using su, which is handy
+# since not all sudo support -E.  The downside is that while you can
+# setup sudo to not require a password, su does... so you need to
+# invoke it as root in a scripting world.
+
+# new env
+env - su linecook [script]
+
+# current env
+su linecook [script]
+su -m linecook [script]
+
+# login env
+su -l linecook [script]
+

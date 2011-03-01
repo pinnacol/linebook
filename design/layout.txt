@@ -1,0 +1,29 @@
+var
+  linecook
+    current -> id
+    shared
+      ...            # if there is anything needed?  LINECOOK_SHARE_DIR
+    packages
+      id
+        run  -> scripts/run
+        test -> scripts/test
+        blobs
+          ch/ecksum  # store once, link to elsewhere?
+        scripts/
+          name
+          name.d
+        ...
+        tmp          # remove/remake each run
+          callback   # run after linecook finishes, add post-lc hooks here
+          callback1  # to start services, etc.
+          ...
+          callbackN
+          profile
+          profile1
+          ...
+          profileN
+          runlist
+        log
+          time
+            stdout
+            stderr

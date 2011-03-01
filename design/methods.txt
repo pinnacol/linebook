@@ -76,3 +76,12 @@ assert_dir path, [{mode, user, group}]
 #
 * add normal user [name, password, home_dir, comment, skel, shell, uid]
 * add system user [name, password, comment, shell, uid]
+
+=============================================================================
+# add checks before a recipe, ensure:
+# whoami
+# env variable needed
+# etc.
+#
+# Even run tests prior -- decide whether the recipe needs to be run.
+#
