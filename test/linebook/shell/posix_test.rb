@@ -64,6 +64,30 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # with_cmd_prefix test
+  #
+  
+  def test_with_cmd_prefix_sets_cmd_prefix_for_the_duration_of_a_block
+    assert_equal nil, recipe.cmd_prefix
+    recipe.with_cmd_prefix('prefix') do
+      assert_equal 'prefix', recipe.cmd_prefix
+    end
+    assert_equal nil, recipe.cmd_prefix
+  end
+  
+  #
+  # with_cmd_suffix test
+  #
+  
+  def test_with_cmd_suffix_sets_cmd_suffix_for_the_duration_of_a_block
+    assert_equal nil, recipe.cmd_suffix
+    recipe.with_cmd_suffix('suffix') do
+      assert_equal 'suffix', recipe.cmd_suffix
+    end
+    assert_equal nil, recipe.cmd_suffix
+  end
+  
+  #
   # check_status test
   #
   
@@ -153,11 +177,29 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
+  def test_cmd_does_not_quote_the_command
+    assert_recipe %q{
+      command_name a b c
+    } do
+      cmd 'command_name a b c'
+    end
+  end
+  
   def test_cmd_quotes_partially_quoted_args
     assert_recipe %q{
       command_name "'one" "two'" "th'ree"
     } do
       cmd 'command_name', "'one", "two'", "th'ree"
+    end
+  end
+  
+  def test_cmd_uses_current_cmd_prefix_and_suffix
+    assert_recipe %q{
+      prefix command_name "a" "b" "c" suffix
+    } do
+      self.cmd_prefix = "prefix "
+      self.cmd_suffix = " suffix"
+      cmd 'command_name', "a", "b", "c"
     end
   end
   

@@ -32,8 +32,10 @@ module Linebook
         opts && block_given? ? yield(opts) : opts
       end
       
+      # The prefix added to all cmd calls.
       attr_accessor :cmd_prefix
       
+      # Sets cmd_prefix for the duration of a block.
       def with_cmd_prefix(prefix)
         current = cmd_prefix
         begin
@@ -44,8 +46,10 @@ module Linebook
         end
       end
       
+      # The suffix added to all cmd calls.
       attr_accessor :cmd_suffix
       
+      # Sets cmd_suffix for the duration of a block.
       def with_cmd_suffix(suffix)
         current = cmd_suffix
         begin

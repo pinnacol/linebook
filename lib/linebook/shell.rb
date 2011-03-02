@@ -59,7 +59,7 @@ module Linebook
       end
       
       chmod 644, backup_path
-      nil
+      self
     end
     
     def _backup(*args, &block) # :nodoc:
@@ -72,7 +72,7 @@ module Linebook
       end 
       chmod options[:mode], target
       chown options[:user], options[:group], target
-      nil
+      self
     end
     
     def _directory(*args, &block) # :nodoc:
@@ -85,7 +85,7 @@ module Linebook
         args = format_opts(opts) + args
       end
       cmd command, *args
-      nil
+      self
     end
     
     def _execute(*args, &block) # :nodoc:
@@ -96,7 +96,7 @@ module Linebook
     def file(file_name, target, options={})
       source = file_path(file_name, guess_target_name(target))
       install(source, target, options)
-      nil
+      self
     end
     
     def _file(*args, &block) # :nodoc:
@@ -106,7 +106,7 @@ module Linebook
     def group?(name)
       #  grep "^<%= name %>:" /etc/group >/dev/null 2>&1
       _erbout.concat "grep \"^"; _erbout.concat(( name ).to_s); _erbout.concat ":\" /etc/group >/dev/null 2>&1";
-      nil
+      self
     end
     
     def _group?(*args, &block) # :nodoc:
@@ -117,7 +117,7 @@ module Linebook
       not_if _group?(name) do
         groupadd name
       end
-      nil
+      self
     end
     
     def _group(*args, &block) # :nodoc:
@@ -126,7 +126,7 @@ module Linebook
     
     def groupadd(name, options={})
       execute 'groupadd', name, options
-      nil
+      self
     end
     
     def _groupadd(*args, &block) # :nodoc:
@@ -135,7 +135,7 @@ module Linebook
     
     def groupdel(name, options={})
       execute 'groupdel', name, options
-      nil
+      self
     end
     
     def _groupdel(*args, &block) # :nodoc:
@@ -144,7 +144,7 @@ module Linebook
     
     def groupmod(name, options={})
       execute 'groupmod', name, options
-      nil
+      self
     end
     
     def _groupmod(*args, &block) # :nodoc:
@@ -158,7 +158,7 @@ module Linebook
       #  
       _erbout.concat "id -Gn "; _erbout.concat(( quote(user) ).to_s);  if sep ; _erbout.concat " | sed \"s/ /"; _erbout.concat(( sep ).to_s); _erbout.concat "/g\"";  end ; _erbout.concat "\n"
       _erbout.concat "\n"
-      nil
+      self
     end
     
     def _groups(*args, &block) # :nodoc:
@@ -180,7 +180,7 @@ module Linebook
       cp source, target
       chmod options[:mode], target
       chown options[:user], options[:group], target
-      nil
+      self
     end
     
     def _install(*args, &block) # :nodoc:
@@ -189,7 +189,7 @@ module Linebook
     
     def package(name, version=nil)
       raise NotImplementedError
-      nil
+      self
     end
     
     def _package(*args, &block) # :nodoc:
@@ -208,7 +208,7 @@ module Linebook
         target.puts %{"#{shell_path}" "#{recipe_path}" $*}
         check_status
       end
-      nil
+      self
     end
     
     def _recipe(*args, &block) # :nodoc:
@@ -220,7 +220,7 @@ module Linebook
       locals = options[:locals] || {}
       source = template_path(template_name, guess_target_name(target), locals)
       install(source, target, options)
-      nil
+      self
     end
     
     def _template(*args, &block) # :nodoc:
@@ -230,7 +230,7 @@ module Linebook
     def user?(name)
       #  grep "^<%= name %>" /etc/passwd >/dev/null 2>&1
       _erbout.concat "grep \"^"; _erbout.concat(( name ).to_s); _erbout.concat "\" /etc/passwd >/dev/null 2>&1";
-      nil
+      self
     end
     
     def _user?(*args, &block) # :nodoc:
@@ -247,7 +247,7 @@ module Linebook
         groups = groups.gsub('*') { "$(#{_groups(name, :sep => ',')})" }
         usermod name, :groups => groups
       end
-      nil
+      self
     end
     
     def _user(*args, &block) # :nodoc:
@@ -256,7 +256,7 @@ module Linebook
     
     def useradd(name, options={})
       execute 'useradd', name, options
-      nil
+      self
     end
     
     def _useradd(*args, &block) # :nodoc:
@@ -265,7 +265,7 @@ module Linebook
     
     def userdel(name, options={})
       execute 'userdel', name, options
-      nil
+      self
     end
     
     def _userdel(*args, &block) # :nodoc:
@@ -274,7 +274,7 @@ module Linebook
     
     def usermod(name, options={})
       execute 'usermod', name, options
-      nil
+      self
     end
     
     def _usermod(*args, &block) # :nodoc:
