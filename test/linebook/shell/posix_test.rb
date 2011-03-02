@@ -251,6 +251,18 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # comment test
+  #
+  
+  def test_comment_writes_a_comment_string
+    assert_recipe %q{
+      # string
+    } do
+      comment 'string'
+    end
+  end
+  
+  #
   # execute test
   #
   
@@ -278,18 +290,6 @@ class PosixTest < Test::Unit::TestCase
       self.execute_prefix = "prefix "
       self.execute_suffix = " suffix"
       execute 'command_name', "a", "b", "c"
-    end
-  end
-  
-  #
-  # comment test
-  #
-  
-  def test_comment_writes_a_comment_string
-    assert_recipe %q{
-      # string
-    } do
-      comment 'string'
     end
   end
   
@@ -505,25 +505,6 @@ class PosixTest < Test::Unit::TestCase
       set_options(:verbose => true, :xtrace => false)
     end
   end
-  
-  # def test_set_options_functions_to_set_options
-  #   build_package do
-  #     target.puts 'echo a'
-  #     set_options(:verbose => true)
-  #     target.puts 'echo b'
-  #     set_options(:verbose => false)
-  #     target.puts 'echo c'
-  #   end
-  #   
-  #   check_package %Q{
-  #     % sh package/recipe 2>&1
-  #     a
-  #     echo b
-  #     b
-  #     set +o verbose
-  #     c
-  #   } 
-  # end
   
   #
   # unset test
