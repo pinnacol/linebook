@@ -1,17 +1,8 @@
-Execute a command and check the output status. Arguments are quoted with ""
-unless they begin with '-' or are already quoted. If the last arg is a hash,
-then it will be formatted into options and prepended to args.
-
-Execute also allows a prefix/suffix to wrap the command and args. See
-with_execute_prefix and with_execute_suffix.
+Executes a command and checks the output status. Unlike cmd, execute allows a
+prefix/suffix to wrap the command and args. See with_execute_prefix and
+with_execute_suffix.
 (command, *args)
-  opts = args.last.kind_of?(Hash) ? args.pop : {}
-  args.compact!
-  args.collect! {|arg| quote(arg) }
-  
-  args = format_execute_options(opts) + args
-  args.unshift(command)
 --
-<%= execute_prefix %><%= args.join(' ') %><%= execute_suffix %>
+<%= execute_prefix %><%= format_cmd(command, *args) %><%= execute_suffix %>
 
 <% check_status %>

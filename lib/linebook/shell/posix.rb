@@ -4,6 +4,12 @@ require 'erb'
 module Linebook
   module Shell
     module Posix
+      # Returns true if the obj converts to a string which is whitespace or empty.
+      def blank?(obj)
+        # shortcut for nil...
+        obj.nil? || obj.to_s.strip.empty?
+      end
+      
       # Encloses the arg in quotes ("").
       def quote(arg)
         quoted?(arg) || !quote?(arg) ? arg : "\"#{arg}\""
@@ -21,10 +27,56 @@ module Linebook
         arg =~ /\A".*"\z/ || arg =~ /\A'.*'\z/ ? true : false
       end
       
-      # Returns true if the obj converts to a string which is whitespace or empty.
-      def blank?(obj)
-        # shortcut for nil...
-        obj.nil? || obj.to_s.strip.empty?
+      # Formats a command line command.  Arguments are quoted. If the last arg is a
+      # hash, then it will be formatted into options using format_options and
+      # prepended to args.
+      def format_cmd(command, *args)
+        opts = args.last.kind_of?(Hash) ? args.pop : {}
+        args.compact!
+        args.collect! {|arg| quote(arg) }
+        
+        args = format_options(opts) + args
+        args.unshift(command)
+        args.join(' ')
+      end
+      
+      # Formats a hash key-value string into command line options using the
+      # following heuristics:
+      #
+      # * Prepend '--' to mulit-char keys and '-' to single-char keys (unless
+      #   they already start with '-').
+      # * For true values return the '--key'
+      # * For false/nil values return nothing
+      # * For all other values, quote (unless already quoted) and return '--key
+      #  "value"'
+      #
+      # In addition, key formatting is performed on non-string keys (typically
+      # symbols) such that underscores are converted to dashes, ie :some_key =>
+      # 'some-key'.
+      def format_options(opts)
+        options = []
+        
+        opts.each do |(key, value)|
+          unless key.kind_of?(String)
+            key = key.to_s.gsub('_', '-')
+          end
+          
+          unless key[0] == ?-
+            prefix = key.length == 1 ? '-' : '--'
+            key = "#{prefix}#{key}"
+          end
+          
+          case value
+          when true
+            options << key
+          when false, nil
+            next
+          else
+            options << "#{key} #{quote(value.to_s)}"
+          end
+        end
+        
+        options.sort
       end
       
       # The prefix added to all execute calls.
@@ -53,45 +105,6 @@ module Linebook
         ensure
           self.execute_suffix = current
         end
-      end
-      
-      # Formats a hash key-value string into command line options using the
-      # following heuristics:
-      #
-      # * Prepend '--' to mulit-char keys and '-' to single-char keys (unless
-      #   they already start with '-').
-      # * For true values return the '--key'
-      # * For false/nil values return nothing
-      # * For all other values, quote (unless already quoted) and return '--key
-      #  "value"'
-      #
-      # In addition, key formatting is performed on non-string keys (typically
-      # symbols) such that underscores are converted to dashes, ie :some_key =>
-      # 'some-key'.
-      def format_execute_options(opts)
-        options = []
-        
-        opts.each do |(key, value)|
-          unless key.kind_of?(String)
-            key = key.to_s.gsub('_', '-')
-          end
-          
-          unless key[0] == ?-
-            prefix = key.length == 1 ? '-' : '--'
-            key = "#{prefix}#{key}"
-          end
-          
-          case value
-          when true
-            options << key
-          when false, nil
-            next
-          else
-            options << "#{key} #{quote(value.to_s)}"
-          end
-        end
-        
-        options.sort
       end
       
       # Adds a check that ensures the last exit status is as indicated. Note that no
@@ -127,16 +140,12 @@ module Linebook
         capture { check_status_function(*args, &block) }
       end
       
-      # Execute a command and check the output status.  Arguments are quoted with ""
-      # unless they begin with '-' or are already quoted.
+      # Executes a command and checks the output status.
       def cmd(command, *args)
-        args.compact!
-        args.collect! {|arg| quote(arg) }
-        args.unshift(command)
-        #  <%= args.join(' ') %>
+        #  <%= format_cmd(command, *args) %>
         #  
         #  <% check_status %>
-        _erbout.concat(( args.join(' ') ).to_s)
+        _erbout.concat(( format_cmd(command, *args) ).to_s)
         _erbout.concat "\n"
         check_status ;
         self
@@ -158,23 +167,14 @@ module Linebook
         capture { comment(*args, &block) }
       end
       
-      # Execute a command and check the output status. Arguments are quoted with ""
-      # unless they begin with '-' or are already quoted. If the last arg is a hash,
-      # then it will be formatted into options and prepended to args.
-      # 
-      # Execute also allows a prefix/suffix to wrap the command and args. See
-      # with_execute_prefix and with_execute_suffix.
+      # Executes a command and checks the output status. Unlike cmd, execute allows a
+      # prefix/suffix to wrap the command and args. See with_execute_prefix and
+      # with_execute_suffix.
       def execute(command, *args)
-        opts = args.last.kind_of?(Hash) ? args.pop : {}
-        args.compact!
-        args.collect! {|arg| quote(arg) }
-        
-        args = format_execute_options(opts) + args
-        args.unshift(command)
-        #  <%= execute_prefix %><%= args.join(' ') %><%= execute_suffix %>
+        #  <%= execute_prefix %><%= format_cmd(command, *args) %><%= execute_suffix %>
         #  
         #  <% check_status %>
-        _erbout.concat(( execute_prefix ).to_s); _erbout.concat(( args.join(' ') ).to_s); _erbout.concat(( execute_suffix ).to_s)
+        _erbout.concat(( execute_prefix ).to_s); _erbout.concat(( format_cmd(command, *args) ).to_s); _erbout.concat(( execute_suffix ).to_s)
         _erbout.concat "\n"
         check_status ;
         self

@@ -11,6 +11,25 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # blank test
+  #
+  
+  def test_blank_check_returns_false_for_non_empty_or_whitespace_string
+    assert_equal false, recipe.blank?('abc')
+  end
+  
+  class ToEmptyStr
+    def to_s; ''; end
+  end
+  
+  def test_blank_check_returns_true_for_objects_that_to_s_to_a_whitespace_string
+    assert_equal true, recipe.blank?(nil)
+    assert_equal true, recipe.blank?('')
+    assert_equal true, recipe.blank?('   ')
+    assert_equal true, recipe.blank?(ToEmptyStr.new)
+  end
+  
+  #
   # quote test
   #
   
@@ -54,22 +73,62 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
-  # blank test
+  # format_cmd test
   #
   
-  def test_blank_check_returns_false_for_non_empty_or_whitespace_string
-    assert_equal false, recipe.blank?('abc')
+  def test_format_cmd_formats_a_command
+    cmd  = recipe.format_cmd('command', 'one', 'two', 'three', 'a' => true, 'b' => true, 'c' => true)
+    assert_equal 'command -a -b -c "one" "two" "three"', cmd
   end
   
-  class ToEmptyStr
-    def to_s; ''; end
+  def test_format_cmd_does_not_quote_quoted_args
+    assert_equal %{command_name "one" 'two'}, recipe.format_cmd('command_name', '"one"', "'two'")
   end
   
-  def test_blank_check_returns_true_for_objects_that_to_s_to_a_whitespace_string
-    assert_equal true, recipe.blank?(nil)
-    assert_equal true, recipe.blank?('')
-    assert_equal true, recipe.blank?('   ')
-    assert_equal true, recipe.blank?(ToEmptyStr.new)
+  def test_format_cmd_quotes_partially_quoted_args
+    assert_equal %{command_name "'one" "two'" "th'ree"}, recipe.format_cmd('command_name', "'one", "two'", "th'ree")
+  end
+  
+  #
+  # format_options test
+  #
+  
+  def test_format_options_formats_key_value_options_to_options_array
+    assert_equal ['--key "value"'], recipe.format_options('--key' => '"value"')
+  end
+  
+  def test_format_options_quotes_values
+    assert_equal ['--key "value"'], recipe.format_options('--key' => 'value')
+  end
+  
+  def test_format_options_stringifies_values
+    assert_equal ['--key "value"'], recipe.format_options('--key' => :value)
+  end
+  
+  def test_format_options_omits_value_for_true
+    assert_equal ['--key'], recipe.format_options('--key' => true)
+  end
+  
+  def test_format_options_omits_options_with_false_or_nil_values
+    assert_equal [], recipe.format_options('--key' => false)
+    assert_equal [], recipe.format_options('--key' => nil)
+  end
+  
+  def test_format_options_guesses_option_prefix_for_keys_that_need_them
+    assert_equal ['--long', '-s'], recipe.format_options('long' => true, 's' => true)
+  end
+  
+  def test_format_options_reformats_symbol_keys_with_dashes
+    assert_equal ['--long-opt'], recipe.format_options(:long_opt => true)
+  end
+  
+  def test_format_options_sorts_options
+    assert_equal %w{
+      -a -b -c -x -y -z
+    }, recipe.format_options(
+      'a' => true, 'b' => true, 'c' => true,
+      'x' => true, 'y' => true, 'z' => true
+    )
   end
   
   #
@@ -94,48 +153,6 @@ class PosixTest < Test::Unit::TestCase
       assert_equal 'suffix', recipe.execute_suffix
     end
     assert_equal nil, recipe.execute_suffix
-  end
-  
-  #
-  # format_execute_options test
-  #
-  
-  def test_format_execute_options_formats_key_value_options_to_options_array
-    assert_equal ['--key "value"'], recipe.format_execute_options('--key' => '"value"')
-  end
-  
-  def test_format_execute_options_quotes_values
-    assert_equal ['--key "value"'], recipe.format_execute_options('--key' => 'value')
-  end
-  
-  def test_format_execute_options_stringifies_values
-    assert_equal ['--key "value"'], recipe.format_execute_options('--key' => :value)
-  end
-  
-  def test_format_execute_options_omits_value_for_true
-    assert_equal ['--key'], recipe.format_execute_options('--key' => true)
-  end
-  
-  def test_format_execute_options_omits_options_with_false_or_nil_values
-    assert_equal [], recipe.format_execute_options('--key' => false)
-    assert_equal [], recipe.format_execute_options('--key' => nil)
-  end
-  
-  def test_format_execute_options_guesses_option_prefix_for_keys_that_need_them
-    assert_equal ['--long', '-s'], recipe.format_execute_options('long' => true, 's' => true)
-  end
-  
-  def test_format_execute_options_reformats_symbol_keys_with_dashes
-    assert_equal ['--long-opt'], recipe.format_execute_options(:long_opt => true)
-  end
-  
-  def test_format_execute_options_sorts_options
-    assert_equal %w{
-      -a -b -c -x -y -z
-    }, recipe.format_execute_options(
-      'a' => true, 'b' => true, 'c' => true,
-      'x' => true, 'y' => true, 'z' => true
-    )
   end
   
   #
@@ -212,48 +229,42 @@ class PosixTest < Test::Unit::TestCase
   # cmd test
   #
   
-  def test_cmd_quotes_non_option_args
-    assert_recipe %q{
-      command_name -a --bc "one" "two" "three"
-    } do
-      cmd 'command_name', '-a', '--bc', 'one', 'two', 'three'
+  def test_cmd_executes_cmd_and_checks_pass_status
+    setup_recipe do
+      check_status_function
+      
+      cmd 'true'
+      target.puts 'echo success'
+      
+      cmd 'fail'
+      target.puts 'echo fail'
     end
-  end
-  
-  def test_cmd_does_not_quote_quoted_args
-    assert_recipe %q{
-      command_name "one" 'two'
-    } do
-      cmd 'command_name', '"one"', "'two'"
-    end
-  end
-  
-  def test_cmd_does_not_quote_the_command
-    assert_recipe %q{
-      command_name a b c
-    } do
-      cmd 'command_name a b c'
-    end
-  end
-  
-  def test_cmd_quotes_partially_quoted_args
-    assert_recipe %q{
-      command_name "'one" "two'" "th'ree"
-    } do
-      cmd 'command_name', "'one", "two'", "th'ree"
-    end
+    
+    assert_alike %{
+      success
+      [127] ./recipe:...:
+    }, *run_package
   end
   
   #
   # execute test
   #
   
-  def test_execute_forms_cmd_with_options_hash
-    assert_recipe %q{
-      command_name --option "value" -o "one" "two" "three"
-    } do
-      execute 'command_name', 'one', 'two', 'three', :o => true, :option => 'value'
+  def test_execute_executes_cmd_and_checks_pass_status
+    setup_recipe do
+      check_status_function
+      
+      execute 'true'
+      target.puts 'echo success'
+      
+      execute 'fail'
+      target.puts 'echo fail'
     end
+    
+    assert_alike %{
+      success
+      [127] ./recipe:...:
+    }, *run_package
   end
   
   def test_execute_uses_current_execute_prefix_and_suffix

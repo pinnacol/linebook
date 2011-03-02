@@ -1,10 +1,6 @@
-Execute a command and check the output status.  Arguments are quoted with ""
-unless they begin with '-' or are already quoted.
+Executes a command and checks the output status.
 (command, *args)
-  args.compact!
-  args.collect! {|arg| quote(arg) }
-  args.unshift(command)
 --
-<%= args.join(' ') %>
+<%= format_cmd(command, *args) %>
 
 <% check_status %>
