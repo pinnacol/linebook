@@ -1,4 +1,4 @@
-Unlink a file or directory.
+Unlink a file or directory, with -r.
 (path)
 --
-  cmd 'rm', '-r', path
+  rm path, '-r' => true

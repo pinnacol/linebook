@@ -1,6 +1,7 @@
+Makes a command to chown a file or directory.
 (user, group, target)
 --
   if user || group
-    cmd 'chown', "#{user}:#{group}", target
+    execute 'chown', "#{user}:#{group}", target
   end
   

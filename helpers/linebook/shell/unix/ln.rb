@@ -1,3 +1,4 @@
-(source, target)
+Link source to target.  Accepts a hash of command line options.
+(source, target, options={})
 --
-  cmd 'ln', source, target
+  execute 'ln', source, target, options

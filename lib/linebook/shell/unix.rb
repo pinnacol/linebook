@@ -41,9 +41,13 @@ module Linebook
         capture { cat(*args, &block) }
       end
       
+      # Makes a command to chmod a file or directory.  Provide the mode as the
+      # literal string that should go into the statement:
+      # 
+      #   chmod "600" target
       def chmod(mode, target)
         if mode
-          cmd 'chmod', mode, target
+          execute 'chmod', mode, target
         end
         self
       end
@@ -52,9 +56,10 @@ module Linebook
         capture { chmod(*args, &block) }
       end
       
+      # Makes a command to chown a file or directory.
       def chown(user, group, target)
         if user || group
-          cmd 'chown', "#{user}:#{group}", target
+          execute 'chown', "#{user}:#{group}", target
         end
         self
       end
@@ -63,8 +68,9 @@ module Linebook
         capture { chown(*args, &block) }
       end
       
-      def cp(source, target)
-        cmd 'cp', source, target
+      # Copy source to target.  Accepts a hash of command line options.
+      def cp(source, target, options={})
+        execute 'cp', source, target, options
         self
       end
       
@@ -72,8 +78,9 @@ module Linebook
         capture { cp(*args, &block) }
       end
       
+      # Copy source to target, with -f.
       def cp_f(source, target)
-        cmd 'cp', '-f', source, target
+        cp source, target, '-f' => true
         self
       end
       
@@ -81,8 +88,9 @@ module Linebook
         capture { cp_f(*args, &block) }
       end
       
+      # Copy source to target, with -r.
       def cp_r(source, target)
-        cmd 'cp', '-r', source, target
+        cp source, target, '-r'=> true
         self
       end
       
@@ -90,8 +98,9 @@ module Linebook
         capture { cp_r(*args, &block) }
       end
       
+      # Copy source to target, with -rf.
       def cp_rf(source, target)
-        cmd 'cp', '-r', '-f', source, target
+        cp source, target, '-rf' => true
         self
       end
       
@@ -141,8 +150,9 @@ module Linebook
         capture { file?(*args, &block) }
       end
       
-      def ln(source, target)
-        cmd 'ln', source, target
+      # Link source to target.  Accepts a hash of command line options.
+      def ln(source, target, options={})
+        execute 'ln', source, target, options
         self
       end
       
@@ -150,8 +160,9 @@ module Linebook
         capture { ln(*args, &block) }
       end
       
+      # Copy source to target, with -s.
       def ln_s(source, target)
-        cmd 'ln', '-s', source, target
+        ln source, target, '-s' => true
         self
       end
       
@@ -159,9 +170,9 @@ module Linebook
         capture { ln_s(*args, &block) }
       end
       
-      # Make a directory
-      def mkdir(path)
-        cmd 'mkdir', path
+      # Make a directory.  Accepts a hash of command line options.
+      def mkdir(path, options={})
+        execute 'mkdir', path, options
         self
       end
       
@@ -171,7 +182,7 @@ module Linebook
       
       # Make a directory, and parent directories as needed.
       def mkdir_p(path)
-        cmd 'mkdir', '-p', path
+        mkdir path, '-p' => true
         self
       end
       
@@ -179,8 +190,9 @@ module Linebook
         capture { mkdir_p(*args, &block) }
       end
       
-      def mv(source, target)
-        cmd 'mv', source, target
+      # Move source to target.  Accepts a hash of command line options.
+      def mv(source, target, options={})
+        execute 'mv', source, target, options
         self
       end
       
@@ -188,8 +200,9 @@ module Linebook
         capture { mv(*args, &block) }
       end
       
+      # Move source to target, with -f.
       def mv_f(source, target)
-        cmd 'mv', '-f', source, target
+        mv source, target, '-f' => true
         self
       end
       
@@ -214,9 +227,9 @@ module Linebook
         capture { quiet(*args, &block) }
       end
       
-      # Unlink a file.
-      def rm(path)
-        cmd 'rm', path
+      # Unlink a file.  Accepts a hash of command line options.
+      def rm(path, options={})
+        execute 'rm', path, options
         self
       end
       
@@ -224,9 +237,9 @@ module Linebook
         capture { rm(*args, &block) }
       end
       
-      # Unlink a file or directory.
+      # Unlink a file or directory, with -r.
       def rm_r(path)
-        cmd 'rm', '-r', path
+        rm path, '-r' => true
         self
       end
       
@@ -234,9 +247,9 @@ module Linebook
         capture { rm_r(*args, &block) }
       end
       
-      # Unlink a file or directory, forcefully.
+      # Unlink a file or directory, with -rf.
       def rm_rf(path)
-        cmd 'rm', '-rf', path
+        rm path, '-rf' => true
         self
       end
       

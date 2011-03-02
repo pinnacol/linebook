@@ -1,3 +1,4 @@
+Copy source to target, with -rf.
 (source, target)
 --
-  cmd 'cp', '-r', '-f', source, target
+  cp source, target, '-rf' => true

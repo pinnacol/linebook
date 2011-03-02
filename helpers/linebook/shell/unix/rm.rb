@@ -1,4 +1,4 @@
-Unlink a file.
-(path)
+Unlink a file.  Accepts a hash of command line options.
+(path, options={})
 --
-  cmd 'rm', path
+  execute 'rm', path, options

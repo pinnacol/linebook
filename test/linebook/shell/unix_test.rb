@@ -18,7 +18,7 @@ class UnixTest < Test::Unit::TestCase
     setup_recipe do
       target.puts 'touch file'
       target.puts 'ls -la file'
-      chmod 600, 'file'
+      chmod '600', 'file'
       target.puts 'ls -la file'
     end
     
@@ -32,6 +32,16 @@ class UnixTest < Test::Unit::TestCase
     assert_recipe %q{
     } do
       chmod nil, 'target'
+    end
+  end
+  
+  def test_chmod_may_prefix
+    assert_recipe %q{
+      sudo chmod "600" "target"
+    } do
+      with_execute_prefix 'sudo ' do
+        chmod '600', 'target'
+      end
     end
   end
   
@@ -94,9 +104,19 @@ class UnixTest < Test::Unit::TestCase
   
   def test_cp_rf
     assert_recipe %q{
-      cp -r -f "source" "target"
+      cp -rf "source" "target"
     } do
       cp_rf 'source', 'target'
+    end
+  end
+  
+  def test_cp_may_prefix
+    assert_recipe %q{
+      sudo cp "source" "target"
+    } do
+      with_execute_prefix 'sudo ' do
+        cp 'source', 'target'
+      end
     end
   end
   
@@ -129,6 +149,76 @@ class UnixTest < Test::Unit::TestCase
       ln -s "source" "target"
     } do
       ln_s 'source', 'target'
+    end
+  end
+  
+  def test_ln_may_prefix
+    assert_recipe %q{
+      sudo ln "source" "target"
+    } do
+      with_execute_prefix 'sudo ' do
+        ln 'source', 'target'
+      end
+    end
+  end
+  
+  #
+  # mkdir test
+  #
+  
+  def test_mkdir
+    assert_recipe %q{
+      mkdir "target"
+    } do
+      mkdir 'target'
+    end
+  end
+  
+  def test_mkdir_p
+    assert_recipe %q{
+      mkdir -p "target"
+    } do
+      mkdir_p 'target'
+    end
+  end
+  
+  def test_mkdir_may_prefix
+    assert_recipe %q{
+      sudo mkdir "target"
+    } do
+      with_execute_prefix 'sudo ' do
+        mkdir 'target'
+      end
+    end
+  end
+  
+  #
+  # mv test
+  #
+  
+  def test_mv
+    assert_recipe %q{
+      mv "source" "target"
+    } do
+      mv 'source', 'target'
+    end
+  end
+  
+  def test_mv_f
+    assert_recipe %q{
+      mv -f "source" "target"
+    } do
+      mv_f 'source', 'target'
+    end
+  end
+  
+  def test_mv_may_prefix
+    assert_recipe %q{
+      sudo mv "source" "target"
+    } do
+      with_execute_prefix 'sudo ' do
+        mv 'source', 'target'
+      end
     end
   end
   
@@ -248,6 +338,16 @@ class UnixTest < Test::Unit::TestCase
       rm -rf "target"
     } do
       rm_rf 'target'
+    end
+  end
+  
+  def test_rm_may_prefix
+    assert_recipe %q{
+      sudo rm "source" "target"
+    } do
+      with_execute_prefix 'sudo ' do
+        rm 'source', 'target'
+      end
     end
   end
   

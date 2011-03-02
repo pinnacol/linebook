@@ -1,3 +1,4 @@
+Move source to target, with -f.
 (source, target)
 --
-  cmd 'mv', '-f', source, target
+  mv source, target, '-f' => true
