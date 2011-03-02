@@ -28,25 +28,9 @@ module Linebook
       '/var/log/linecook'
     end
     
-    def format_opts(opts)
-      options = opts.collect do |(key, value)|
-        unless key.kind_of?(String)
-          key = key.to_s.gsub('_', '-')
-        end
-        
-        prefix = key.length == 1 ? '-' : '--'
-        
-        case value
-        when true
-          "#{prefix}#{key}"
-        when false, nil
-          nil
-        else
-          %{#{prefix}#{key} "#{value}"}
-        end
-      end
-      
-      options.compact.sort
+    def nest_opts(opts, default={})
+      opts = default if opts.nil? || opts == true
+      opts && block_given? ? yield(opts) : opts
     end
     
     # Backup a file.
@@ -82,7 +66,7 @@ module Linebook
     def execute(command, *args)
       if args.last.kind_of?(Hash)
         opts = args.pop
-        args = format_opts(opts) + args
+        args = format_cmd_options(opts) + args
       end
       cmd command, *args
       self

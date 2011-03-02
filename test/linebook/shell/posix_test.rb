@@ -88,6 +88,48 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # format_cmd_options test
+  #
+  
+  def test_format_cmd_options_formats_key_value_options_to_options_array
+    assert_equal ['--key "value"'], recipe.format_cmd_options('--key' => '"value"')
+  end
+  
+  def test_format_cmd_options_quotes_values
+    assert_equal ['--key "value"'], recipe.format_cmd_options('--key' => 'value')
+  end
+  
+  def test_format_cmd_options_stringifies_values
+    assert_equal ['--key "value"'], recipe.format_cmd_options('--key' => :value)
+  end
+  
+  def test_format_cmd_options_omits_value_for_true
+    assert_equal ['--key'], recipe.format_cmd_options('--key' => true)
+  end
+  
+  def test_format_cmd_options_omits_options_with_false_or_nil_values
+    assert_equal [], recipe.format_cmd_options('--key' => false)
+    assert_equal [], recipe.format_cmd_options('--key' => nil)
+  end
+  
+  def test_format_cmd_options_guesses_option_prefix_for_keys_that_need_them
+    assert_equal ['--long', '-s'], recipe.format_cmd_options('long' => true, 's' => true)
+  end
+  
+  def test_format_cmd_options_reformats_symbol_keys_with_dashes
+    assert_equal ['--long-opt'], recipe.format_cmd_options(:long_opt => true)
+  end
+  
+  def test_format_cmd_options_sorts_options
+    assert_equal %w{
+      -a -b -c -x -y -z
+    }, recipe.format_cmd_options(
+      'a' => true, 'b' => true, 'c' => true,
+      'x' => true, 'y' => true, 'z' => true
+    )
+  end
+  
+  #
   # check_status test
   #
   
@@ -200,6 +242,18 @@ class PosixTest < Test::Unit::TestCase
       self.cmd_prefix = "prefix "
       self.cmd_suffix = " suffix"
       cmd 'command_name', "a", "b", "c"
+    end
+  end
+  
+  #
+  # execute test
+  #
+  
+  def test_execute_forms_cmd_with_options_hash
+    assert_recipe %q{
+      command_name --option "value" -o "one" "two" "three"
+    } do
+      execute 'command_name', 'one', 'two', 'three', :o => true, :option => 'value'
     end
   end
   

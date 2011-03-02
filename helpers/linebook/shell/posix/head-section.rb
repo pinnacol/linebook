@@ -22,11 +22,6 @@ def blank?(obj)
   obj.nil? || obj.to_s.strip.empty?
 end
 
-def nest_opts(opts, default={})
-  opts = default if opts.nil? || opts == true
-  opts && block_given? ? yield(opts) : opts
-end
-
 # The prefix added to all cmd calls.
 attr_accessor :cmd_prefix
 
@@ -53,4 +48,49 @@ def with_cmd_suffix(suffix)
   ensure
     self.cmd_suffix = current
   end
+end
+
+# Formats a hash key-value string into command line options using the
+# following heuristics:
+#
+# * Prepend '--' to mulit-char keys and '-' to single-char keys (unless
+#   they already start with '-').
+# * For true values return the '--key'
+# * For false/nil values return nothing
+# * For all other values, quote (unless already quoted) and return '--key
+#  "value"'
+#
+# In addition, key formatting is performed on non-string keys (typically
+# symbols) such that underscores are converted to dashes, ie :some_key =>
+# 'some-key'.
+def format_cmd_options(opts)
+  options = []
+  
+  opts.each do |(key, value)|
+    unless key.kind_of?(String)
+      key = key.to_s.gsub('_', '-')
+    end
+    
+    unless key[0] == ?-
+      prefix = key.length == 1 ? '-' : '--'
+      key = "#{prefix}#{key}"
+    end
+    
+    case value
+    when true
+      options << key
+    when false, nil
+      next
+    else
+      value = value.to_s
+      
+      unless quoted?(value) || !quote?(value)
+        value = quote(value)
+      end
+      
+      options << "#{key} #{value}"
+    end
+  end
+  
+  options.sort
 end
