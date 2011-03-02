@@ -5,21 +5,23 @@ def blank?(obj)
   obj.nil? || obj.to_s.strip.empty?
 end
 
-# Encloses the arg in quotes ("").
+# Encloses the arg in quotes if the arg is not quoted and is quotable. 
+# Stringifies arg using to_s.
 def quote(arg)
+  arg = arg.to_s
   quoted?(arg) || !quote?(arg) ? arg : "\"#{arg}\""
 end
 
-# Returns true if the arg is not an option, and is not already quoted (either
-# by quotes or apostrophes).  The intention is to check whether an arg
+# Returns true if the str is not an option, and is not already quoted (either
+# by quotes or apostrophes).  The intention is to check whether a string
 # _should_ be quoted.
-def quote?(arg)
-  arg[0] == ?- || quoted?(arg) ? false : true
+def quote?(str)
+  str[0] == ?- || quoted?(str) ? false : true
 end
 
-# Returns true if the arg is quoted (either by quotes or apostrophes).
-def quoted?(arg)
-  arg =~ /\A".*"\z/ || arg =~ /\A'.*'\z/ ? true : false
+# Returns true if the str is quoted (either by quotes or apostrophes).
+def quoted?(str)
+  str =~ /\A".*"\z/ || str =~ /\A'.*'\z/ ? true : false
 end
 
 # Formats a command line command.  Arguments are quoted. If the last arg is a

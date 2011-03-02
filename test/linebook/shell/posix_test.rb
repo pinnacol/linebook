@@ -47,6 +47,10 @@ class PosixTest < Test::Unit::TestCase
     assert_equal %{'abc'}, recipe.quote("'abc'")
   end
   
+  def test_quote_stringifies_args
+    assert_equal %{"sym"}, recipe.quote(:sym)
+  end
+  
   #
   # quote? test
   #
