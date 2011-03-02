@@ -16,18 +16,47 @@ def current_indent
   @current_indent ||= ""
 end
 
+def outdent_ids
+  @outdent_ids ||= []
+end
+
 # Indents the output of the block.  See current_indent.
 def indent(indent='  ', &block)
   @current_indent = current_indent + indent
-  
   str = capture(&block)
+  @current_indent.chomp! indent
   
   unless str.empty?
     str.gsub!(/^/, indent)
+    
+    if current_indent.empty?
+      outdent_ids.each do |id|
+        str.gsub!(/#{id}(\d+):(.*?)#{id}/m) do
+          $2.gsub!(/^.{#{$1.to_i}}/, '')
+        end
+      end
+      outdent_ids.clear
+    end
+    
     target.puts str
   end
   
-  @current_indent.chomp! indent
+  self
+end
+
+# Outdents a section of text indented by indent.
+def outdent(id=nil)
+  if current_indent.empty?
+    yield
+  else
+    id ||= ":outdent_#{outdent_ids.length}:"
+    outdent_ids << id
+    
+    target << "#{id}#{current_indent.length}:#{rstrip}"
+    yield
+    target << "#{id}#{rstrip}"
+  end
+  
   self
 end
 

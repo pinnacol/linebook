@@ -22,18 +22,47 @@ module Linebook
         @current_indent ||= ""
       end
       
+      def outdent_ids
+        @outdent_ids ||= []
+      end
+      
       # Indents the output of the block.  See current_indent.
       def indent(indent='  ', &block)
         @current_indent = current_indent + indent
-        
         str = capture(&block)
+        @current_indent.chomp! indent
         
         unless str.empty?
           str.gsub!(/^/, indent)
+          
+          if current_indent.empty?
+            outdent_ids.each do |id|
+              str.gsub!(/#{id}(\d+):(.*?)#{id}/m) do
+                $2.gsub!(/^.{#{$1.to_i}}/, '')
+              end
+            end
+            outdent_ids.clear
+          end
+          
           target.puts str
         end
         
-        @current_indent.chomp! indent
+        self
+      end
+      
+      # Outdents a section of text indented by indent.
+      def outdent(id=nil)
+        if current_indent.empty?
+          yield
+        else
+          id ||= ":outdent_#{outdent_ids.length}:"
+          outdent_ids << id
+          
+          target << "#{id}#{current_indent.length}:#{rstrip}"
+          yield
+          target << "#{id}#{rstrip}"
+        end
+        
         self
       end
       
@@ -151,21 +180,21 @@ module Linebook
       # Makes a heredoc statement surrounding the contents of the block.  Options:
       # 
       #   delimiter   the delimiter used, by default HEREDOC_n where n increments
-      #   indent      add '-' before the delimiter
+      #   outdent     add '-' before the delimiter
       #   quote       quotes the delimiter
       def heredoc(options={})
         delimiter = options[:delimiter] || begin
           @heredoc_count ||= -1
           "HEREDOC_#{@heredoc_count += 1}"
         end
-        #  <<<%= options[:indent] ? '-' : ' '%><%= options[:quote] ? "\"#{delimiter}\"" : delimiter %>
+        #  <<<%= options[:outdent] ? '-' : ' '%><%= options[:quote] ? "\"#{delimiter}\"" : delimiter %><% outdent(" # :#{delimiter}:") do %>
         #  <% yield %>
-        #  <%= delimiter %>
+        #  <%= delimiter %><% end %>
         #  
         #  
-        _erbout.concat "<<"; _erbout.concat(( options[:indent] ? '-' : ' ').to_s); _erbout.concat(( options[:quote] ? "\"#{delimiter}\"" : delimiter ).to_s); _erbout.concat "\n"
+        _erbout.concat "<<"; _erbout.concat(( options[:outdent] ? '-' : ' ').to_s); _erbout.concat(( options[:quote] ? "\"#{delimiter}\"" : delimiter ).to_s);  outdent(" # :#{delimiter}:") do ; _erbout.concat "\n"
         yield 
-        _erbout.concat(( delimiter ).to_s)
+        _erbout.concat(( delimiter ).to_s);  end 
         _erbout.concat "\n"
         self
       end

@@ -1,7 +1,7 @@
 Makes a heredoc statement surrounding the contents of the block.  Options:
 
   delimiter   the delimiter used, by default HEREDOC_n where n increments
-  indent      add '-' before the delimiter
+  outdent     add '-' before the delimiter
   quote       quotes the delimiter
 
 (options={})
@@ -10,7 +10,7 @@ Makes a heredoc statement surrounding the contents of the block.  Options:
     "HEREDOC_#{@heredoc_count += 1}"
   end
 --
-<<<%= options[:indent] ? '-' : ' '%><%= options[:quote] ? "\"#{delimiter}\"" : delimiter %>
+<<<%= options[:outdent] ? '-' : ' '%><%= options[:quote] ? "\"#{delimiter}\"" : delimiter %><% outdent(" # :#{delimiter}:") do %>
 <% yield %>
-<%= delimiter %>
+<%= delimiter %><% end %>
 

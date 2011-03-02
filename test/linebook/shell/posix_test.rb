@@ -68,6 +68,33 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
+  def test_indent_works_with_outdent
+    assert_recipe %q{
+      a
+        b
+      c
+        d
+      c
+        b
+      a
+    } do
+      target.puts 'a'
+      indent do
+        target.puts 'b'
+        outdent do
+          target.puts 'c'
+          indent do
+            target.puts 'd'
+          end
+          target.puts 'c'
+        end
+        target.puts 'b'
+        
+      end
+      target.puts 'a'
+    end
+  end
+  
   #
   # current_indent test
   #
@@ -252,28 +279,100 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
-  def test_heredoc_flags_indent_if_specified
+  def test_heredoc_flags_outdent_if_specified
     assert_recipe %q{
       <<-HEREDOC_0
       HEREDOC_0
     } do
-      heredoc(:indent => true) {}
+      heredoc(:outdent => true) {}
     end
   end
   
-  # def test_heredoc_works_as_a_heredoc
-  #   build_package do
-  #     target << 'cat '
-  #     heredoc {
-  #       target.puts 'content'
-  #     }
-  #   end
-  #   
-  #   check_package %Q{
-  #     % sh package/recipe
-  #     content
-  #   }
-  # end
+  def test_heredoc_works_as_a_heredoc
+    setup_recipe do
+      target.print 'cat '; heredoc do
+        target.puts 'success'
+      end
+    end
+    
+    assert_output_equal %{
+      success
+    }, *run_package
+  end
+  
+  def test_heredoc_outdents_heredoc_body
+    assert_recipe %{
+      #
+        cat << HEREDOC_0
+      a
+      \tb
+      \t\tc
+          x
+        y
+      z
+      HEREDOC_0
+      #
+    } do
+      target.puts "#"
+      indent do
+        target.print 'cat '; heredoc do
+          target.puts "a"
+          target.puts "\tb"
+          target.puts "\t\tc"
+          target.puts "    x"
+          target.puts "  y"
+          target.puts "z"
+        end
+      end
+      target.puts "#"
+    end
+    
+    assert_output_equal %{
+      a
+      \tb
+      \t\tc
+          x
+        y
+      z
+    }, *run_package
+  end
+  
+  def test_heredoc_works_with_indent_when_outdent_is_true
+    assert_recipe %{
+      #
+        cat <<-HEREDOC_0
+      a
+      \tb
+      \t\tc
+          x
+        y
+      z
+      HEREDOC_0
+      #
+    } do
+      target.puts "#"
+      indent do
+        target.print 'cat '; heredoc :outdent => true do
+          target.puts "a"
+          target.puts "\tb"
+          target.puts "\t\tc"
+          target.puts "    x"
+          target.puts "  y"
+          target.puts "z"
+        end
+      end
+      target.puts "#"
+    end
+    
+    assert_output_equal %{
+      a
+      b
+      c
+          x
+        y
+      z
+    }, *run_package
+  end
   
   #
   # not_if test
