@@ -11,6 +11,80 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # indent test
+  #
+  
+  def test_indent_indents_target_output_during_block
+    assert_recipe %q{
+      a
+        b
+        b
+      a
+    } do
+      target.puts 'a'
+      indent do
+        target.puts 'b'
+        target.puts 'b'
+      end
+      target.puts 'a'
+    end
+  end
+  
+  def test_indent_allows_specification_of_indent
+    assert_recipe %q{
+      a
+      .b
+      .b
+      a
+    } do
+      target.puts 'a'
+      indent('.') do
+        target.puts 'b'
+        target.puts 'b'
+      end
+      target.puts 'a'
+    end
+  end
+  
+  def test_indents_may_be_nested
+    assert_recipe %q{
+      a
+        b
+          c
+          c
+        b
+      a
+    } do
+      target.puts 'a'
+      indent do
+        target.puts 'b'
+        indent do
+          target.puts 'c'
+          target.puts 'c'
+        end
+        target.puts 'b'
+      end
+      target.puts 'a'
+    end
+  end
+  
+  #
+  # current_indent test
+  #
+  
+  def test_current_indent_returns_current_indentation
+    assert_equal '', recipe.current_indent
+    recipe.indent do
+      assert_equal '  ', recipe.current_indent
+      recipe.indent '.' do
+        assert_equal '  .', recipe.current_indent
+      end
+      assert_equal '  ', recipe.current_indent
+    end
+    assert_equal '', recipe.current_indent
+  end
+  
+  #
   # check_status test
   #
   

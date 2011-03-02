@@ -17,6 +17,26 @@ module Linebook
         opts && block_given? ? yield(opts) : opts
       end
       
+      # Returns the current indentation string.
+      def current_indent
+        @current_indent ||= ""
+      end
+      
+      # Indents the output of the block.  See current_indent.
+      def indent(indent='  ', &block)
+        @current_indent = current_indent + indent
+        
+        str = capture(&block)
+        
+        unless str.empty?
+          str.gsub!(/^/, indent)
+          target.puts str
+        end
+        
+        @current_indent.chomp! indent
+        self
+      end
+      
       attr_accessor :cmd_prefix
       
       def with_cmd_prefix(prefix)
@@ -54,7 +74,7 @@ module Linebook
         _erbout.concat "check_status "; _erbout.concat(( expect_status ).to_s); _erbout.concat " $? "; _erbout.concat(( fail_status ).to_s); _erbout.concat " $LINENO\n"
         _erbout.concat "\n"
         end ;
-        nil
+        self
       end
       
       def _check_status(*args, &block) # :nodoc:
@@ -67,7 +87,7 @@ module Linebook
         #  check_status () { if [ $2 -ne $1 ]; then echo "[$2] $0:${4:-?}"; exit $3; else return $2; fi }
         #  
         _erbout.concat "check_status () { if [ $2 -ne $1 ]; then echo \"[$2] $0:${4:-?}\"; exit $3; else return $2; fi }\n"
-        nil
+        self
       end
       
       def _check_status_function(*args, &block) # :nodoc:
@@ -85,7 +105,7 @@ module Linebook
         _erbout.concat(( cmd_prefix ).to_s); _erbout.concat(( args.join(' ') ).to_s); _erbout.concat(( cmd_suffix ).to_s)
         _erbout.concat "\n"
         check_status ;
-        nil
+        self
       end
       
       def _cmd(*args, &block) # :nodoc:
@@ -97,7 +117,7 @@ module Linebook
         #  # <%= str %>
         #  
         _erbout.concat "# "; _erbout.concat(( str ).to_s); _erbout.concat "\n"
-        nil
+        self
       end
       
       def _comment(*args, &block) # :nodoc:
@@ -121,7 +141,7 @@ module Linebook
         unset(*env.collect {|(k,v)| k }) 
         end 
         _erbout.concat "\n"
-        nil
+        self
       end
       
       def _export(*args, &block) # :nodoc:
@@ -147,7 +167,7 @@ module Linebook
         yield 
         _erbout.concat(( delimiter ).to_s)
         _erbout.concat "\n"
-        nil
+        self
       end
       
       def _heredoc(*args, &block) # :nodoc:
@@ -156,7 +176,7 @@ module Linebook
       
       def not_if(cmd, &block)
         only_if("! #{cmd}", &block)
-        nil
+        self
       end
       
       def _not_if(*args, &block) # :nodoc:
@@ -175,7 +195,7 @@ module Linebook
         indent { yield } 
         _erbout.concat "fi\n"
         _erbout.concat "\n"
-        nil
+        self
       end
       
       def _only_if(*args, &block) # :nodoc:
@@ -190,7 +210,7 @@ module Linebook
         options.keys.sort_by {|opt| opt.to_s }.each do |opt| 
         _erbout.concat "set "; _erbout.concat(( options[opt] ? '-' : '+' ).to_s); _erbout.concat "o "; _erbout.concat(( opt ).to_s); _erbout.concat "\n"
         end ;
-        nil
+        self
       end
       
       def _set_options(*args, &block) # :nodoc:
@@ -205,7 +225,7 @@ module Linebook
         keys.each do |key| 
         _erbout.concat "unset "; _erbout.concat(( key ).to_s); _erbout.concat "\n"
         end ;
-        nil
+        self
       end
       
       def _unset(*args, &block) # :nodoc:

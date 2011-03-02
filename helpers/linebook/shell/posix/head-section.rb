@@ -11,6 +11,26 @@ def nest_opts(opts, default={})
   opts && block_given? ? yield(opts) : opts
 end
 
+# Returns the current indentation string.
+def current_indent
+  @current_indent ||= ""
+end
+
+# Indents the output of the block.  See current_indent.
+def indent(indent='  ', &block)
+  @current_indent = current_indent + indent
+  
+  str = capture(&block)
+  
+  unless str.empty?
+    str.gsub!(/^/, indent)
+    target.puts str
+  end
+  
+  @current_indent.chomp! indent
+  self
+end
+
 attr_accessor :cmd_prefix
 
 def with_cmd_prefix(prefix)

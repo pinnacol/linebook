@@ -6,10 +6,10 @@ module Linebook
     module Ubuntu
       def package(name, version=nil)
         #  sudo apt-get -q -y install <%= name %><%= blank?(version) ? nil : "=#{version}" %>
-        #  <%= check_status %>
+        #  <% check_status %>
         _erbout.concat "sudo apt-get -q -y install "; _erbout.concat(( name ).to_s); _erbout.concat(( blank?(version) ? nil : "=#{version}" ).to_s); _erbout.concat "\n"
-        _erbout.concat(( check_status ).to_s);
-        nil
+        check_status ;
+        self
       end
       
       def _package(*args, &block) # :nodoc:
