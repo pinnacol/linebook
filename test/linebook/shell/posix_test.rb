@@ -11,6 +11,59 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # quote test
+  #
+  
+  def test_quote_encloses_arg_in_quotation_marks
+    assert_equal %{"abc"}, recipe.quote("abc")
+    assert_equal %{"'abc'"}, recipe.quote("'abc'")
+  end
+  
+  #
+  # quote? test
+  #
+  
+  def test_quote_check_returns_true_if_arg_is_not_quoted
+    assert_equal true,  recipe.quote?("abc")
+    assert_equal false, recipe.quote?("'abc'")
+    assert_equal false, recipe.quote?('"abc"')
+  end
+  
+  def test_quote_check_returns_false_if_arg_is_an_option
+    assert_equal false, recipe.quote?("--option")
+    assert_equal false, recipe.quote?("-o")
+  end
+  
+  #
+  # quoted? test
+  #
+  
+  def test_quoted_check_returns_true_if_arg_is_quoted_by_quotation_marks_or_apostrophes
+    assert_equal false, recipe.quoted?("abc")
+    assert_equal true,  recipe.quoted?("'abc'")
+    assert_equal true,  recipe.quoted?('"abc"')
+  end
+  
+  #
+  # blank test
+  #
+  
+  def test_blank_check_returns_false_for_non_empty_or_whitespace_string
+    assert_equal false, recipe.blank?('abc')
+  end
+  
+  class ToEmptyStr
+    def to_s; ''; end
+  end
+  
+  def test_blank_check_returns_true_for_objects_that_to_s_to_a_whitespace_string
+    assert_equal true, recipe.blank?(nil)
+    assert_equal true, recipe.blank?('')
+    assert_equal true, recipe.blank?('   ')
+    assert_equal true, recipe.blank?(ToEmptyStr.new)
+  end
+  
+  #
   # indent test
   #
   
@@ -185,11 +238,27 @@ class PosixTest < Test::Unit::TestCase
   # cmd test
   #
   
-  def test_cmd_formats_a_generalized_command
+  def test_cmd_quotes_non_option_args
     assert_recipe %q{
       command_name -a --bc "one" "two" "three"
     } do
       cmd 'command_name', '-a', '--bc', 'one', 'two', 'three'
+    end
+  end
+  
+  def test_cmd_does_not_quote_quoted_args
+    assert_recipe %q{
+      command_name "one" 'two'
+    } do
+      cmd 'command_name', '"one"', "'two'"
+    end
+  end
+  
+  def test_cmd_quotes_partially_quoted_args
+    assert_recipe %q{
+      command_name "'one" "two'" "th'ree"
+    } do
+      cmd 'command_name', "'one", "two'", "th'ree"
     end
   end
   

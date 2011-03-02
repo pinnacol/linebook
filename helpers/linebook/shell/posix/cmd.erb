@@ -1,7 +1,8 @@
-Execute a command and check the output status.
+Execute a command and check the output status.  Arguments are quoted with ""
+unless they begin with '-' or are already quoted.
 (cmd, *args)
   args.compact!
-  args = args.collect! {|arg| arg[0] == ?- ? arg : quote(arg) }
+  args = args.collect! {|arg| arg[0] == ?- || quoted?(arg) ? arg : quote(arg) }
   args.unshift(cmd)
 --
 <%= cmd_prefix %><%= args.join(' ') %><%= cmd_suffix %>

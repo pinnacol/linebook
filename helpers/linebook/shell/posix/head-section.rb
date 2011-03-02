@@ -1,8 +1,24 @@
+
+# Encloses the arg in quotes ("").
 def quote(arg)
   "\"#{arg}\""
 end
 
+# Returns true if the arg is not an option, and is not already quoted (either
+# by quotes or apostrophes).  The intention is to check whether an arg
+# _should_ be quoted.
+def quote?(arg)
+  arg[0] == ?- || quoted?(arg) ? false : true
+end
+
+# Returns true if the arg is quoted (either by quotes or apostrophes).
+def quoted?(arg)
+  arg =~ /\A".*"\z/ || arg =~ /\A'.*'\z/ ? true : false
+end
+
+# Returns true if the obj converts to a string which is whitespace or empty.
 def blank?(obj)
+  # shortcut for nil...
   obj.nil? || obj.to_s.strip.empty?
 end
 

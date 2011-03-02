@@ -4,11 +4,26 @@ require 'erb'
 module Linebook
   module Shell
     module Posix
+      # Encloses the arg in quotes ("").
       def quote(arg)
         "\"#{arg}\""
       end
       
+      # Returns true if the arg is not an option, and is not already quoted (either
+      # by quotes or apostrophes).  The intention is to check whether an arg
+      # _should_ be quoted.
+      def quote?(arg)
+        arg[0] == ?- || quoted?(arg) ? false : true
+      end
+      
+      # Returns true if the arg is quoted (either by quotes or apostrophes).
+      def quoted?(arg)
+        arg =~ /\A".*"\z/ || arg =~ /\A'.*'\z/ ? true : false
+      end
+      
+      # Returns true if the obj converts to a string which is whitespace or empty.
       def blank?(obj)
+        # shortcut for nil...
         obj.nil? || obj.to_s.strip.empty?
       end
       
@@ -123,10 +138,11 @@ module Linebook
         capture { check_status_function(*args, &block) }
       end
       
-      # Execute a command and check the output status.
+      # Execute a command and check the output status.  Arguments are quoted with ""
+      # unless they begin with '-' or are already quoted.
       def cmd(cmd, *args)
         args.compact!
-        args = args.collect! {|arg| arg[0] == ?- ? arg : quote(arg) }
+        args = args.collect! {|arg| arg[0] == ?- || quoted?(arg) ? arg : quote(arg) }
         args.unshift(cmd)
         #  <%= cmd_prefix %><%= args.join(' ') %><%= cmd_suffix %>
         #  
