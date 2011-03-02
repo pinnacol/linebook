@@ -34,7 +34,7 @@ module Linebook
       # Executes 'cat' with the sources.
       def cat(*sources)
         cmd 'cat', *sources
-        nil
+        self
       end
       
       def _cat(*args, &block) # :nodoc:
@@ -45,7 +45,7 @@ module Linebook
         if mode
           cmd 'chmod', mode, target
         end
-        nil
+        self
       end
       
       def _chmod(*args, &block) # :nodoc:
@@ -56,7 +56,7 @@ module Linebook
         if user || group
           cmd 'chown', "#{user}:#{group}", target
         end
-        nil
+        self
       end
       
       def _chown(*args, &block) # :nodoc:
@@ -65,7 +65,7 @@ module Linebook
       
       def cp(source, target)
         cmd 'cp', source, target
-        nil
+        self
       end
       
       def _cp(*args, &block) # :nodoc:
@@ -74,7 +74,7 @@ module Linebook
       
       def cp_f(source, target)
         cmd 'cp', '-f', source, target
-        nil
+        self
       end
       
       def _cp_f(*args, &block) # :nodoc:
@@ -83,7 +83,7 @@ module Linebook
       
       def cp_r(source, target)
         cmd 'cp', '-r', source, target
-        nil
+        self
       end
       
       def _cp_r(*args, &block) # :nodoc:
@@ -92,7 +92,7 @@ module Linebook
       
       def cp_rf(source, target)
         cmd 'cp', '-r', '-f', source, target
-        nil
+        self
       end
       
       def _cp_rf(*args, &block) # :nodoc:
@@ -102,7 +102,7 @@ module Linebook
       def directory?(path)
         #  [ -d "<%= path %>" ]
         _erbout.concat "[ -d \""; _erbout.concat(( path ).to_s); _erbout.concat "\" ]";
-        nil
+        self
       end
       
       def _directory?(*args, &block) # :nodoc:
@@ -114,7 +114,7 @@ module Linebook
         #  echo '<%= args.join(' ') %>'
         #  
         _erbout.concat "echo '"; _erbout.concat(( args.join(' ') ).to_s); _erbout.concat "'\n"
-        nil
+        self
       end
       
       def _echo(*args, &block) # :nodoc:
@@ -124,7 +124,7 @@ module Linebook
       def exists?(path)
         #  [ -e "<%= path %>" ]
         _erbout.concat "[ -e \""; _erbout.concat(( path ).to_s); _erbout.concat "\" ]";
-        nil
+        self
       end
       
       def _exists?(*args, &block) # :nodoc:
@@ -134,7 +134,7 @@ module Linebook
       def file?(path)
         #  [ -f "<%= path %>" ]
         _erbout.concat "[ -f \""; _erbout.concat(( path ).to_s); _erbout.concat "\" ]";
-        nil
+        self
       end
       
       def _file?(*args, &block) # :nodoc:
@@ -143,7 +143,7 @@ module Linebook
       
       def ln(source, target)
         cmd 'ln', source, target
-        nil
+        self
       end
       
       def _ln(*args, &block) # :nodoc:
@@ -152,7 +152,7 @@ module Linebook
       
       def ln_s(source, target)
         cmd 'ln', '-s', source, target
-        nil
+        self
       end
       
       def _ln_s(*args, &block) # :nodoc:
@@ -162,7 +162,7 @@ module Linebook
       # Make a directory
       def mkdir(path)
         cmd 'mkdir', path
-        nil
+        self
       end
       
       def _mkdir(*args, &block) # :nodoc:
@@ -172,7 +172,7 @@ module Linebook
       # Make a directory, and parent directories as needed.
       def mkdir_p(path)
         cmd 'mkdir', '-p', path
-        nil
+        self
       end
       
       def _mkdir_p(*args, &block) # :nodoc:
@@ -181,7 +181,7 @@ module Linebook
       
       def mv(source, target)
         cmd 'mv', source, target
-        nil
+        self
       end
       
       def _mv(*args, &block) # :nodoc:
@@ -190,7 +190,7 @@ module Linebook
       
       def mv_f(source, target)
         cmd 'mv', '-f', source, target
-        nil
+        self
       end
       
       def _mv_f(*args, &block) # :nodoc:
@@ -207,7 +207,7 @@ module Linebook
         indent { yield } 
         _erbout.concat "set $LINECOOK_OPTS > /dev/null";  end ; _erbout.concat "\n"
         _erbout.concat "\n"
-        nil
+        self
       end
       
       def _quiet(*args, &block) # :nodoc:
@@ -217,7 +217,7 @@ module Linebook
       # Unlink a file.
       def rm(path)
         cmd 'rm', path
-        nil
+        self
       end
       
       def _rm(*args, &block) # :nodoc:
@@ -227,7 +227,7 @@ module Linebook
       # Unlink a file or directory.
       def rm_r(path)
         cmd 'rm', '-r', path
-        nil
+        self
       end
       
       def _rm_r(*args, &block) # :nodoc:
@@ -237,7 +237,7 @@ module Linebook
       # Unlink a file or directory, forcefully.
       def rm_rf(path)
         cmd 'rm', '-rf', path
-        nil
+        self
       end
       
       def _rm_rf(*args, &block) # :nodoc:
@@ -250,7 +250,7 @@ module Linebook
         #  #<%= str %><%= comment %><%= str %><%= "-" if comment.length % 2 == 1 %>
         #  
         _erbout.concat "#"; _erbout.concat(( str ).to_s); _erbout.concat(( comment ).to_s); _erbout.concat(( str ).to_s); _erbout.concat(( "-" if comment.length % 2 == 1 ).to_s); _erbout.concat "\n"
-        nil
+        self
       end
       
       def _section(*args, &block) # :nodoc:
@@ -336,7 +336,7 @@ module Linebook
         _erbout.concat "set $LINECOOK_OPTS > /dev/null\n"
         section " #{target_name} " 
         _erbout.concat "\n"
-        nil
+        self
       end
       
       def _shebang(*args, &block) # :nodoc:
@@ -353,7 +353,7 @@ module Linebook
         indent { yield } 
         _erbout.concat "set $LINECOOK_OPTS > /dev/null";  end ; _erbout.concat "\n"
         _erbout.concat "\n"
-        nil
+        self
       end
       
       def _verbose(*args, &block) # :nodoc:
@@ -370,7 +370,7 @@ module Linebook
         indent { yield } 
         _erbout.concat "set $LINECOOK_OPTS > /dev/null";  end ; _erbout.concat "\n"
         _erbout.concat "\n"
-        nil
+        self
       end
       
       def _xtrace(*args, &block) # :nodoc:

@@ -58,7 +58,7 @@ class UnixTest < Test::Unit::TestCase
     assert_recipe %q{
       sudo chown "user:group" "target"
     } do
-      with_cmd_prefix 'sudo ' do
+      with_execute_prefix 'sudo ' do
         chown 'user', 'group', 'target'
       end
     end

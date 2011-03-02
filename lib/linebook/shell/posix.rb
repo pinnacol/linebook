@@ -6,7 +6,7 @@ module Linebook
     module Posix
       # Encloses the arg in quotes ("").
       def quote(arg)
-        "\"#{arg}\""
+        quoted?(arg) || !quote?(arg) ? arg : "\"#{arg}\""
       end
       
       # Returns true if the arg is not an option, and is not already quoted (either
@@ -27,31 +27,31 @@ module Linebook
         obj.nil? || obj.to_s.strip.empty?
       end
       
-      # The prefix added to all cmd calls.
-      attr_accessor :cmd_prefix
+      # The prefix added to all execute calls.
+      attr_accessor :execute_prefix
       
-      # Sets cmd_prefix for the duration of a block.
-      def with_cmd_prefix(prefix)
-        current = cmd_prefix
+      # Sets execute_prefix for the duration of a block.
+      def with_execute_prefix(prefix)
+        current = execute_prefix
         begin
-          self.cmd_prefix = prefix
+          self.execute_prefix = prefix
           yield
         ensure
-          self.cmd_prefix = current
+          self.execute_prefix = current
         end
       end
       
-      # The suffix added to all cmd calls.
-      attr_accessor :cmd_suffix
+      # The suffix added to all execute calls.
+      attr_accessor :execute_suffix
       
-      # Sets cmd_suffix for the duration of a block.
-      def with_cmd_suffix(suffix)
-        current = cmd_suffix
+      # Sets execute_suffix for the duration of a block.
+      def with_execute_suffix(suffix)
+        current = execute_suffix
         begin
-          self.cmd_suffix = suffix
+          self.execute_suffix = suffix
           yield
         ensure
-          self.cmd_suffix = current
+          self.execute_suffix = current
         end
       end
       
@@ -68,7 +68,7 @@ module Linebook
       # In addition, key formatting is performed on non-string keys (typically
       # symbols) such that underscores are converted to dashes, ie :some_key =>
       # 'some-key'.
-      def format_cmd_options(opts)
+      def format_execute_options(opts)
         options = []
         
         opts.each do |(key, value)|
@@ -87,13 +87,7 @@ module Linebook
           when false, nil
             next
           else
-            value = value.to_s
-            
-            unless quoted?(value) || !quote?(value)
-              value = quote(value)
-            end
-            
-            options << "#{key} #{value}"
+            options << "#{key} #{quote(value.to_s)}"
           end
         end
         
@@ -135,14 +129,14 @@ module Linebook
       
       # Execute a command and check the output status.  Arguments are quoted with ""
       # unless they begin with '-' or are already quoted.
-      def cmd(cmd, *args)
+      def cmd(command, *args)
         args.compact!
-        args = args.collect! {|arg| arg[0] == ?- || quoted?(arg) ? arg : quote(arg) }
-        args.unshift(cmd)
-        #  <%= cmd_prefix %><%= args.join(' ') %><%= cmd_suffix %>
+        args.collect! {|arg| quote(arg) }
+        args.unshift(command)
+        #  <%= args.join(' ') %>
         #  
         #  <% check_status %>
-        _erbout.concat(( cmd_prefix ).to_s); _erbout.concat(( args.join(' ') ).to_s); _erbout.concat(( cmd_suffix ).to_s)
+        _erbout.concat(( args.join(' ') ).to_s)
         _erbout.concat "\n"
         check_status ;
         self
@@ -164,12 +158,25 @@ module Linebook
         capture { comment(*args, &block) }
       end
       
+      # Execute a command and check the output status. Arguments are quoted with ""
+      # unless they begin with '-' or are already quoted. If the last arg is a hash,
+      # then it will be formatted into options and prepended to args.
+      # 
+      # Execute also allows a prefix/suffix to wrap the command and args. See
+      # with_execute_prefix and with_execute_suffix.
       def execute(command, *args)
-        if args.last.kind_of?(Hash)
-          opts = args.pop
-          args = format_cmd_options(opts) + args
-        end
-        cmd command, *args
+        opts = args.last.kind_of?(Hash) ? args.pop : {}
+        args.compact!
+        args.collect! {|arg| quote(arg) }
+        
+        args = format_execute_options(opts) + args
+        args.unshift(command)
+        #  <%= execute_prefix %><%= args.join(' ') %><%= execute_suffix %>
+        #  
+        #  <% check_status %>
+        _erbout.concat(( execute_prefix ).to_s); _erbout.concat(( args.join(' ') ).to_s); _erbout.concat(( execute_suffix ).to_s)
+        _erbout.concat "\n"
+        check_status ;
         self
       end
       

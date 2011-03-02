@@ -1,7 +1,7 @@
 
 # Encloses the arg in quotes ("").
 def quote(arg)
-  "\"#{arg}\""
+  quoted?(arg) || !quote?(arg) ? arg : "\"#{arg}\""
 end
 
 # Returns true if the arg is not an option, and is not already quoted (either
@@ -22,31 +22,31 @@ def blank?(obj)
   obj.nil? || obj.to_s.strip.empty?
 end
 
-# The prefix added to all cmd calls.
-attr_accessor :cmd_prefix
+# The prefix added to all execute calls.
+attr_accessor :execute_prefix
 
-# Sets cmd_prefix for the duration of a block.
-def with_cmd_prefix(prefix)
-  current = cmd_prefix
+# Sets execute_prefix for the duration of a block.
+def with_execute_prefix(prefix)
+  current = execute_prefix
   begin
-    self.cmd_prefix = prefix
+    self.execute_prefix = prefix
     yield
   ensure
-    self.cmd_prefix = current
+    self.execute_prefix = current
   end
 end
 
-# The suffix added to all cmd calls.
-attr_accessor :cmd_suffix
+# The suffix added to all execute calls.
+attr_accessor :execute_suffix
 
-# Sets cmd_suffix for the duration of a block.
-def with_cmd_suffix(suffix)
-  current = cmd_suffix
+# Sets execute_suffix for the duration of a block.
+def with_execute_suffix(suffix)
+  current = execute_suffix
   begin
-    self.cmd_suffix = suffix
+    self.execute_suffix = suffix
     yield
   ensure
-    self.cmd_suffix = current
+    self.execute_suffix = current
   end
 end
 
@@ -63,7 +63,7 @@ end
 # In addition, key formatting is performed on non-string keys (typically
 # symbols) such that underscores are converted to dashes, ie :some_key =>
 # 'some-key'.
-def format_cmd_options(opts)
+def format_execute_options(opts)
   options = []
   
   opts.each do |(key, value)|
@@ -82,13 +82,7 @@ def format_cmd_options(opts)
     when false, nil
       next
     else
-      value = value.to_s
-      
-      unless quoted?(value) || !quote?(value)
-        value = quote(value)
-      end
-      
-      options << "#{key} #{value}"
+      options << "#{key} #{quote(value.to_s)}"
     end
   end
   

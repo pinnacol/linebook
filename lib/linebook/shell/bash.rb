@@ -15,7 +15,7 @@ module Linebook
         #  
         _erbout.concat "su "; _erbout.concat(( user_name ).to_s); _erbout.concat " \""; _erbout.concat(( capture_path(target_name, &block) ).to_s); _erbout.concat "\"\n"
         check_status
-        nil
+        self
       end
       
       def _su(*args, &block) # :nodoc:
@@ -24,8 +24,8 @@ module Linebook
       
       # Switches to sudo for a block.
       def sudo()
-        with_cmd_prefix('sudo ') { yield }
-        nil
+        with_execute_prefix('sudo ') { yield }
+        self
       end
       
       def _sudo(*args, &block) # :nodoc:

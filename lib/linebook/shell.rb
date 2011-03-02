@@ -63,19 +63,6 @@ module Linebook
       capture { directory(*args, &block) }
     end
     
-    def execute(command, *args)
-      if args.last.kind_of?(Hash)
-        opts = args.pop
-        args = format_cmd_options(opts) + args
-      end
-      cmd command, *args
-      self
-    end
-    
-    def _execute(*args, &block) # :nodoc:
-      capture { execute(*args, &block) }
-    end
-    
     # Installs a file from the package.
     def file(file_name, target, options={})
       source = file_path(file_name, guess_target_name(target))
