@@ -22,36 +22,57 @@ def blank?(obj)
   obj.nil? || obj.to_s.strip.empty?
 end
 
-def nest_opts(opts, default={})
-  opts = default if opts.nil? || opts == true
-  opts && block_given? ? yield(opts) : opts
+# An array used for tracking indents currently in use.
+def indents
+  @indents ||= []
 end
 
-# Returns the current indentation string.
-def current_indent
-  @current_indent ||= ""
-end
-
-def outdent_ids
-  @outdent_ids ||= []
-end
-
-# Indents the output of the block.  See current_indent.
+# Indents the output of the block.  Indents may be nested. To prevent a
+# section from being indented, enclose it within outdent which resets
+# indentation to nothing for the duration of a block.
+#
+# Example:
+#
+#   target.puts 'a'
+#   indent do
+#     target.puts 'b'
+#     outdent do
+#       target.puts 'c'
+#       indent do
+#         target.puts 'd'
+#       end
+#       target.puts 'c'
+#     end
+#     target.puts 'b'
+#   end
+#   target.puts 'a'
+#
+#   "\n" + result
+#   # => %q{
+#   # a
+#   #   b
+#   # c
+#   #   d
+#   # c
+#   #   b
+#   # a
+#   # }
+#
 def indent(indent='  ', &block)
-  @current_indent = current_indent + indent
+  indents << indents.last.to_s + indent
   str = capture(&block)
-  @current_indent.chomp! indent
+  indents.pop
   
   unless str.empty?
     str.gsub!(/^/, indent)
     
-    if current_indent.empty?
-      outdent_ids.each do |id|
-        str.gsub!(/#{id}(\d+):(.*?)#{id}/m) do
+    if indents.empty?
+      outdents.each do |flag|
+        str.gsub!(/#{flag}(\d+):(.*?)#{flag}/m) do
           $2.gsub!(/^.{#{$1.to_i}}/, '')
         end
       end
-      outdent_ids.clear
+      outdents.clear
     end
     
     target.puts str
@@ -60,20 +81,44 @@ def indent(indent='  ', &block)
   self
 end
 
-# Outdents a section of text indented by indent.
-def outdent(id=nil)
-  if current_indent.empty?
+# An array used for tracking outdents currently in use.
+def outdents
+  @outdents ||= []
+end
+
+# Resets indentation to nothing for a section of text indented by indent.
+#
+# === Notes
+#
+# Outdent works by setting a text flag around the outdented section; the flag
+# and indentation is later stripped out using regexps.  For that reason, be
+# sure flag is not something that will appear anywhere else in the section.
+#
+# The default flag is like ':outdent_N:' where N is a big random number.
+def outdent(flag=nil)
+  current_indent = indents.last
+  
+  if current_indent.nil?
     yield
   else
-    id ||= ":outdent_#{outdent_ids.length}:"
-    outdent_ids << id
+    flag ||= ":outdent_#{rand(10000000)}:"
+    outdents << flag
     
-    target << "#{id}#{current_indent.length}:#{rstrip}"
+    target << "#{flag}#{current_indent.length}:#{rstrip}"
+    indents << ''
+    
     yield
-    target << "#{id}#{rstrip}"
+    
+    indents.pop
+    target << "#{flag}#{rstrip}"
   end
   
   self
+end
+
+def nest_opts(opts, default={})
+  opts = default if opts.nil? || opts == true
+  opts && block_given? ? yield(opts) : opts
 end
 
 attr_accessor :cmd_prefix

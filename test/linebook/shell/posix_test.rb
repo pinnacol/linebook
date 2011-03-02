@@ -67,6 +67,34 @@ class PosixTest < Test::Unit::TestCase
   # indent test
   #
   
+  def test_indent_documentation
+    setup_recipe do
+      target.puts 'a'
+      indent do
+        target.puts 'b'
+        outdent do
+          target.puts 'c'
+          indent do
+            target.puts 'd'
+          end
+          target.puts 'c'
+        end
+        target.puts 'b'
+      end
+      target.puts 'a'
+    end
+    
+    assert_equal %q{
+a
+  b
+c
+  d
+c
+  b
+a
+}, "\n" + recipe.result
+  end
+  
   def test_indent_indents_target_output_during_block
     assert_recipe %q{
       a
@@ -121,47 +149,62 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
-  def test_indent_works_with_outdent
+  #
+  # outdent test
+  #
+  
+  def test_outdent_does_nothing_outside_of_indent
     assert_recipe %q{
       a
-        b
+       b
+        c
+    } do
+      outdent do
+        target.puts 'a'
+        target.puts ' b'
+        target.puts '  c'
+      end
+    end
+  end
+
+  def test_outdent_strips_the_current_indentation_off_of_a_section
+    assert_recipe %q{
+      a
+      +b
       c
-        d
+      -x
+      --y
+      z
+      z
+      --y
+      -x
       c
-        b
+      +b
       a
     } do
       target.puts 'a'
-      indent do
+      indent('+') do
         target.puts 'b'
         outdent do
           target.puts 'c'
-          indent do
-            target.puts 'd'
+          indent('-') do
+            target.puts 'x'
+            indent('-') do
+              target.puts 'y'
+              outdent do
+                target.puts 'z'
+                target.puts 'z'
+              end
+              target.puts 'y'
+            end
+            target.puts 'x'
           end
           target.puts 'c'
         end
         target.puts 'b'
-        
       end
       target.puts 'a'
     end
-  end
-  
-  #
-  # current_indent test
-  #
-  
-  def test_current_indent_returns_current_indentation
-    assert_equal '', recipe.current_indent
-    recipe.indent do
-      assert_equal '  ', recipe.current_indent
-      recipe.indent '.' do
-        assert_equal '  .', recipe.current_indent
-      end
-      assert_equal '  ', recipe.current_indent
-    end
-    assert_equal '', recipe.current_indent
   end
   
   #
