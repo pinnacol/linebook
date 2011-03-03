@@ -1,6 +1,6 @@
 # Always execute a script and not multiple commands because sudo
 # in different versions will and will not pass a '-' to the shell
-# such that these could be equivalent:
+# such that these may or may not be equivalent:
 #
 #   sudo -i -u linecook abc
 #   bash - abc
@@ -21,10 +21,11 @@ sudo -E -u linecook [script]
 # login env
 sudo -i -u linecook [script]
 
-# Note that there are equivalent commands using su, which is handy
-# since not all sudo support -E.  The downside is that while you can
-# setup sudo to not require a password, su does... so you need to
-# invoke it as root in a scripting world.
+# These are equivalent commands using su, which is handy since not all sudo
+# support -E.  The downside is that while you can setup sudo to not require a
+# password, su does... so you need to invoke it as root in a scripting world...
+# OR you need to modify pam.d as in 
+# http://cosminswiki.com/index.php/How_to_let_users_su_without_password
 
 # new env
 env - su linecook [script]
@@ -35,4 +36,40 @@ su -m linecook [script]
 
 # login env
 su -l linecook [script]
+
+# Consider using 'su -m' under most in-script transfers to get predictable
+# continuation.  Then 'su -l' for logins.
+
+export EXAMPLE_VAR=value
+mkdir -p /tmp/example
+cd /tmp/example
+echo 'pwd' > echopwd.sh
+echo 'env | grep EXAMPLE_VAR' >> echopwd.sh
+chmod +x echopwd.sh
+mkdir dir
+cd dir
+./../echopwd.sh
+# => /tmp/example/dir
+# => EXAMPLE_VAR=value
+su linecook /tmp/example/echopwd.sh
+# => /tmp/example/dir
+# => EXAMPLE_VAR=value
+su -m linecook /tmp/example/echopwd.sh
+# => /tmp/example/dir
+# => EXAMPLE_VAR=value
+su -l linecook /tmp/example/echopwd.sh
+# => /home/linecook
+
+#
+# Note -l/-m are mutually exclusive, only allow one.  Moreover there
+# is different behavior on different boxes for which win in these examples
+#
+
+su -m -l linecook /tmp/example/echopwd.sh
+su -l -m linecook /tmp/example/echopwd.sh
+
+# => /home/linecook
+# OR
+# => /tmp/example/dir
+# => EXAMPLE_VAR=value
 

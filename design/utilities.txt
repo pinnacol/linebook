@@ -2,6 +2,8 @@ UNIX Utilities: http://en.wikipedia.org/wiki/List_of_Unix_utilities
 POSIX Syntax: http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html
 POSIX Utilities: http://pubs.opengroup.org/onlinepubs/009695399/idx/sbi.html
 
+UNIX SPEC: http://www.opengroup.org/onlinepubs/000095399/toc.htm
+
 % bash -c help
 GNU bash, version 3.2.17(1)-release (i386-apple-darwin9.0)
 These shell commands are defined internally.  Type `help' to see this list.

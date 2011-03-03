@@ -22,6 +22,12 @@ date=[[[mm]dd]HH]MM[[cc]yy][.ss]
 
 = OS - Generic ( this is an API overwrite as needed )
 # user management, package name mappings?
+#
+# User attributes:
+#   :uid, :gid, :comment, :home, :shell, :password 
+# Group attributes:
+#   :gid, :users
+#
 
 su user, *env        # obtain shell/env
 prerequisites        # openssl, curl, perl
@@ -40,6 +46,8 @@ groups user
 
 = Shell
 # high level wrappers, generally add direction with idempotent checks
+# Specifically targeted towards Linux -- PAM authentication and the
+# typical Unix user management
 
 install source target
 
