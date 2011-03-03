@@ -17,6 +17,9 @@ shebang              # add hooks to define functions
                      # patch modules... even as there are 'require before'
                      # modules handled by extend
 
+date
+date=[[[mm]dd]HH]MM[[cc]yy][.ss]
+
 = OS - Generic ( this is an API overwrite as needed )
 # user management, package name mappings?
 
