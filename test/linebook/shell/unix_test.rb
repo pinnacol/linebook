@@ -121,6 +121,51 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
+  # set_date test
+  #
+  
+  def test_set_date_sets_the_system_date_to_the_specified_time
+    time = Time.now
+    
+    setup_recipe do
+      set_date time
+      target.puts "date '+%Y-%m-%d %H:%M'"
+    end
+    
+    assert_output_equal %{
+      #{time.strftime("%Y-%m-%d %H:%M")}
+    }, *run_package
+  end
+  
+  def test_set_date_adjusts_to_utc
+    time  = Time.now
+    
+    setup_recipe do
+      set_date time.dup.utc
+      target.puts "date '+%Y-%m-%d %H:%M'"
+    end
+    
+    assert_output_equal %{
+      #{time.strftime("%Y-%m-%d %H:%M")}
+    }, *run_package
+  end
+  
+  #
+  # date test
+  #
+  
+  def test_date_prints_date_in_specified_format
+    setup_recipe do
+      target.puts "sudo date 031008301979 > /dev/null"
+      date "%Y-%m-%d %H:%M"
+    end
+    
+    assert_output_equal %{
+      1979-03-10 08:30
+    }, *run_package
+  end
+  
+  #
   # echo test
   #
   

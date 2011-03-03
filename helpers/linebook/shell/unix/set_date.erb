@@ -1,0 +1,4 @@
+Sets the system time.
+(time=Time.now) 
+--
+sudo date -u <%= time.dup.utc.strftime("%m%d%H%M%Y.%S") %> > /dev/null

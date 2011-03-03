@@ -108,6 +108,21 @@ module Linebook
         capture { cp_rf(*args, &block) }
       end
       
+      # Returns the current system time.  A format string may be provided, as well as
+      # a hash of command line options.
+      def date(format=nil, options={})
+        if format
+          format = quote("+#{format}")
+        end
+        
+        cmd "date", format, options
+        self
+      end
+      
+      def _date(*args, &block) # :nodoc:
+        capture { date(*args, &block) }
+      end
+      
       def directory?(path)
         #  [ -d "<%= path %>" ]
         _erbout.concat "[ -d \""; _erbout.concat(( path ).to_s); _erbout.concat "\" ]";
@@ -268,6 +283,18 @@ module Linebook
       
       def _section(*args, &block) # :nodoc:
         capture { section(*args, &block) }
+      end
+      
+      # Sets the system time.
+      def set_date(time=Time.now) 
+        #  sudo date -u <%= time.dup.utc.strftime("%m%d%H%M%Y.%S") %> > /dev/null
+        #  
+        _erbout.concat "sudo date -u "; _erbout.concat(( time.dup.utc.strftime("%m%d%H%M%Y.%S") ).to_s); _erbout.concat " > /dev/null\n"
+        self
+      end
+      
+      def _set_date(*args, &block) # :nodoc:
+        capture { set_date(*args, &block) }
       end
       
       # == Notes
