@@ -6,7 +6,7 @@ Use dev/null on set such that no options will not dump ENV into stdout.
 --
 #! <%= shell_path %>
 <% section %>
-<%= check_status_function %>
+<% check_status_function %>
 
 export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}
 export LINECOOK_OPTS=${LINECOOK_OPTS:--v}

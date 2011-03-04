@@ -303,7 +303,7 @@ module Linebook
         @target_format = '$LINECOOK_DIR/%s'
         #  #! <%= shell_path %>
         #  <% section %>
-        #  <%= check_status_function %>
+        #  <% check_status_function %>
         #  
         #  export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}
         #  export LINECOOK_OPTS=${LINECOOK_OPTS:--v}
@@ -341,7 +341,7 @@ module Linebook
         #  
         _erbout.concat "#! "; _erbout.concat(( shell_path ).to_s); _erbout.concat "\n"
         section 
-        _erbout.concat(( check_status_function ).to_s)
+        check_status_function 
         _erbout.concat "\n"
         _erbout.concat "export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}\n"
         _erbout.concat "export LINECOOK_OPTS=${LINECOOK_OPTS:--v}\n"
