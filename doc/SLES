@@ -44,30 +44,29 @@ install iso, take a snapshot and setup port forwarding.
 Transfer your ssh key to the vm. Help to generate ssh keys can be found on
 GitHub (http://help.github.com/key-setup-redirect):
 
-  scp -P 2222 -o UserKnownHostsFile=/dev/null ~/.ssh/id_rsa.pub linecook@localhost:id_rsa.pub
-  
-Login as linecook and setup sudo permissions for the linecook user:
+  scp -P 2228 -o UserKnownHostsFile=/dev/null ~/.ssh/id_rsa.pub linecook@localhost:id_rsa.pub
 
-  vm: su -
-  vm: visudo
+Login as root and setup su for the linecook user:
+
+  vm: vi /etc/pam.d/su
   
   # insert:
   #
-  #   # Members of the linecook group may sudo without a password
-  #   %linecook ALL=NOPASSWD: ALL
+  #   auth       sufficient pam_wheel.so trust
   #
-  # then exit (write out changes as prompted)
   
-  vm: groupadd linecook
-  vm: usermod -A linecook linecook
-  vm: exit
+  vm: p=$(id -gn linecook)
+  vm: g=$(id -Gn linecook | sed "s/$p //" | sed "s/ /,/g")
+  vm: usermod -G "wheel,$g" linecook
 
 Setup SSH and exit:
 
+  vm: su -l linecook
   vm: mkdir .ssh
   vm: mv id_rsa.pub .ssh/authorized_keys
   vm: chmod 0700 .ssh
   vm: chmod 0600 .ssh/authorized_keys
+  vm: exit
   vm: exit
 
 Now take the standard snapshots:
