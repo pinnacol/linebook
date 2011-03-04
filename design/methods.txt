@@ -20,7 +20,7 @@ shebang              # add hooks to define functions
 date
 date=[[[mm]dd]HH]MM[[cc]yy][.ss]
 
-= OS - Generic ( this is an API overwrite as needed )
+= OS - Linux ( this is an API overwrite as needed )
 # user management, package name mappings?
 #
 # User attributes:
@@ -28,6 +28,10 @@ date=[[[mm]dd]HH]MM[[cc]yy][.ss]
 # Group attributes:
 #   :gid, :users
 #
+
+id
+
+useradd, usermod, userdel, groupadd, groupdel, groupmod, passwd
 
 su user, *env        # obtain shell/env
 prerequisites        # openssl, curl, perl
