@@ -2,13 +2,13 @@ require File.expand_path('../../../test_helper', __FILE__)
 require 'linebook/shell'
 require 'linebook/os/ubuntu'
 
-class OsTest < Test::Unit::TestCase
+class UbuntuTest < Test::Unit::TestCase
   include Linecook::Test
+  only_hosts 'ubuntu'
   
-  def setup_recipe(target_path='recipe')
-    recipe = super
-    recipe.extend Linebook::Shell
-    recipe.extend Linebook::Os::Ubuntu
+  def setup
+    super
+    use_helpers Linebook::Shell, Linebook::Os::Ubuntu
   end
   
   #

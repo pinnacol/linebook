@@ -118,14 +118,27 @@ task :default => :test
 
 desc 'Run the tests assuming each vm is setup'
 task :quicktest => :build do
-  tests = Dir.glob('test/**/*_test.rb')
-  tests.delete_if {|test| test =~ /_test\/test_/ }
+  hosts = ENV['HOST'].to_s.split(':')
   
-  if ENV['RCOV'] == 'true'
-    FileUtils.rm_rf File.expand_path('../coverage', __FILE__)
-    sh('rcov', '-w', '--text-report', '--exclude', '^/', *tests)
-  else
-    sh('ruby', '-w', '-e', 'ARGV.dup.each {|test| load test}', *tests)
+  if hosts.empty?
+   `bundle exec linecook state --hosts`.split("\n").each do |line|
+     hosts << line.split(':').at(0)
+    end
+  end
+  
+  hosts.each do |host|
+    puts "Using Host: #{host}"
+    ENV['LINECOOK_TEST_HOST'] = host
+    
+    tests = Dir.glob('test/**/*_test.rb')
+    tests.delete_if {|test| test =~ /_test\/test_/ }
+
+    if ENV['RCOV'] == 'true'
+      FileUtils.rm_rf File.expand_path('../coverage', __FILE__)
+      sh('rcov', '-w', '--text-report', '--exclude', '^/', *tests)
+    else
+      sh('ruby', '-w', '-e', 'ARGV.dup.each {|test| load test}', *tests)
+    end
   end
 end
 
@@ -133,7 +146,7 @@ desc 'Run the tests'
 task :test do
   begin
     Rake::Task["start"].invoke
-    Rake::Task["quicktest"].invoke
+    Rake::Task["hosttest"].invoke
   ensure
     Rake::Task["stop"].execute(nil)
   end
