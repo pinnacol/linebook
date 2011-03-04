@@ -5,9 +5,9 @@ module Linebook
   module Os
     module Linux
       def useradd(name)
-        #  sudo useradd <%= name %>
+        #  sudo -i -- -c "useradd <%= name %>"
         #  
-        _erbout.concat "sudo useradd "; _erbout.concat(( name ).to_s); _erbout.concat "\n"
+        _erbout.concat "sudo -i -- -c \"useradd "; _erbout.concat(( name ).to_s); _erbout.concat "\"\n"
         self
       end
       

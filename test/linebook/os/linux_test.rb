@@ -14,8 +14,8 @@ class LinuxTest < Test::Unit::TestCase
   
   def clean_recipe
     setup_recipe do
-      target.puts "sudo userdel #{TEST_USER} > /dev/null 2>&1"
-      target.puts "sudo groupdel #{TEST_GROUP} > /dev/null 2>&1"
+      target.puts %{sudo -i -- -c "userdel #{TEST_USER}" > /dev/null 2>&1}
+      target.puts %{sudo -i -- -c "groupdel #{TEST_GROUP}" > /dev/null 2>&1}
       target.puts "true"
     end
   end

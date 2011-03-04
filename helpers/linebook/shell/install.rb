@@ -12,5 +12,5 @@ Installs a file
   end
   
   cp source, target
-  chmod options[:mode], target
+  chmod options[:mode] || 644, target
   chown options[:user], options[:group], target

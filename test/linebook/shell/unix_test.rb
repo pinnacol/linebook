@@ -16,6 +16,7 @@ class UnixTest < Test::Unit::TestCase
   def test_chomd_chmods_a_file
     setup_recipe do
       target.puts 'touch file'
+      target.puts 'chmod 644 file'
       target.puts 'ls -la file'
       chmod '600', 'file'
       target.puts 'ls -la file'
@@ -441,8 +442,8 @@ class UnixTest < Test::Unit::TestCase
     end
     
     assert_output_equal %{
-      /home/linecook/test/linebook/shell/unix_test/test_shebang_sets_LINECOOK_DIR_to_recipe_dirname
-    }, *run_package
+      /tmp/package
+    }, *run_package('remote_dir' => '/tmp/package')
   end
   
   def test_shebang_uses_LINECOOK_OPTS_if_set
