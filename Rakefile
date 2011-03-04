@@ -131,13 +131,35 @@ end
 
 desc 'Run the tests vs each vm in config/ssh'
 task :multitest do
+  require 'thread'
+  
   hosts = `bundle exec linecook state --hosts`.split("\n")
   hosts.collect! {|line| line.split(':').at(0) }
   
-  hosts.each do |host|
-    puts "Using Host: #{host}"
-    ENV['LINECOOK_TEST_HOST'] = host
-    Rake::Task["quicktest"].execute
+  log_dir = File.expand_path('../log', __FILE__)
+  unless File.exists?(log_dir)
+    FileUtils.mkdir_p(log_dir)
+  end
+  
+  threads = hosts.collect do |host|
+    Thread.new do
+      logfile = File.join(log_dir, host)
+      Thread.current["host"] = host
+      Thread.current["logfile"] = logfile
+      
+      cmd = "LINECOOK_TEST_HOST=#{host} rake quicktest > '#{logfile}' 2>&1"
+      puts  "Multitest Host: #{host}"
+      system(cmd)
+      
+      stdout  = File.read(logfile).split("\n")
+      time    = stdout.grep(/^Finished in/)
+      results = stdout.grep(/^\d+ tests/)
+      puts "Using Host: #{host}\n  #{time}\n  #{results}"
+    end
+  end
+  
+  threads.each do |thread|
+    thread.join
   end
 end
 
