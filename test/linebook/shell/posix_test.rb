@@ -6,8 +6,8 @@ class PosixTest < Test::Unit::TestCase
   
   def setup
     super
-    setup_host 'abox'
-    setup_helpers Linebook::Shell::Posix
+    use_host 'abox'
+    use_helpers Linebook::Shell::Posix
   end
   
   #

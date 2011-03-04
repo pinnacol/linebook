@@ -7,8 +7,8 @@ class BashTest < Test::Unit::TestCase
   
   def setup
     super
-    setup_host 'abox'
-    setup_helpers Linebook::Shell, Linebook::Shell::Bash
+    use_host 'abox'
+    use_helpers Linebook::Shell, Linebook::Shell::Bash
   end
   
   #

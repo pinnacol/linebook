@@ -8,8 +8,8 @@ class ShellTest < Test::Unit::TestCase
   
   def setup
     super
-    setup_host 'abox'
-    setup_helpers Linebook::Shell
+    use_host 'abox'
+    use_helpers Linebook::Shell
   end
   
   #

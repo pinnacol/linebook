@@ -6,8 +6,8 @@ class LinuxTest < Test::Unit::TestCase
   
   def setup
     super
-    setup_host 'abox'
-    setup_helpers Linebook::Os::Linux
+    use_host 'abox'
+    use_helpers Linebook::Os::Linux
   end
   
   TEST_USER  = 'test_user'
