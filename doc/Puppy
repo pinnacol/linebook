@@ -30,7 +30,7 @@ Now there are some issues:
 * puppy linux uses it's own package management system (not yum/apt-get)
 * the package system is not instantly usable
 * openssh is not present
-* no user management stuff appears to be present
+* no user management stuff appears to be present (ie sshd will need )
 * ergo... the remainder will not work
 
 Transfer your ssh key to the vm. Help to generate ssh keys can be found on
