@@ -35,16 +35,6 @@ class UnixTest < Test::Unit::TestCase
     end
   end
   
-  def test_chmod_may_prefix
-    assert_recipe %q{
-      sudo chmod "600" "target"
-    } do
-      with_execute_prefix 'sudo ' do
-        chmod '600', 'target'
-      end
-    end
-  end
-  
   #
   # chown test
   #
@@ -61,16 +51,6 @@ class UnixTest < Test::Unit::TestCase
     assert_recipe %q{
     } do
       chown nil, nil, 'target'
-    end
-  end
-  
-  def test_chown_may_prefix
-    assert_recipe %q{
-      sudo chown "user:group" "target"
-    } do
-      with_execute_prefix 'sudo ' do
-        chown 'user', 'group', 'target'
-      end
     end
   end
   
@@ -107,16 +87,6 @@ class UnixTest < Test::Unit::TestCase
       cp -rf "source" "target"
     } do
       cp_rf 'source', 'target'
-    end
-  end
-  
-  def test_cp_may_prefix
-    assert_recipe %q{
-      sudo cp "source" "target"
-    } do
-      with_execute_prefix 'sudo ' do
-        cp 'source', 'target'
-      end
     end
   end
   
@@ -197,16 +167,6 @@ class UnixTest < Test::Unit::TestCase
     end
   end
   
-  def test_ln_may_prefix
-    assert_recipe %q{
-      sudo ln "source" "target"
-    } do
-      with_execute_prefix 'sudo ' do
-        ln 'source', 'target'
-      end
-    end
-  end
-  
   #
   # mkdir test
   #
@@ -227,16 +187,6 @@ class UnixTest < Test::Unit::TestCase
     end
   end
   
-  def test_mkdir_may_prefix
-    assert_recipe %q{
-      sudo mkdir "target"
-    } do
-      with_execute_prefix 'sudo ' do
-        mkdir 'target'
-      end
-    end
-  end
-  
   #
   # mv test
   #
@@ -254,16 +204,6 @@ class UnixTest < Test::Unit::TestCase
       mv -f "source" "target"
     } do
       mv_f 'source', 'target'
-    end
-  end
-  
-  def test_mv_may_prefix
-    assert_recipe %q{
-      sudo mv "source" "target"
-    } do
-      with_execute_prefix 'sudo ' do
-        mv 'source', 'target'
-      end
     end
   end
   
@@ -383,16 +323,6 @@ class UnixTest < Test::Unit::TestCase
       rm -rf "target"
     } do
       rm_rf 'target'
-    end
-  end
-  
-  def test_rm_may_prefix
-    assert_recipe %q{
-      sudo rm "source" "target"
-    } do
-      with_execute_prefix 'sudo ' do
-        rm 'source', 'target'
-      end
     end
   end
   

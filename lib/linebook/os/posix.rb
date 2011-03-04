@@ -81,34 +81,6 @@ module Linebook
         options.sort
       end
       
-      # The prefix added to all execute calls.
-      attr_accessor :execute_prefix
-      
-      # Sets execute_prefix for the duration of a block.
-      def with_execute_prefix(prefix)
-        current = execute_prefix
-        begin
-          self.execute_prefix = prefix
-          yield
-        ensure
-          self.execute_prefix = current
-        end
-      end
-      
-      # The suffix added to all execute calls.
-      attr_accessor :execute_suffix
-      
-      # Sets execute_suffix for the duration of a block.
-      def with_execute_suffix(suffix)
-        current = execute_suffix
-        begin
-          self.execute_suffix = suffix
-          yield
-        ensure
-          self.execute_suffix = current
-        end
-      end
-      
       # Adds a check that ensures the last exit status is as indicated. Note that no
       # check will be added unless check_status_function is added beforehand.
       def check_status(expect_status=0, fail_status='$?')
@@ -142,21 +114,6 @@ module Linebook
         capture { check_status_function(*args, &block) }
       end
       
-      # Executes a command and checks the output status.
-      def cmd(command, *args)
-        #  <%= format_cmd(command, *args) %>
-        #  
-        #  <% check_status %>
-        _erbout.concat(( format_cmd(command, *args) ).to_s)
-        _erbout.concat "\n"
-        check_status ;
-        self
-      end
-      
-      def _cmd(*args, &block) # :nodoc:
-        capture { cmd(*args, &block) }
-      end
-      
       # Writes a comment
       def comment(str)
         #  # <%= str %>
@@ -169,14 +126,14 @@ module Linebook
         capture { comment(*args, &block) }
       end
       
-      # Executes a command and checks the output status. Unlike cmd, execute allows a
-      # prefix/suffix to wrap the command and args. See with_execute_prefix and
-      # with_execute_suffix.
+      # Executes a command and checks the output status.  Quotes all non-option args
+      # that aren't already quoted. Accepts a trailing hash which will be transformed
+      # into command line options.
       def execute(command, *args)
-        #  <%= execute_prefix %><%= format_cmd(command, *args) %><%= execute_suffix %>
+        #  <%= format_cmd(command, *args) %>
         #  
         #  <% check_status %>
-        _erbout.concat(( execute_prefix ).to_s); _erbout.concat(( format_cmd(command, *args) ).to_s); _erbout.concat(( execute_suffix ).to_s)
+        _erbout.concat(( format_cmd(command, *args) ).to_s)
         _erbout.concat "\n"
         check_status ;
         self

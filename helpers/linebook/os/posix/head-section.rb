@@ -75,31 +75,3 @@ def format_options(opts)
   
   options.sort
 end
-
-# The prefix added to all execute calls.
-attr_accessor :execute_prefix
-
-# Sets execute_prefix for the duration of a block.
-def with_execute_prefix(prefix)
-  current = execute_prefix
-  begin
-    self.execute_prefix = prefix
-    yield
-  ensure
-    self.execute_prefix = current
-  end
-end
-
-# The suffix added to all execute calls.
-attr_accessor :execute_suffix
-
-# Sets execute_suffix for the duration of a block.
-def with_execute_suffix(suffix)
-  current = execute_suffix
-  begin
-    self.execute_suffix = suffix
-    yield
-  ensure
-    self.execute_suffix = current
-  end
-end

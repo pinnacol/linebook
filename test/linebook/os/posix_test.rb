@@ -92,6 +92,11 @@ class PosixTest < Test::Unit::TestCase
     assert_equal %{command_name "'one" "two'" "th'ree"}, recipe.format_cmd('command_name', "'one", "two'", "th'ree")
   end
   
+  def test_format_cmd_skips_nil_args
+    cmd = recipe.format_cmd 'which', nil, 'name'
+    assert_equal 'which "name"', cmd
+  end
+  
   #
   # format_options test
   #
@@ -132,30 +137,6 @@ class PosixTest < Test::Unit::TestCase
       'a' => true, 'b' => true, 'c' => true,
       'x' => true, 'y' => true, 'z' => true
     )
-  end
-  
-  #
-  # with_execute_prefix test
-  #
-  
-  def test_with_execute_prefix_sets_execute_prefix_for_the_duration_of_a_block
-    assert_equal nil, recipe.execute_prefix
-    recipe.with_execute_prefix('prefix') do
-      assert_equal 'prefix', recipe.execute_prefix
-    end
-    assert_equal nil, recipe.execute_prefix
-  end
-  
-  #
-  # with_execute_suffix test
-  #
-  
-  def test_with_execute_suffix_sets_execute_suffix_for_the_duration_of_a_block
-    assert_equal nil, recipe.execute_suffix
-    recipe.with_execute_suffix('suffix') do
-      assert_equal 'suffix', recipe.execute_suffix
-    end
-    assert_equal nil, recipe.execute_suffix
   end
   
   #
@@ -229,27 +210,6 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
-  # cmd test
-  #
-  
-  def test_cmd_executes_cmd_and_checks_pass_status
-    setup_recipe do
-      check_status_function
-      
-      cmd 'true'
-      target.puts 'echo success'
-      
-      cmd 'fail'
-      target.puts 'echo fail'
-    end
-    
-    assert_alike %{
-      success
-      [127] ./recipe:...:
-    }, *run_package
-  end
-  
-  #
   # comment test
   #
   
@@ -280,16 +240,6 @@ class PosixTest < Test::Unit::TestCase
       success
       [127] ./recipe:...:
     }, *run_package
-  end
-  
-  def test_execute_uses_current_execute_prefix_and_suffix
-    assert_recipe %q{
-      prefix command_name "a" "b" "c" suffix
-    } do
-      self.execute_prefix = "prefix "
-      self.execute_suffix = " suffix"
-      execute 'command_name', "a", "b", "c"
-    end
   end
   
   #

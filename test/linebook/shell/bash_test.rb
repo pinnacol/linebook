@@ -11,26 +11,6 @@ class BashTest < Test::Unit::TestCase
   end
   
   #
-  # cmd test
-  #
-  
-  def test_cmd_quotes_non_option_args
-    assert_recipe(%{
-      ls -la "name"
-    }){ 
-      cmd 'ls', '-la', 'name'
-    }
-  end
-  
-  def test_cmd_skips_nil_args
-    assert_recipe(%{
-      which "name"
-    }){ 
-      cmd 'which', nil, 'name'
-    }
-  end
-  
-  #
   # su test
   #
   

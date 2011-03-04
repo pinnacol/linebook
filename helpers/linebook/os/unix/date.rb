@@ -6,4 +6,4 @@ a hash of command line options.
     format = quote("+#{format}")
   end
   
-  cmd "date", format, options
+  execute "date", format, options

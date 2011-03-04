@@ -33,7 +33,7 @@ module Linebook
       
       # Executes 'cat' with the sources.
       def cat(*sources)
-        cmd 'cat', *sources
+        execute 'cat', *sources
         self
       end
       
@@ -115,7 +115,7 @@ module Linebook
           format = quote("+#{format}")
         end
         
-        cmd "date", format, options
+        execute "date", format, options
         self
       end
       
