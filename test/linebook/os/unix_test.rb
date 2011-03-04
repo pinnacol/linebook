@@ -1,12 +1,12 @@
 require File.expand_path('../../../test_helper', __FILE__)
-require 'linebook/shell/unix'
+require 'linebook/os/unix'
 
 class UnixTest < Test::Unit::TestCase
   include Linecook::Test
   
   def setup
     super
-    use_helpers Linebook::Shell::Unix
+    use_helpers Linebook::Os::Unix
   end
   
   #

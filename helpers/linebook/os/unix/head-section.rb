@@ -1,4 +1,4 @@
-require 'linebook/shell/posix'
+require 'linebook/os/posix'
 include Posix
 
 def shell_path

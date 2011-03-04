@@ -4,10 +4,13 @@ require 'erb'
 module Linebook
   module Os
     module Linux
-      def useradd(name)
-        #  sudo -i -- -c "useradd <%= name %>"
+      require 'linebook/os/unix'
+      include Unix
+      
+      def useradd(name, options={})
+        #  sudo -i -- -c "useradd <%= format_options(options) %> <%= name %>"
         #  
-        _erbout.concat "sudo -i -- -c \"useradd "; _erbout.concat(( name ).to_s); _erbout.concat "\"\n"
+        _erbout.concat "sudo -i -- -c \"useradd "; _erbout.concat(( format_options(options) ).to_s); _erbout.concat " "; _erbout.concat(( name ).to_s); _erbout.concat "\"\n"
         self
       end
       

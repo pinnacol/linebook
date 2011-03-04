@@ -1,12 +1,12 @@
 require File.expand_path('../../../test_helper', __FILE__)
-require 'linebook/shell/posix'
+require 'linebook/os/posix'
 
 class PosixTest < Test::Unit::TestCase
   include Linecook::Test
   
   def setup
     super
-    use_helpers Linebook::Shell::Posix
+    use_helpers Linebook::Os::Posix
   end
   
   #

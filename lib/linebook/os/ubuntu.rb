@@ -4,6 +4,9 @@ require 'erb'
 module Linebook
   module Os
     module Ubuntu
+      require 'linebook/os/linux'
+      include Linux
+      
       def package(name, version=nil)
         #  sudo apt-get -q -y install <%= name %><%= blank?(version) ? nil : "=#{version}" %>
         #  <% check_status %>
