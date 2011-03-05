@@ -7,10 +7,37 @@ module Linebook
       require 'linebook/os/unix'
       include Unix
       
+      def su(user='root', &block)
+        target_name = guess_target_name(user)
+        path = capture_path(target_name, &block)
+        chown user, nil, path
+        chmod 744, path
+        sudo path, :E => true, :u => user
+        self
+      end
+      
+      def _su(*args, &block) # :nodoc:
+        capture { su(*args, &block) }
+      end
+      
+      def sudo(*args)
+        if args.empty?
+          target << 'sudo '
+        else
+          execute('sudo', *args)
+        end
+        self
+      end
+      
+      def _sudo(*args, &block) # :nodoc:
+        capture { sudo(*args, &block) }
+      end
+      
+      # Adds the user.  Assumes the current user is root, or has root privileges.
       def useradd(name, options={})
-        #  su root useradd <%= format_options(options) %> <%= name %>
+        #  useradd <%= format_options(options) %> <%= name %>
         #  
-        _erbout.concat "su root useradd "; _erbout.concat(( format_options(options) ).to_s); _erbout.concat " "; _erbout.concat(( name ).to_s); _erbout.concat "\n"
+        _erbout.concat "useradd "; _erbout.concat(( format_options(options) ).to_s); _erbout.concat " "; _erbout.concat(( name ).to_s); _erbout.concat "\n"
         self
       end
       

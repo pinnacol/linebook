@@ -102,7 +102,8 @@ class UnixTest < Test::Unit::TestCase
         set_date time
       end
       
-      target.puts "su root '#{path}' > /dev/null"
+      target.puts %{chmod +x "#{path}"}
+      target.puts %{sudo -u root "$(pwd)/#{path}" > /dev/null}
       target.puts "date '+%Y-%m-%d %H:%M'"
     end
     
@@ -119,7 +120,8 @@ class UnixTest < Test::Unit::TestCase
         set_date time.dup.utc
       end
       
-      target.puts "su root '#{path}' > /dev/null"
+      target.puts %{chmod +x "#{path}"}
+      target.puts %{sudo -u root "$(pwd)/#{path}" > /dev/null}
       target.puts "date '+%Y-%m-%d %H:%M'"
     end
     
@@ -138,7 +140,8 @@ class UnixTest < Test::Unit::TestCase
         target.puts "date 031008301979"
       end
       
-      target.puts "su root '#{path}' > /dev/null"
+      target.puts %{chmod +x "#{path}"}
+      target.puts %{sudo -u root "$(pwd)/#{path}" > /dev/null}
       date "%Y-%m-%d %H:%M"
     end
     

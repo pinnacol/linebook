@@ -1,3 +1,4 @@
+Adds the user.  Assumes the current user is root, or has root privileges.
 (name, options={})
 --
-su root useradd <%= format_options(options) %> <%= name %>
+useradd <%= format_options(options) %> <%= name %>
