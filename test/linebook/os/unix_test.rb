@@ -98,7 +98,11 @@ class UnixTest < Test::Unit::TestCase
     time = Time.now
     
     setup_recipe do
-      set_date time
+      path = capture_path('set_date.sh') do
+        set_date time
+      end
+      
+      target.puts "su root '#{path}' > /dev/null"
       target.puts "date '+%Y-%m-%d %H:%M'"
     end
     
@@ -111,7 +115,11 @@ class UnixTest < Test::Unit::TestCase
     time  = Time.now
     
     setup_recipe do
-      set_date time.dup.utc
+      path = capture_path('set_date.sh') do
+        set_date time.dup.utc
+      end
+      
+      target.puts "su root '#{path}' > /dev/null"
       target.puts "date '+%Y-%m-%d %H:%M'"
     end
     
@@ -126,7 +134,11 @@ class UnixTest < Test::Unit::TestCase
   
   def test_date_prints_date_in_specified_format
     setup_recipe do
-      target.puts "sudo date 031008301979 > /dev/null"
+      path = capture_path('set_date.sh') do
+        target.puts "date 031008301979"
+      end
+      
+      target.puts "su root '#{path}' > /dev/null"
       date "%Y-%m-%d %H:%M"
     end
     

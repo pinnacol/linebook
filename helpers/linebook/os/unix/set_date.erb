@@ -1,4 +1,5 @@
-Sets the system time.
+Sets the system time.  Must be root for this to succeed.
 (time=Time.now) 
 --
-sudo date -u <%= time.dup.utc.strftime("%m%d%H%M%Y.%S") %> > /dev/null
+date -u <%= time.dup.utc.strftime("%m%d%H%M%Y.%S") %>
+<% check_status %>

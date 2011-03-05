@@ -14,8 +14,12 @@ class LinuxTest < Test::Unit::TestCase
   
   def clean_recipe
     setup_recipe do
-      target.puts %{sudo -i -- -c "userdel #{TEST_USER}" > /dev/null 2>&1}
-      target.puts %{sudo -i -- -c "groupdel #{TEST_GROUP}" > /dev/null 2>&1}
+      path = capture_path('cleanup_test_user.sh') do 
+        target.puts %{userdel #{TEST_USER} > /dev/null 2>&1}
+        target.puts %{groupdel #{TEST_GROUP} > /dev/null 2>&1}
+      end
+      
+      target.puts "su root '#{path}'"
       target.puts "true"
     end
   end
@@ -38,4 +42,22 @@ class LinuxTest < Test::Unit::TestCase
       #{TEST_USER}
     }, *run_package
   end
+  
+  # #
+  # # su test
+  # #
+  # 
+  # def test_su_switches_user_for_duration_of_a_block
+  #   setup_recipe do
+  #     su 'root' do
+  #       target.puts 'whoami'
+  #     end
+  #     
+  #     target.puts 'if ! [ -e file ]; then echo success; fi'
+  #   end
+  # 
+  #   assert_output_equal %{
+  #     success
+  #   }, *run_package
+  # end
 end

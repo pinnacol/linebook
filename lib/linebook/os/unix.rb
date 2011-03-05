@@ -285,11 +285,12 @@ module Linebook
         capture { section(*args, &block) }
       end
       
-      # Sets the system time.
+      # Sets the system time.  Must be root for this to succeed.
       def set_date(time=Time.now) 
-        #  sudo date -u <%= time.dup.utc.strftime("%m%d%H%M%Y.%S") %> > /dev/null
-        #  
-        _erbout.concat "sudo date -u "; _erbout.concat(( time.dup.utc.strftime("%m%d%H%M%Y.%S") ).to_s); _erbout.concat " > /dev/null\n"
+        #  date -u <%= time.dup.utc.strftime("%m%d%H%M%Y.%S") %>
+        #  <% check_status %>
+        _erbout.concat "date -u "; _erbout.concat(( time.dup.utc.strftime("%m%d%H%M%Y.%S") ).to_s); _erbout.concat "\n"
+        check_status ;
         self
       end
       
