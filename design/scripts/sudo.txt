@@ -22,10 +22,16 @@ sudo -E -u linecook [script]
 sudo -i -u linecook [script]
 
 # These are equivalent commands using su, which is handy since not all sudo
-# support -E.  The downside is that while you can setup sudo to not require a
-# password, su does... so you need to invoke it as root in a scripting world...
+# support -E (or rather, 10.5.x OSX does not... everyone else seems to).  The
+# downside is that while you can setup sudo to not require a password, su
+# does... so you need to invoke it as root in a scripting world...
 # OR you need to modify pam.d as in 
 # http://cosminswiki.com/index.php/How_to_let_users_su_without_password
+#
+# MOREOVER, su requires a terminal.  That requirement can be sort-of satisfied
+# using 'ssh -t' but that ONLY works when using ssh from an existing terminal.
+# Forcing tty allocation with 'ssh -tt' can cause scripts to hang.  Basically
+# a deal breaker.
 
 # new env
 env - su linecook [script]
@@ -59,6 +65,14 @@ su -m linecook /tmp/example/echopwd.sh
 # => EXAMPLE_VAR=value
 su -l linecook /tmp/example/echopwd.sh
 # => /home/linecook
+
+sudo -u linecook /tmp/example/echopwd.sh
+# => /tmp/example/dir
+sudo -E -u linecook /tmp/example/echopwd.sh
+# => /tmp/example/dir
+# => EXAMPLE_VAR=value
+sudo -i -u linecook /tmp/example/echopwd.sh
+# =>  /home/linecook
 
 #
 # Note -l/-m are mutually exclusive, only allow one.  Moreover there
