@@ -1,14 +1,14 @@
-Host ubuntu  # [abox]
+Host ubuntu
 Port 2220
 
 Host opensuse
-Port 2223
+Port 2221
 
 Host debian
-Port 2225
+Port 2222
 
 Host sles
-Port 2228
+Port 2223
 
 Host *
 HostName localhost

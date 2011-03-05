@@ -6,3 +6,4 @@ coverage/
 Gemfile.lock
 log
 vm
+config/ssh
