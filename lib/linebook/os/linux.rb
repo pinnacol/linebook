@@ -19,6 +19,7 @@ module Linebook
         capture { login(*args, &block) }
       end
       
+      # Switches to a different user for the duration of a block.
       def su(user='root', &block)
         target_name = guess_target_name(user)
         path = capture_path(target_name, &block)

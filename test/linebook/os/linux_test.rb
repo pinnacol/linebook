@@ -62,4 +62,26 @@ class LinuxTest < Test::Unit::TestCase
       linecook
     }, *run_package
   end
+  
+  def test_nested_su
+    setup_recipe do
+      target.puts 'whoami'
+      su 'root' do
+        target.puts 'whoami'
+        su 'linecook' do
+          target.puts 'whoami'
+        end
+        target.puts 'whoami'
+      end
+      target.puts 'whoami'
+    end
+  
+    assert_output_equal %{
+      linecook
+      root
+      linecook
+      root
+      linecook
+    }, *run_package
+  end
 end

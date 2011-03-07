@@ -103,7 +103,7 @@ class UnixTest < Test::Unit::TestCase
       end
       
       target.puts %{chmod +x "#{path}"}
-      target.puts %{sudo -u root "$(pwd)/#{path}" > /dev/null}
+      target.puts %{sudo -u root "#{path}" > /dev/null}
       target.puts "date '+%Y-%m-%d %H:%M'"
     end
     
@@ -121,7 +121,7 @@ class UnixTest < Test::Unit::TestCase
       end
       
       target.puts %{chmod +x "#{path}"}
-      target.puts %{sudo -u root "$(pwd)/#{path}" > /dev/null}
+      target.puts %{sudo -u root "#{path}" > /dev/null}
       target.puts "date '+%Y-%m-%d %H:%M'"
     end
     
@@ -141,7 +141,7 @@ class UnixTest < Test::Unit::TestCase
       end
       
       target.puts %{chmod +x "#{path}"}
-      target.puts %{sudo -u root "$(pwd)/#{path}" > /dev/null}
+      target.puts %{sudo -u root "#{path}" > /dev/null}
       date "%Y-%m-%d %H:%M"
     end
     
