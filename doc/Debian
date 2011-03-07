@@ -57,6 +57,11 @@ Setup SSH for the linecook user:
   vm: exit
   vm: exit
 
+Remove the login banner and exit:
+
+  vm: sudo rm /etc/motd
+  vm: exit
+
 Now take the standard snapshots:
 
   VBoxManage snapshot debian take BASE

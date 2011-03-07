@@ -59,6 +59,9 @@ Login as root and setup sudo permissions for the linecook user:
   #   %linecook ALL=NOPASSWD: ALL
   #
   # then exit (write out changes as prompted)
+  
+  vm: groupadd linecook
+  vm: usermod -A linecook linecook
 
 Setup SSH for the linecook user:
 

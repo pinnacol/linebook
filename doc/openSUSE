@@ -41,6 +41,9 @@ Login as root, start sshd, stop the firewall, and setup permissions for the line
   #   %linecook ALL=NOPASSWD: ALL
   #
   # then exit (write out changes as prompted)
+  
+  vm: groupadd linecook
+  vm: usermod -A linecook linecook
 
 Transfer your ssh key to the vm. Help to generate ssh keys can be found on
 {GitHub}[http://help.github.com/key-setup-redirect]:

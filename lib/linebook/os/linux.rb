@@ -7,10 +7,21 @@ module Linebook
       require 'linebook/os/unix'
       include Unix
       
+      def login(user='root', &block)
+        target_name = guess_target_name(user)
+        path = capture_path(target_name, &block)
+        chmod 744, path
+        sudo path, :E => false, :i => true, :u => user
+        self
+      end
+      
+      def _login(*args, &block) # :nodoc:
+        capture { login(*args, &block) }
+      end
+      
       def su(user='root', &block)
         target_name = guess_target_name(user)
         path = capture_path(target_name, &block)
-        chown user, nil, path
         chmod 744, path
         sudo path, :E => true, :u => user
         self

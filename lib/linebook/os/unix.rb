@@ -16,7 +16,7 @@ module Linebook
       end
       
       def target_format
-        @target_format ||= "%s"
+        @target_format ||= "$(pwd)/%s"
       end
       
       def target_path(target_name)

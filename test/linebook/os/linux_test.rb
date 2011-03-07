@@ -14,13 +14,10 @@ class LinuxTest < Test::Unit::TestCase
   
   def clean_recipe
     setup_recipe do
-      path = capture_path('cleanup_test_user.sh') do 
+      login do
         target.puts %{userdel #{TEST_USER} > /dev/null 2>&1}
         target.puts %{groupdel #{TEST_GROUP} > /dev/null 2>&1}
       end
-      
-      target.puts %{chmod +x "#{path}"}
-      target.puts %{sudo -u root "$(pwd)/#{path}" > /dev/null}
       target.puts "true"
     end
   end
@@ -33,7 +30,7 @@ class LinuxTest < Test::Unit::TestCase
     clean_recipe
     
     setup_recipe do
-      su do
+      login do
         target.puts "id #{TEST_USER} 2>&1"
         useradd TEST_USER
         target.puts "id -nu #{TEST_USER}"

@@ -84,6 +84,7 @@ module Linebook
       def guess_target_name(source_name)
         next_target_name File.join("#{target_name}.d", File.basename(source_name))
       end
+      
       # Adds a check that ensures the last exit status is as indicated. Note that no
       # check will be added unless check_status_function is added beforehand.
       def check_status(expect_status=0, fail_status='$?')
