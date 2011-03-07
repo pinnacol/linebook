@@ -58,7 +58,7 @@ Login as root and setup sudo permissions for the linecook user:
   #   # Members of the linecook group may sudo without a password
   #   %linecook ALL=NOPASSWD: ALL
   #
-  # then exit (write out changes as prompted)
+  # then write out changes
   
   vm: groupadd linecook
   vm: usermod -A linecook linecook

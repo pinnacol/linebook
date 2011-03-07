@@ -55,11 +55,10 @@ Setup SSH for the linecook user:
   vm: chmod 0700 .ssh
   vm: chmod 0600 .ssh/authorized_keys
   vm: exit
-  vm: exit
 
 Remove the login banner and exit:
 
-  vm: sudo rm /etc/motd
+  vm: rm /etc/motd
   vm: exit
 
 Now take the standard snapshots:
