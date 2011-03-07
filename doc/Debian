@@ -1,5 +1,9 @@
 = Debian
 
+<em>Note these instructions are for building a dev box only. In particular
+they allow the linecook user to sudo without a password, which may not be in
+you best production interests.</em>
+
 Build an Debian base box using the following:
 
   * http://www.debian.org/distrib/netinst
@@ -22,31 +26,28 @@ install iso, take a snapshot and setup port forwarding.
   VBoxManage snapshot debian take RAW
   VBoxManage controlvm debian poweroff
   # wait to fully power off
-  VBoxManage modifyvm debian --natpf1 'debian-ssh,tcp,,2225,,22'
-  VBoxManage modifyvm debian --natpf1 'debian-http,tcp,,8885,,80'
+  VBoxManage modifyvm debian --natpf1 'debian-ssh,tcp,,2222,,22'
   VBoxManage -q snapshot debian restore RAW
   VBoxManage startvm debian
 
 Transfer your ssh key to the vm. Help to generate ssh keys can be found on
 {GitHub}[http://help.github.com/key-setup-redirect]:
 
-  scp -P 2225 -o UserKnownHostsFile=/dev/null ~/.ssh/id_rsa.pub linecook@localhost:id_rsa.pub
+  scp -P 2222 -o UserKnownHostsFile=/dev/null ~/.ssh/id_rsa.pub linecook@localhost:id_rsa.pub
 
-Login as root and setup su for the linecook user:
+Login as root and setup sudo permissions for the linecook user:
 
-  vm: vi /etc/pam.d/su
+  vm: aptitude install sudo
+  vm: visudo
   
-  # uncomment:
+  # insert:
   #
-  #   # Uncomment this if you want wheel members to be able to
-  #   # su without a password.
-  #   auth       sufficient pam_wheel.so trust
+  #   # Members of the linecook group may sudo without a password
+  #   %linecook ALL=NOPASSWD: ALL
   #
-  
-  vm: groupadd wheel
-  vm: usermod -a -G wheel linecook
+  # then exit (write out changes as prompted)
 
-Setup SSH for linecook and exit:
+Setup SSH for the linecook user:
 
   vm: su -l linecook
   vm: mkdir .ssh
@@ -65,5 +66,4 @@ Now take the standard snapshots:
 To cleanup the port forwarding (run later, if ever):
 
   VBoxManage modifyvm debian --natpf1 delete 'debian-ssh'
-  VBoxManage modifyvm debian --natpf1 delete 'debian-http'
 

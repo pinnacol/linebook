@@ -1,5 +1,9 @@
 = openSUSE
 
+<em>Note these instructions are for building a dev box only. In particular
+they allow the linecook user to sudo without a password and turn off the
+firewall, which may not be in you best production interests.</em>
+
 Build an openSUSE base box using the following:
 
   * http://software.opensuse.org/113/en
@@ -21,29 +25,27 @@ install iso, take a snapshot and setup port forwarding.
   VBoxManage snapshot opensuse take RAW
   VBoxManage controlvm opensuse poweroff
   # wait to fully power off
-  VBoxManage modifyvm opensuse --natpf1 'opensuse-ssh,tcp,,2223,,22'
-  VBoxManage modifyvm opensuse --natpf1 'opensuse-http,tcp,,8883,,80'
+  VBoxManage modifyvm opensuse --natpf1 'opensuse-ssh,tcp,,2221,,22'
   VBoxManage -q snapshot opensuse restore RAW
   VBoxManage startvm opensuse
 
-Login as root, start sshd, stop the firewall, and setup su for the linecook
-user:
+Login as root, start sshd, stop the firewall, and setup permissions for the linecook user:
 
   vm: /etc/init.d/sshd start
   vm: rcSuSEfirewall2 stop
-  vm: vi /etc/pam.d/su
+  vm: visudo
   
   # insert:
   #
-  #   auth       sufficient pam_wheel.so trust
+  #   # Members of the linecook group may sudo without a password
+  #   %linecook ALL=NOPASSWD: ALL
   #
-  
-  vm: usermod -A wheel linecook
+  # then exit (write out changes as prompted)
 
 Transfer your ssh key to the vm. Help to generate ssh keys can be found on
 {GitHub}[http://help.github.com/key-setup-redirect]:
 
-  scp -P 2223 -o UserKnownHostsFile=/dev/null ~/.ssh/id_rsa.pub linecook@localhost:id_rsa.pub
+  scp -P 2221 -o UserKnownHostsFile=/dev/null ~/.ssh/id_rsa.pub linecook@localhost:id_rsa.pub
 
 Setup SSH for linecook and exit:
 
@@ -64,4 +66,3 @@ Now take the standard snapshots:
 To cleanup the port forwarding (run later, if ever):
 
   VBoxManage modifyvm opensuse --natpf1 delete 'opensuse-ssh'
-  VBoxManage modifyvm opensuse --natpf1 delete 'opensuse-http'

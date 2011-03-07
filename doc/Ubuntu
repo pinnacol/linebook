@@ -1,5 +1,9 @@
 == Ubuntu
 
+<em>Note these instructions are for building a dev box only. In particular
+they allow the linecook user to sudo without a password, which may not be in
+you best production interests.</em>
+
 Build a Ubuntu base box using the following:
 
   - name: ubuntu
@@ -21,7 +25,6 @@ install iso, take a snapshot and setup port forwarding.
   VBoxManage controlvm ubuntu poweroff
   # wait to fully power off
   VBoxManage modifyvm ubuntu --natpf1 'ubuntu-ssh,tcp,,2220,,22'
-  VBoxManage modifyvm ubuntu --natpf1 'ubuntu-http,tcp,,8880,,80'
   VBoxManage -q snapshot ubuntu restore RAW
   VBoxManage startvm ubuntu
 
@@ -29,20 +32,17 @@ Transfer your ssh key to the vm. Help to generate ssh keys can be found on
 {GitHub}[http://help.github.com/key-setup-redirect]:
 
   scp -P 2220 -o UserKnownHostsFile=/dev/null ~/.ssh/id_rsa.pub linecook@localhost:id_rsa.pub
-  
-Login as linecook and setup su permissions for the linecook user:
 
-  vm: sudo vi /etc/pam.d/su
+Login and setup sudo permissions for the linecook user:
 
-  # uncomment:
-  #
-  #   # Uncomment this if you want wheel members to be able to
-  #   # su without a password.
-  #   auth       sufficient pam_wheel.so trust
-  #
+  vm: sudo visudo
   
-  vm: sudo groupadd wheel
-  vm: sudo usermod -a -G wheel linecook
+  # insert:
+  #
+  #   # Members of the linecook group may sudo without a password
+  #   %linecook ALL=NOPASSWD: ALL
+  #
+  # then exit (write out changes as prompted)
 
 Setup SSH:
 
@@ -65,4 +65,4 @@ Now take some standard snapshots:
 To cleanup the port forwarding (run later, if ever):
 
   VBoxManage modifyvm ubuntu --natpf1 delete 'ubuntu-ssh'
-  VBoxManage modifyvm ubuntu --natpf1 delete 'ubuntu-http'
+
