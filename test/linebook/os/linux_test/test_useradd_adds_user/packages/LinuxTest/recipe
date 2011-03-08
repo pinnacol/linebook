@@ -1,3 +1,0 @@
-chmod "744" "$(cd $(dirname $0); pwd)/recipe.d/root"
-sudo -i -u "root" "$(cd $(dirname $0); pwd)/recipe.d/root"
-true

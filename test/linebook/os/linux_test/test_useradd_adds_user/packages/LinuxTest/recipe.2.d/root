@@ -1,3 +1,0 @@
-id test_user 2>&1
-useradd  test_user
-id -nu test_user

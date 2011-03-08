@@ -156,9 +156,9 @@ class UnixTest < Test::Unit::TestCase
   
   def test_echo
     assert_recipe(%{
-      echo 'a b c'
+      echo "a b c"
     }){
-      echo 'a', 'b c'
+      echo 'a b c'
     }
   end
   
@@ -344,52 +344,6 @@ class UnixTest < Test::Unit::TestCase
   #
   # shebang test
   #
-  
-  def test_shebang_uses_LINECOOK_DIR_if_set
-    setup_recipe 'recipe' do
-      target.puts "LINECOOK_DIR='current'"
-      shebang
-      target.puts 'echo "$LINECOOK_DIR"'
-    end
-    
-    assert_output_equal %{
-      current
-    }, *run_package
-  end
-  
-  def test_shebang_exports_LINECOOK_DIR
-    setup_recipe 'outer' do
-      target.puts "LINECOOK_DIR='current'"
-      shebang
-      target.puts 'echo outer'
-      target.puts 'echo "$LINECOOK_DIR"'
-      
-      capture_path('inner') do
-        target.puts 'echo inner'
-        target.puts 'echo "$LINECOOK_DIR"'
-      end
-      
-      target.puts %{sh "$(dirname $0)/inner"}
-    end
-    
-    assert_output_equal %{
-      outer
-      current
-      inner
-      current
-    }, *run_package
-  end
-  
-  def test_shebang_sets_LINECOOK_DIR_to_recipe_dirname
-    setup_recipe 'recipe' do
-      shebang
-      target.puts 'echo "$LINECOOK_DIR"'
-    end
-    
-    assert_output_equal %{
-      /tmp/package
-    }, *run_package('remote_dir' => '/tmp/package')
-  end
   
   def test_shebang_uses_LINECOOK_OPTS_if_set
     setup_recipe 'recipe' do

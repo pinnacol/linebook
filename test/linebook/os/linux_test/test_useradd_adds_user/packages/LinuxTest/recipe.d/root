@@ -1,2 +1,0 @@
-userdel test_user > /dev/null 2>&1
-groupdel test_group > /dev/null 2>&1

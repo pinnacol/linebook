@@ -108,7 +108,7 @@ module Linebook
       # a hash of command line options.
       def date(format=nil, options={})
         if format
-          format = quote("+#{format}")
+          format = "+#{quote(format)}"
         end
         
         execute "date", format, options
@@ -131,9 +131,7 @@ module Linebook
       
       # Echo the args.
       def echo(*args)
-        #  echo "<%= args.join(' ') %>"
-        #  
-        _erbout.concat "echo \""; _erbout.concat(( args.join(' ') ).to_s); _erbout.concat "\"\n"
+        execute 'echo', *args
         self
       end
       
@@ -301,7 +299,6 @@ module Linebook
         #  <% section %>
         #  <% check_status_function %>
         #  
-        #  export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}
         #  export LINECOOK_OPTS=${LINECOOK_OPTS:--v}
         #  
         #  usage="usage: %s: [-hqvx]\n"
@@ -328,7 +325,7 @@ module Linebook
         #  echo >&2
         #  echo "###############################################################################" >&2
         #  echo "# $SHELL" >&2
-        #  echo "# $(whoami)@$(hostname):$(pwd)" >&2
+        #  echo "# $(whoami)@$(hostname):$(pwd):$0" >&2
         #  
         #  <% end %>
         #  set $LINECOOK_OPTS > /dev/null
@@ -339,7 +336,6 @@ module Linebook
         section 
         check_status_function 
         _erbout.concat "\n"
-        _erbout.concat "export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}\n"
         _erbout.concat "export LINECOOK_OPTS=${LINECOOK_OPTS:--v}\n"
         _erbout.concat "\n"
         _erbout.concat "usage=\"usage: %s: [-hqvx]\\n\"\n"
@@ -366,7 +362,7 @@ module Linebook
         _erbout.concat "echo >&2\n"
         _erbout.concat "echo \"###############################################################################\" >&2\n"
         _erbout.concat "echo \"# $SHELL\" >&2\n"
-        _erbout.concat "echo \"# $(whoami)@$(hostname):$(pwd)\" >&2\n"
+        _erbout.concat "echo \"# $(whoami)@$(hostname):$(pwd):$0\" >&2\n"
         _erbout.concat "\n"
         end 
         _erbout.concat "set $LINECOOK_OPTS > /dev/null\n"

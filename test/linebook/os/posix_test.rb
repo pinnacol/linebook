@@ -204,8 +204,8 @@ class PosixTest < Test::Unit::TestCase
     # note the LINENO output is not directly tested here because as of 10.10
     # sh on Ubuntu does not support LINENO
     assert_alike %{
-      [0] ./fail_true:...:
-      [1] ./fail_false:...:
+      [0] :...:/fail_true:...:
+      [1] :...:/fail_false:...:
     }, *run_package
   end
   
@@ -238,7 +238,7 @@ class PosixTest < Test::Unit::TestCase
     
     assert_alike %{
       success
-      [127] ./recipe:...:
+      [127] :...:/recipe:...:
     }, *run_package
   end
   

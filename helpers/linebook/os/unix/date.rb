@@ -3,7 +3,7 @@ a hash of command line options.
 (format=nil, options={})
 --
   if format
-    format = quote("+#{format}")
+    format = "+#{quote(format)}"
   end
   
   execute "date", format, options

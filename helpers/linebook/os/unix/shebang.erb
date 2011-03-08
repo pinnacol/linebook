@@ -1,13 +1,11 @@
 == Notes
 Use dev/null on set such that no options will not dump ENV into stdout.
-
 (options={})
 --
 #! <%= shell_path %>
 <% section %>
 <% check_status_function %>
 
-export LINECOOK_DIR=${LINECOOK_DIR:-$(cd $(dirname $0); pwd)}
 export LINECOOK_OPTS=${LINECOOK_OPTS:--v}
 
 usage="usage: %s: [-hqvx]\n"
@@ -34,7 +32,7 @@ shift $(($OPTIND - 1))
 echo >&2
 echo "###############################################################################" >&2
 echo "# $SHELL" >&2
-echo "# $(whoami)@$(hostname):$(pwd)" >&2
+echo "# $(whoami)@$(hostname):$(pwd):$0" >&2
 
 <% end %>
 set $LINECOOK_OPTS > /dev/null

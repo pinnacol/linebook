@@ -251,6 +251,7 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_copies_source_to_target
     setup_recipe 'recipe' do
+      target.puts "cd #{package_dir}"
       target.puts 'echo content > source'
       
       install 'source', 'target'
@@ -265,6 +266,7 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_backs_up_existing_target
     setup_recipe 'recipe' do
+      target.puts "cd #{package_dir}"
       target.puts 'echo new > source'
       target.puts 'echo old > target'
       
@@ -282,6 +284,7 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_can_turn_off_backup
     setup_recipe 'recipe' do
+      target.puts "cd #{package_dir}"
       target.puts 'echo new > source'
       target.puts 'echo old > target'
       
@@ -297,6 +300,7 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_makes_parent_dirs_as_needed
     setup_recipe do
+      target.puts "cd #{package_dir}"
       target.puts 'echo content > source'
       install 'source', 'target/file'
       
@@ -310,6 +314,7 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_allows_passing_options_to_directory
     setup_recipe do
+      target.puts "cd #{package_dir}"
       target.puts 'echo content > source'
       install 'source', 'target/file', :directory => {:mode => 700}
       
@@ -323,6 +328,7 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_sets_mode
     setup_recipe do
+      target.puts "cd #{package_dir}"
       target.puts 'echo content > source'
       install 'source', 'target', :mode => 600
       target.puts 'ls -la .'
