@@ -232,13 +232,13 @@ class PosixTest < Test::Unit::TestCase
       execute 'true'
       target.puts 'echo success'
       
-      execute 'fail'
+      execute 'false'
       target.puts 'echo fail'
     end
     
     assert_alike %{
       success
-      [127] :...:/recipe:...:
+      [1] :...:/recipe:...:
     }, *run_package
   end
   

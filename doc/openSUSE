@@ -29,22 +29,22 @@ install iso, take a snapshot and setup port forwarding.
   VBoxManage -q snapshot opensuse restore RAW
   VBoxManage startvm opensuse
 
-Login as root, start sshd, stop the firewall, and setup permissions for the linecook user:
+Login as root, start sshd, stop the firewall, and setup su for the linecook user:
 
   vm: /etc/init.d/sshd start
   vm: rcSuSEfirewall2 stop
-  vm: visudo
+  vm: vi /etc/pam.d/su
   
   # insert:
-  #
-  #   # Members of the linecook group may sudo without a password
-  #   %linecook ALL=NOPASSWD: ALL
-  #
-  # then write out changes
+  #   auth       sufficient pam_wheel.so trust
   
-  vm: groupadd linecook
-  vm: usermod -A linecook linecook
-
+  vm: vi /etc/pam.d/su-l
+  
+  # insert:
+  #   auth       sufficient pam_wheel.so trust
+  
+  vm: usermod -A wheel linecook
+  
 Transfer your ssh key to the vm. Help to generate ssh keys can be found on
 {GitHub}[http://help.github.com/key-setup-redirect]:
 

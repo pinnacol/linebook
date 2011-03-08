@@ -12,7 +12,7 @@ module Linebook
         target_name = guess_target_name(user)
         path = capture_path(target_name, &block)
         chmod '+x', path
-        sudo path, :i => true, :u => user
+        execute 'su', user, path, :l => true
         self
       end
       
@@ -25,25 +25,12 @@ module Linebook
         target_name = guess_target_name(user)
         path = capture_path(target_name, &block)
         chmod '+x', path
-        sudo path, :E => true, :u => user
+        execute 'su', user, path, :m => true
         self
       end
       
       def _su(*args, &block) # :nodoc:
         capture { su(*args, &block) }
-      end
-      
-      def sudo(*args)
-        if args.empty?
-          target << 'sudo '
-        else
-          execute 'sudo', *args
-        end
-        self
-      end
-      
-      def _sudo(*args, &block) # :nodoc:
-        capture { sudo(*args, &block) }
       end
       
       # Adds the user.  Assumes the current user is root, or has root privileges.

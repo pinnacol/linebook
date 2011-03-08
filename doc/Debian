@@ -35,17 +35,19 @@ Transfer your ssh key to the vm. Help to generate ssh keys can be found on
 
   scp -P 2222 -o UserKnownHostsFile=/dev/null ~/.ssh/id_rsa.pub linecook@localhost:id_rsa.pub
 
-Login as root and setup sudo permissions for the linecook user:
+Login as root and setup su for the linecook user:
 
-  vm: aptitude install sudo
-  vm: visudo
-  
-  # insert:
+  vm: vi /etc/pam.d/su
+
+  # uncomment:
   #
-  #   # Members of the linecook group may sudo without a password
-  #   %linecook ALL=NOPASSWD: ALL
+  #   # Uncomment this if you want wheel members to be able to
+  #   # su without a password.
+  #   auth       sufficient pam_wheel.so trust
   #
-  # then exit (write out changes as prompted)
+
+  vm: groupadd wheel
+  vm: usermod -a -G wheel linecook
 
 Setup SSH for the linecook user:
 

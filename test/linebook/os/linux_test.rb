@@ -44,6 +44,59 @@ class LinuxTest < Test::Unit::TestCase
   end
   
   #
+  # login test
+  #
+  
+  def test_login_logs_in_as_user_for_duration_of_a_block
+    setup_recipe do
+      target.puts "export VAR=a"
+      target.puts CONTEXT_CHECK
+      login 'root' do
+        target.puts CONTEXT_CHECK
+        target.puts "export VAR=b"
+        target.puts CONTEXT_CHECK
+      end
+      target.puts CONTEXT_CHECK
+    end
+  
+    assert_output_equal %{
+      linecook:/home/linecook:a
+      root:/root:
+      root:/root:b
+      linecook:/home/linecook:a
+    }, *run_package
+  end
+  
+  def test_nested_login
+    setup_recipe do
+      target.puts "export VAR=a"
+      target.puts CONTEXT_CHECK
+      login 'root' do
+        target.puts CONTEXT_CHECK
+        target.puts "export VAR=b"
+        target.puts CONTEXT_CHECK
+        login 'linecook' do
+          target.puts CONTEXT_CHECK
+          target.puts "export VAR=c"
+          target.puts CONTEXT_CHECK
+        end
+        target.puts CONTEXT_CHECK
+      end
+      target.puts CONTEXT_CHECK
+    end
+  
+    assert_output_equal %{
+      linecook:/home/linecook:a
+      root:/root:
+      root:/root:b
+      linecook:/home/linecook:
+      linecook:/home/linecook:c
+      root:/root:b
+      linecook:/home/linecook:a
+    }, *run_package
+  end
+  
+  #
   # su test
   #
   
@@ -51,7 +104,6 @@ class LinuxTest < Test::Unit::TestCase
   
   def test_su_switches_user_for_duration_of_a_block
     setup_recipe do
-      target.puts "cd ~"
       target.puts "export VAR=a"
       target.puts CONTEXT_CHECK
       su 'root' do
@@ -72,7 +124,6 @@ class LinuxTest < Test::Unit::TestCase
   
   def test_nested_su
     setup_recipe do
-      target.puts "cd ~"
       target.puts "export VAR=a"
       target.puts CONTEXT_CHECK
       su 'root' do
@@ -99,59 +150,4 @@ class LinuxTest < Test::Unit::TestCase
       linecook:/home/linecook:a
     }, *run_package
   end
-  
-   #
-   # login test
-   #
-   
-   def test_login_logs_in_as_user_for_duration_of_a_block
-     setup_recipe do
-       target.puts "cd ~"
-       target.puts "export VAR=a"
-       target.puts CONTEXT_CHECK
-       login 'root' do
-         target.puts CONTEXT_CHECK
-         target.puts "export VAR=b"
-         target.puts CONTEXT_CHECK
-       end
-       target.puts CONTEXT_CHECK
-     end
-   
-     assert_output_equal %{
-       linecook:/home/linecook:a
-       root:/root:
-       root:/root:b
-       linecook:/home/linecook:a
-     }, *run_package
-   end
-   
-   def test_nested_login
-     setup_recipe do
-       target.puts "cd ~"
-       target.puts "export VAR=a"
-       target.puts CONTEXT_CHECK
-       login 'root' do
-         target.puts CONTEXT_CHECK
-         target.puts "export VAR=b"
-         target.puts CONTEXT_CHECK
-         login 'linecook' do
-           target.puts CONTEXT_CHECK
-           target.puts "export VAR=c"
-           target.puts CONTEXT_CHECK
-         end
-         target.puts CONTEXT_CHECK
-       end
-       target.puts CONTEXT_CHECK
-     end
-   
-     assert_output_equal %{
-       linecook:/home/linecook:a
-       root:/root:
-       root:/root:b
-       linecook:/home/linecook:
-       linecook:/home/linecook:c
-       root:/root:b
-       linecook:/home/linecook:a
-     }, *run_package
-   end
 end

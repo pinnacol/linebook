@@ -375,6 +375,16 @@ module Linebook
         capture { shebang(*args, &block) }
       end
       
+      # Touch a file.  Accepts a hash of command line options.
+      def touch(path, options={})
+        execute 'touch', path, options
+        self
+      end
+      
+      def _touch(*args, &block) # :nodoc:
+        capture { touch(*args, &block) }
+      end
+      
       def verbose()
         #  set -v<% if block_given? %>
         #  <% indent { yield } %>
