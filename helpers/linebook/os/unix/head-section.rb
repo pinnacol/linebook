@@ -9,12 +9,8 @@ def env_path
   @env_path ||= '/usr/bin/env'
 end
 
-def target_format
-  @target_format ||= "$(pwd)/%s"
-end
-
-def target_path(target_name)
-  target_format % super(target_name)
+def guess_target_name(source_name)
+  next_target_name File.join("#{target_name}.d", File.basename(source_name))
 end
 
 def close

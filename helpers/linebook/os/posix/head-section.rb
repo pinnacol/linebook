@@ -16,7 +16,7 @@ end
 # by quotes or apostrophes).  The intention is to check whether a string
 # _should_ be quoted.
 def quote?(str)
-  str[0] == ?- || quoted?(str) ? false : true
+  str[0] == ?- || str[0] == ?+ || quoted?(str) ? false : true
 end
 
 # Returns true if the str is quoted (either by quotes or apostrophes).
@@ -74,8 +74,4 @@ def format_options(opts)
   end
   
   options.sort
-end
-
-def guess_target_name(source_name)
-  next_target_name File.join("#{target_name}.d", File.basename(source_name))
 end

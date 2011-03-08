@@ -15,12 +15,8 @@ module Linebook
         @env_path ||= '/usr/bin/env'
       end
       
-      def target_format
-        @target_format ||= "$(pwd)/%s"
-      end
-      
-      def target_path(target_name)
-        target_format % super(target_name)
+      def guess_target_name(source_name)
+        next_target_name File.join("#{target_name}.d", File.basename(source_name))
       end
       
       def close
@@ -135,9 +131,9 @@ module Linebook
       
       # Echo the args.
       def echo(*args)
-        #  echo '<%= args.join(' ') %>'
+        #  echo "<%= args.join(' ') %>"
         #  
-        _erbout.concat "echo '"; _erbout.concat(( args.join(' ') ).to_s); _erbout.concat "'\n"
+        _erbout.concat "echo \""; _erbout.concat(( args.join(' ') ).to_s); _erbout.concat "\"\n"
         self
       end
       
@@ -301,7 +297,6 @@ module Linebook
       # == Notes
       # Use dev/null on set such that no options will not dump ENV into stdout.
       def shebang(options={})
-        @target_format = '$LINECOOK_DIR/%s'
         #  #! <%= shell_path %>
         #  <% section %>
         #  <% check_status_function %>
