@@ -26,22 +26,22 @@ class LinuxTest < Test::Unit::TestCase
   # useradd test
   #
   
-  # def test_useradd_adds_user
-  #   clean_recipe
-  #   
-  #   setup_recipe do
-  #     login do
-  #       target.puts "id #{TEST_USER} 2>&1"
-  #       useradd TEST_USER
-  #       target.puts "id -nu #{TEST_USER}"
-  #     end
-  #   end
-  #   
-  #   assert_output_equal %{
-  #     id: #{TEST_USER}: No such user
-  #     #{TEST_USER}
-  #   }, *run_package
-  # end
+  def test_useradd_adds_user
+    clean_recipe
+    
+    setup_recipe do
+      login do
+        target.puts "id #{TEST_USER} 2>&1"
+        useradd TEST_USER
+        target.puts "id -nu #{TEST_USER}"
+      end
+    end
+    
+    assert_output_equal %{
+      id: #{TEST_USER}: No such user
+      #{TEST_USER}
+    }, *run_package
+  end
   
   #
   # su test

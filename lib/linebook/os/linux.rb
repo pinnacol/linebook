@@ -7,21 +7,12 @@ module Linebook
       require 'linebook/os/unix'
       include Unix
       
+      # Logs in as a different user for the duration of a block.
       def login(user='root', &block)
         target_name = guess_target_name(user)
-        path = capture_path(target_name) do
-          target.puts "export LINECOOK_PACKAGE_DIR=$(cd $(dirname $0)#{'/..' * (target_name.split('/').length - 1)}; pwd)"
-          instance_eval(&block)
-        end
-        #  chmod +x <%= path %>
-        #  sudo -i -u <%= user %> "<%= path %>"
-        #  
-        #  <% check_status %>
-        #  
-        _erbout.concat "chmod +x "; _erbout.concat(( path ).to_s); _erbout.concat "\n"
-        _erbout.concat "sudo -i -u "; _erbout.concat(( user ).to_s); _erbout.concat " \""; _erbout.concat(( path ).to_s); _erbout.concat "\"\n"
-        _erbout.concat "\n"
-        check_status
+        path = capture_path(target_name, &block)
+        chmod '+x', path
+        sudo path, :i => true, :u => user
         self
       end
       
@@ -33,15 +24,8 @@ module Linebook
       def su(user='root', &block)
         target_name = guess_target_name(user)
         path = capture_path(target_name, &block)
-        #  chmod +x <%= path %>
-        #  sudo -E -u <%= user %> <%= path %>
-        #  
-        #  <% check_status %>
-        #  
-        _erbout.concat "chmod +x "; _erbout.concat(( path ).to_s); _erbout.concat "\n"
-        _erbout.concat "sudo -E -u "; _erbout.concat(( user ).to_s); _erbout.concat " "; _erbout.concat(( path ).to_s); _erbout.concat "\n"
-        _erbout.concat "\n"
-        check_status
+        chmod '+x', path
+        sudo path, :E => true, :u => user
         self
       end
       
@@ -49,18 +33,12 @@ module Linebook
         capture { su(*args, &block) }
       end
       
-      def sudo(options={}, path=nil)
-        # unless path.nil?
-        #   if options[:E]
-        # 
-        #   else
-        #     target << format_cmd('sudo', options)
-        #     target << ' -- '
-        #     target <<  %q{"export LINECOOK_PACKAGE_DIR='$LINECOOK_PACKAGE_DIR';"}
-        #     target.puts %{'. "#{path}"'}
-        #   end
-        #   check_status
-        # end
+      def sudo(*args)
+        if args.empty?
+          target << 'sudo '
+        else
+          execute 'sudo', *args
+        end
         self
       end
       
