@@ -6,3 +6,6 @@ UNIX SPEC: http://www.opengroup.org/onlinepubs/000095399/toc.htm
 UNIX Hierarchy: http://en.wikipedia.org/wiki/File:Unix_history-simple.svg
 Users: https://wiki.archlinux.org/index.php/Users_and_Groups
 Linux: http://www.g-loaded.eu/2005/11/06/manage-users-from-the-command-line/
+
+Linux: http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/command.html#CMDUTIL
+Linux Behavior:  http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/cmdbehav.html
