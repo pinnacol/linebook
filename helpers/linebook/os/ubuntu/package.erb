@@ -1,4 +1,0 @@
-(name, version=nil)
---
-sudo apt-get -q -y install <%= name %><%= blank?(version) ? nil : "=#{version}" %>
-<% check_status %>

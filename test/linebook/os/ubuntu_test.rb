@@ -8,7 +8,7 @@ class UbuntuTest < Test::Unit::TestCase
   
   def setup
     super
-    use_helpers Linebook::Shell, Linebook::Os::Ubuntu
+    use_helpers Linebook::Os::Ubuntu
   end
   
   #
@@ -17,7 +17,7 @@ class UbuntuTest < Test::Unit::TestCase
   
   def test_package_creates_commands_to_install_package_with_apt_get
     assert_recipe %q{
-      sudo apt-get -q -y install name
+      apt-get install -q -y "name"
     } do
       package 'name'
     end
@@ -25,7 +25,7 @@ class UbuntuTest < Test::Unit::TestCase
   
   def test_package_adds_version_request_if_specified
     assert_recipe %q{
-      sudo apt-get -q -y install name=1.0.0
+      apt-get install -q -y "name=1.0.0"
     } do
       package 'name', '1.0.0'
     end

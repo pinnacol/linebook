@@ -7,11 +7,10 @@ module Linebook
       require 'linebook/os/linux'
       include Linux
       
-      def package(name, version=nil)
-        #  sudo apt-get -q -y install <%= name %><%= blank?(version) ? nil : "=#{version}" %>
-        #  <% check_status %>
-        _erbout.concat "sudo apt-get -q -y install "; _erbout.concat(( name ).to_s); _erbout.concat(( blank?(version) ? nil : "=#{version}" ).to_s); _erbout.concat "\n"
-        check_status ;
+      # Installs a package using apt-get, by default with the options '-q -y'.
+      def package(name, version=nil, options={})
+        name = "#{name}=#{version}" unless blank?(version)
+        execute "apt-get install", name, {:q => true, :y => true}.merge(options)
         self
       end
       

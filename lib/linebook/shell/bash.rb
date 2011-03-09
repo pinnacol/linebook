@@ -7,30 +7,6 @@ module Linebook
       def shell_path
         @shell_path ||= '/bin/bash'
       end
-      
-      # Switches to a different user for the duration of a block.
-      def su(user_name, target_name=user_name, &block)
-        #  su <%= user_name %> "<%= capture_path(target_name, &block) %>"
-        #  <% check_status %>
-        #  
-        _erbout.concat "su "; _erbout.concat(( user_name ).to_s); _erbout.concat " \""; _erbout.concat(( capture_path(target_name, &block) ).to_s); _erbout.concat "\"\n"
-        check_status
-        self
-      end
-      
-      def _su(*args, &block) # :nodoc:
-        capture { su(*args, &block) }
-      end
-      
-      # Switches to sudo for a block.
-      def sudo()
-        with_execute_prefix('sudo ') { yield }
-        self
-      end
-      
-      def _sudo(*args, &block) # :nodoc:
-        capture { sudo(*args, &block) }
-      end
     end
   end
 end
