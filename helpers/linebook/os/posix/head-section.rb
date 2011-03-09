@@ -76,3 +76,20 @@ def format_options(opts)
   
   options.sort
 end
+
+# The path to the bin dir in the package.  By default 'package_dir/bin'.
+def bin_path
+  File.join(package_dir, 'bin')
+end
+
+# Enables bin scripts by unshifting bin_path to PATH.
+def unshift_bin_path
+  export "PATH", "#{bin_path}:$PATH"
+end
+
+# Defines a command script from the block.  The command will be located in the
+# bin directory of the package; call unshift_bin_path to enable commands.
+def command(name, mode=0700, &block)
+  capture_path("bin/#{name}", mode, &block)
+  self
+end

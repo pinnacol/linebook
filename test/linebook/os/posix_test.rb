@@ -223,6 +223,24 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # command test
+  #
+  
+  def test_command_defines_a_command_from_the_block
+    setup_recipe do
+      unshift_bin_path
+      command 'say_hello' do
+        target.puts 'echo "hello $1"'
+      end
+      target.puts "say_hello world"
+    end
+    
+    assert_output_equal %q{
+      hello world
+    }, *run_package
+  end
+  
+  #
   # execute test
   #
   

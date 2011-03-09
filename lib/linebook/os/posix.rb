@@ -17,11 +17,12 @@ module Linebook
         quoted?(arg) || !quote?(arg) ? arg : "\"#{arg}\""
       end
       
-      # Returns true if the str is not an option, and is not already quoted (either
-      # by quotes or apostrophes).  The intention is to check whether a string
-      # _should_ be quoted.
+      # Returns true if the str is not an option (ie it begins with - or +), and is
+      # not already quoted (either by quotes or apostrophes).  The intention is to
+      # check whether a string _should_ be quoted.
       def quote?(str)
-        str[0] == ?- || str[0] == ?+ || quoted?(str) ? false : true
+        c = str[0]
+        c == ?- || c == ?+ || quoted?(str) ? false : true
       end
       
       # Returns true if the str is quoted (either by quotes or apostrophes).
@@ -79,6 +80,23 @@ module Linebook
         end
         
         options.sort
+      end
+      
+      # The path to the bin dir in the package.  By default 'package_dir/bin'.
+      def bin_path
+        File.join(package_dir, 'bin')
+      end
+      
+      # Enables bin scripts by unshifting bin_path to PATH.
+      def unshift_bin_path
+        export "PATH", "#{bin_path}:$PATH"
+      end
+      
+      # Defines a command script from the block.  The command will be located in the
+      # bin directory of the package; call unshift_bin_path to enable commands.
+      def command(name, mode=0700, &block)
+        capture_path("bin/#{name}", mode, &block)
+        self
       end
       
       # Adds a check that ensures the last exit status is as indicated. Note that no
