@@ -1,6 +1,11 @@
+== 0.5.0 2011/03/09
+
+Updated to linecook-0.16.0. Properly scoped *nix modules under os. Added
+support for su/login. Progress in testing and developing the base dialect.
+
 == 0.4.0 2011/02/23
 
-Updated to linecook-0.15
+Updated to linecook-0.15.0
 
 == 0.3.2 2011/02/03
 
