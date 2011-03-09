@@ -340,19 +340,6 @@ class ShellTest < Test::Unit::TestCase
   end
   
   #
-  # shebang test
-  #
-  
-  def test_shebang_adds_shebang_line_for_sh
-    assert_recipe_matches %q{
-      #! /bin/bash
-      :...:
-    } do
-      shebang
-    end
-  end
-  
-  #
   # recipe test
   #
   

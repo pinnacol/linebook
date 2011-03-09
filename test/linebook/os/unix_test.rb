@@ -289,43 +289,4 @@ class UnixTest < Test::Unit::TestCase
       c
     }, stdout, msg
   end
-  
-  #
-  # shebang test
-  #
-  
-  def test_shebang_uses_LINECOOK_OPTS_if_set
-    setup_recipe 'recipe' do
-      target.puts "LINECOOK_OPTS='+v +x'"
-      shebang
-      target.puts 'echo "$LINECOOK_OPTS"'
-    end
-    
-    assert_output_equal %{
-      +v +x
-    }, *run_package
-  end
-  
-  def test_shebang_exports_LINECOOK_OPTS
-    setup_recipe 'outer' do
-      target.puts "LINECOOK_OPTS='+v +x'"
-      shebang
-      target.puts 'echo outer'
-      target.puts 'echo "$LINECOOK_OPTS"'
-      
-      capture_path('inner') do
-        target.puts 'echo inner'
-        target.puts 'echo "$LINECOOK_OPTS"'
-      end
-      
-      target.puts %{sh "$(dirname $0)/inner"}
-    end
-    
-    assert_output_equal %{
-      outer
-      +v +x
-      inner
-      +v +x
-    }, *run_package
-  end
 end

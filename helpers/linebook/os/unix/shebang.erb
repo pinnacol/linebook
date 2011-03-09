@@ -1,40 +1,29 @@
-== Notes
-Use dev/null on set such that no options will not dump ENV into stdout.
-(options={})
+(program='/bin/sh', options={})
 --
-#! <%= shell_path %>
+#!<%= program %>
 <% section %>
-<% check_status_function %>
 
-export LINECOOK_OPTS=${LINECOOK_OPTS:--v}
-
-usage="usage: %s: [-hqvx]\n"
-option="       %s   %s\n"
-while getopts "hqvx" opt
+usage="usage: %s: [-h]\n"
+while getopts "h" opt
 do
   case $opt in
   h  )  printf "$usage" $0
-        printf "$option" "-h" "prints this help"
-        printf "$option" "-q" "quiet (set +v +x)"
-        printf "$option" "-v" "verbose (set -v)"
-        printf "$option" "-x" "xtrace (set -x)"
+        printf "       %s   %s\n" "-h" "prints this help"
         exit 0 ;;
-  q  )  LINECOOK_OPTS="$LINECOOK_OPTS +v +x";;
-  v  )  LINECOOK_OPTS="$LINECOOK_OPTS -v";;
-  x  )  LINECOOK_OPTS="$LINECOOK_OPTS -x";;
   \? )  printf "$usage" $0
         exit 2 ;;
   esac
 done
 shift $(($OPTIND - 1))
 
+<% check_status_function %>
+<% yield if block_given? %>
+
 <% if options[:info] %>
 echo >&2
 echo "###############################################################################" >&2
-echo "# $SHELL" >&2
 echo "# $(whoami)@$(hostname):$(pwd):$0" >&2
 
 <% end %>
-set $LINECOOK_OPTS > /dev/null
 <% section " #{target_name} " %>
 

@@ -7,14 +7,6 @@ module Linebook
       require 'linebook/os/posix'
       include Posix
       
-      def shell_path
-        @shell_path ||= '/bin/sh'
-      end
-      
-      def env_path
-        @env_path ||= '/usr/bin/env'
-      end
-      
       def guess_target_name(source_name)
         next_target_name File.join("#{target_name}.d", File.basename(source_name))
       end
@@ -297,80 +289,60 @@ module Linebook
         capture { set_date(*args, &block) }
       end
       
-      # == Notes
-      # Use dev/null on set such that no options will not dump ENV into stdout.
-      def shebang(options={})
-        #  #! <%= shell_path %>
+      def shebang(program='/bin/sh', options={})
+        #  #!<%= program %>
         #  <% section %>
-        #  <% check_status_function %>
         #  
-        #  export LINECOOK_OPTS=${LINECOOK_OPTS:--v}
-        #  
-        #  usage="usage: %s: [-hqvx]\n"
-        #  option="       %s   %s\n"
-        #  while getopts "hqvx" opt
+        #  usage="usage: %s: [-h]\n"
+        #  while getopts "h" opt
         #  do
         #    case $opt in
         #    h  )  printf "$usage" $0
-        #          printf "$option" "-h" "prints this help"
-        #          printf "$option" "-q" "quiet (set +v +x)"
-        #          printf "$option" "-v" "verbose (set -v)"
-        #          printf "$option" "-x" "xtrace (set -x)"
+        #          printf "       %s   %s\n" "-h" "prints this help"
         #          exit 0 ;;
-        #    q  )  LINECOOK_OPTS="$LINECOOK_OPTS +v +x";;
-        #    v  )  LINECOOK_OPTS="$LINECOOK_OPTS -v";;
-        #    x  )  LINECOOK_OPTS="$LINECOOK_OPTS -x";;
         #    \? )  printf "$usage" $0
         #          exit 2 ;;
         #    esac
         #  done
         #  shift $(($OPTIND - 1))
         #  
+        #  <% check_status_function %>
+        #  <% yield if block_given? %>
+        #  
         #  <% if options[:info] %>
         #  echo >&2
         #  echo "###############################################################################" >&2
-        #  echo "# $SHELL" >&2
         #  echo "# $(whoami)@$(hostname):$(pwd):$0" >&2
         #  
         #  <% end %>
-        #  set $LINECOOK_OPTS > /dev/null
         #  <% section " #{target_name} " %>
         #  
         #  
-        _erbout.concat "#! "; _erbout.concat(( shell_path ).to_s); _erbout.concat "\n"
+        _erbout.concat "#!"; _erbout.concat(( program ).to_s); _erbout.concat "\n"
         section 
-        check_status_function 
         _erbout.concat "\n"
-        _erbout.concat "export LINECOOK_OPTS=${LINECOOK_OPTS:--v}\n"
-        _erbout.concat "\n"
-        _erbout.concat "usage=\"usage: %s: [-hqvx]\\n\"\n"
-        _erbout.concat "option=\"       %s   %s\\n\"\n"
-        _erbout.concat "while getopts \"hqvx\" opt\n"
+        _erbout.concat "usage=\"usage: %s: [-h]\\n\"\n"
+        _erbout.concat "while getopts \"h\" opt\n"
         _erbout.concat "do\n"
         _erbout.concat "  case $opt in\n"
         _erbout.concat "  h  )  printf \"$usage\" $0\n"
-        _erbout.concat "        printf \"$option\" \"-h\" \"prints this help\"\n"
-        _erbout.concat "        printf \"$option\" \"-q\" \"quiet (set +v +x)\"\n"
-        _erbout.concat "        printf \"$option\" \"-v\" \"verbose (set -v)\"\n"
-        _erbout.concat "        printf \"$option\" \"-x\" \"xtrace (set -x)\"\n"
+        _erbout.concat "        printf \"       %s   %s\\n\" \"-h\" \"prints this help\"\n"
         _erbout.concat "        exit 0 ;;\n"
-        _erbout.concat "  q  )  LINECOOK_OPTS=\"$LINECOOK_OPTS +v +x\";;\n"
-        _erbout.concat "  v  )  LINECOOK_OPTS=\"$LINECOOK_OPTS -v\";;\n"
-        _erbout.concat "  x  )  LINECOOK_OPTS=\"$LINECOOK_OPTS -x\";;\n"
         _erbout.concat "  \\? )  printf \"$usage\" $0\n"
         _erbout.concat "        exit 2 ;;\n"
         _erbout.concat "  esac\n"
         _erbout.concat "done\n"
         _erbout.concat "shift $(($OPTIND - 1))\n"
         _erbout.concat "\n"
+        check_status_function 
+        yield if block_given? 
+        _erbout.concat "\n"
         if options[:info] 
         _erbout.concat "echo >&2\n"
         _erbout.concat "echo \"###############################################################################\" >&2\n"
-        _erbout.concat "echo \"# $SHELL\" >&2\n"
         _erbout.concat "echo \"# $(whoami)@$(hostname):$(pwd):$0\" >&2\n"
         _erbout.concat "\n"
         end 
-        _erbout.concat "set $LINECOOK_OPTS > /dev/null\n"
         section " #{target_name} " 
         _erbout.concat "\n"
         self
