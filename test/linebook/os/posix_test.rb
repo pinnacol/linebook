@@ -63,6 +63,7 @@ class PosixTest < Test::Unit::TestCase
   def test_quote_check_returns_false_if_arg_is_an_option
     assert_equal false, recipe.quote?("--option")
     assert_equal false, recipe.quote?("-o")
+    assert_equal false, recipe.quote?("+o")
   end
   
   #

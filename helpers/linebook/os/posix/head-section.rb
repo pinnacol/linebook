@@ -12,11 +12,12 @@ def quote(arg)
   quoted?(arg) || !quote?(arg) ? arg : "\"#{arg}\""
 end
 
-# Returns true if the str is not an option, and is not already quoted (either
-# by quotes or apostrophes).  The intention is to check whether a string
-# _should_ be quoted.
+# Returns true if the str is not an option (ie it begins with - or +), and is
+# not already quoted (either by quotes or apostrophes).  The intention is to
+# check whether a string _should_ be quoted.
 def quote?(str)
-  str[0] == ?- || str[0] == ?+ || quoted?(str) ? false : true
+  c = str[0]
+  c == ?- || c == ?+ || quoted?(str) ? false : true
 end
 
 # Returns true if the str is quoted (either by quotes or apostrophes).
