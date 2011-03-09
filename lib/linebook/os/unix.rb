@@ -219,23 +219,6 @@ module Linebook
         capture { mv_f(*args, &block) }
       end
       
-      def quiet()
-        #  set +x +v<% if block_given? %>
-        #  <% indent { yield } %>
-        #  set $LINECOOK_OPTS > /dev/null<% end %>
-        #  
-        #  
-        _erbout.concat "set +x +v";  if block_given? ; _erbout.concat "\n"
-        indent { yield } 
-        _erbout.concat "set $LINECOOK_OPTS > /dev/null";  end ; _erbout.concat "\n"
-        _erbout.concat "\n"
-        self
-      end
-      
-      def _quiet(*args, &block) # :nodoc:
-        capture { quiet(*args, &block) }
-      end
-      
       # Unlink a file.  Accepts a hash of command line options.
       def rm(path, options={})
         execute 'rm', path, options
@@ -284,7 +267,7 @@ module Linebook
       def set(options)
         if block_given?
           var = next_variable_name('set')
-          patterns = options.keys.collect {|key| "-e #{key}" }
+          patterns = options.keys.collect {|key| "-e #{key}" }.sort
           target.puts %{#{var}=$(set +o | grep #{patterns.join(' ')})}
         end
       
@@ -395,40 +378,6 @@ module Linebook
       
       def _shebang(*args, &block) # :nodoc:
         capture { shebang(*args, &block) }
-      end
-      
-      def verbose()
-        #  set -v<% if block_given? %>
-        #  <% indent { yield } %>
-        #  set $LINECOOK_OPTS > /dev/null<% end %>
-        #  
-        #  
-        _erbout.concat "set -v";  if block_given? ; _erbout.concat "\n"
-        indent { yield } 
-        _erbout.concat "set $LINECOOK_OPTS > /dev/null";  end ; _erbout.concat "\n"
-        _erbout.concat "\n"
-        self
-      end
-      
-      def _verbose(*args, &block) # :nodoc:
-        capture { verbose(*args, &block) }
-      end
-      
-      def xtrace()
-        #  set -x<% if block_given? %>
-        #  <% indent { yield } %>
-        #  set $LINECOOK_OPTS > /dev/null<% end %>
-        #  
-        #  
-        _erbout.concat "set -x";  if block_given? ; _erbout.concat "\n"
-        indent { yield } 
-        _erbout.concat "set $LINECOOK_OPTS > /dev/null";  end ; _erbout.concat "\n"
-        _erbout.concat "\n"
-        self
-      end
-      
-      def _xtrace(*args, &block) # :nodoc:
-        capture { xtrace(*args, &block) }
       end
     end
   end
