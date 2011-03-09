@@ -177,18 +177,6 @@ module Linebook
         capture { execute(*args, &block) }
       end
       
-      # Exit with status.
-      def exit_status(status)
-        #    exit <%= status %>
-        #  
-        _erbout.concat "  exit "; _erbout.concat(( status ).to_s); _erbout.concat "\n"
-        self
-      end
-      
-      def _exit_status(*args, &block) # :nodoc:
-        capture { exit_status(*args, &block) }
-      end
-      
       # Exports a variable.
       def export(key, value)
         #  export <%= key %>=<%= quote(value) %>
@@ -257,31 +245,20 @@ module Linebook
         capture { only_if(*args, &block) }
       end
       
-      # Return with status.
-      def return_status(status)
-        #    return <%= status %>
-        #  
-        _erbout.concat "  return "; _erbout.concat(( status ).to_s); _erbout.concat "\n"
-        self
-      end
-      
-      def _return_status(*args, &block) # :nodoc:
-        capture { return_status(*args, &block) }
-      end
-      
       # Sets the options to on (true) or off (false) as specified.
-      def set_options(options)
+      def set(options)
         #  <% options.keys.sort_by {|opt| opt.to_s }.each do |opt| %>
         #  set <%= options[opt] ? '-' : '+' %>o <%= opt %>
         #  <% end %>
+        #  
         options.keys.sort_by {|opt| opt.to_s }.each do |opt| 
         _erbout.concat "set "; _erbout.concat(( options[opt] ? '-' : '+' ).to_s); _erbout.concat "o "; _erbout.concat(( opt ).to_s); _erbout.concat "\n"
-        end ;
+        end
         self
       end
       
-      def _set_options(*args, &block) # :nodoc:
-        capture { set_options(*args, &block) }
+      def _set(*args, &block) # :nodoc:
+        capture { set(*args, &block) }
       end
       
       # Unsets a list of variables.
@@ -297,6 +274,20 @@ module Linebook
       
       def _unset(*args, &block) # :nodoc:
         capture { unset(*args, &block) }
+      end
+      
+      # Set a variable.
+      def variable(key, value)
+        #  <%= key %>=<%= quote(value) %>
+        #  
+        #  
+        _erbout.concat(( key ).to_s); _erbout.concat "="; _erbout.concat(( quote(value) ).to_s)
+        _erbout.concat "\n"
+        self
+      end
+      
+      def _variable(*args, &block) # :nodoc:
+        capture { variable(*args, &block) }
       end
     end
   end

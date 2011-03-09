@@ -342,6 +342,33 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
+  # set test
+  #
+  
+  def test_set_sets_options_for_the_duration_of_a_block
+    setup_recipe do
+      target.puts 'set -v'
+      target.puts 'echo a'
+      set(:verbose => false, :xtrace => false) do
+        target.puts 'echo b'
+      end
+      target.puts 'echo c'
+    end
+    
+    # the number of set operations echoed is a little unpredicatable
+    stdout, msg = run_package
+    stdout.gsub!(/^set.*\n/, '')
+    
+    assert_output_equal %{
+      echo a
+      a
+      b
+      echo c
+      c
+    }, stdout, msg
+  end
+  
+  #
   # shebang test
   #
   

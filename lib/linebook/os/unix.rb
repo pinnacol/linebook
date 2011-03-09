@@ -279,6 +279,28 @@ module Linebook
         capture { section(*args, &block) }
       end
       
+      # Sets the options to on (true) or off (false) as specified.  If a block is
+      # given then options will only be reset when the block completes.
+      def set(options)
+        if block_given?
+          var = next_variable_name('set')
+          patterns = options.keys.collect {|key| "-e #{key}" }
+          target.puts %{#{var}=$(set +o | grep #{patterns.join(' ')})}
+        end
+      
+        super
+      
+        if block_given?
+          yield
+          target.puts %{eval "$#{var}"}
+        end
+        self
+      end
+      
+      def _set(*args, &block) # :nodoc:
+        capture { set(*args, &block) }
+      end
+      
       # Sets the system time.  Must be root for this to succeed.
       def set_date(time=Time.now) 
         #  date -u <%= time.dup.utc.strftime("%m%d%H%M%Y.%S") %>

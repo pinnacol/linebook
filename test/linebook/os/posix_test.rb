@@ -470,15 +470,15 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
-  # set_options test
+  # set test
   #
   
-  def test_set_options_writes_set_operations_to_set_options
+  def test_set_sets_options
     assert_recipe %q{
       set -o verbose
       set +o xtrace
     } do
-      set_options(:verbose => true, :xtrace => false)
+      set(:verbose => true, :xtrace => false)
     end
   end
   
