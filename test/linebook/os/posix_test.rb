@@ -223,13 +223,12 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
-  # command test
+  # function test
   #
   
-  def test_command_defines_a_command_from_the_block
+  def test_function_defines_a_function_from_the_block
     setup_recipe do
-      unshift_bin_path
-      command 'say_hello' do
+      function 'say_hello' do
         target.puts 'echo "hello $1"'
       end
       target.puts "say_hello world"
@@ -238,6 +237,36 @@ class PosixTest < Test::Unit::TestCase
     assert_output_equal %q{
       hello world
     }, *run_package
+  end
+  
+  def test_function_allows_multiple_declarations_of_the_same_function
+    setup_recipe do
+      3.times do
+        function 'say_hello' do
+          target.puts 'echo "hello $1"'
+        end
+      end
+      target.puts "say_hello world"
+    end
+    
+    assert_output_equal %q{
+      hello world
+    }, *run_package
+  end
+  
+  def test_function_raises_an_error_for_the_same_name_and_different_content
+    err = assert_raises(RuntimeError) do
+      setup_recipe do
+        function 'say_hello' do
+          target.puts 'echo "hello $1"'
+        end
+        function 'say_hello' do
+          target.puts 'echo "goodbye $1"'
+        end
+      end
+    end
+    
+    assert_equal 'function already defined: "say_hello"', err.message
   end
   
   #

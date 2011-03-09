@@ -46,6 +46,19 @@ class LinuxTest < Test::Unit::TestCase
     }, *run_package
   end
   
+  def test_login_does_not_preserve_functions
+    setup_recipe do
+      function "say_hello" do
+        echo 'hello $1'
+      end
+      login do
+        target.puts "say_hello $(whoami)"
+      end
+    end
+  
+    assert_match(/command not found/, *run_package)
+  end
+  
   def test_nested_login
     setup_recipe do
       target.puts "export VAR=a"
@@ -98,6 +111,25 @@ class LinuxTest < Test::Unit::TestCase
       root:/home/linecook:a
       root:/home/linecook:b
       linecook:/home/linecook:a
+    }, *run_package
+  end
+  
+  def test_su_preserves_functions
+    setup_recipe do
+      function "say_hello" do
+        echo 'hello $1'
+      end
+      target.puts "say_hello $(whoami)"
+      su do
+        target.puts "say_hello $(whoami)"
+      end
+      target.puts "say_hello $(whoami)"
+    end
+  
+    assert_output_equal %{
+      hello linecook
+      hello root
+      hello linecook
     }, *run_package
   end
   
