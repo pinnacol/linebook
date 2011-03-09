@@ -379,15 +379,4 @@ class UnixTest < Test::Unit::TestCase
       +v +x
     }, *run_package
   end
-  
-  def test_shebang_sets_LINECOOK_OPTS_to_verbose
-    setup_recipe 'recipe' do
-      shebang
-      target.puts 'echo "$LINECOOK_OPTS"'
-    end
-    
-    assert_output_equal %{
-      -v
-    }, *run_package
-  end
 end
