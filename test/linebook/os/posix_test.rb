@@ -131,12 +131,12 @@ class PosixTest < Test::Unit::TestCase
     assert_equal ['--long-opt'], recipe.format_options(:long_opt => true)
   end
   
-  def test_format_options_sorts_options
+  def test_format_options_sorts_options_such_that_short_options_win
     assert_equal %w{
-      -a -b -c -x -y -z
+      --a-long --b-long --c-long -a -b -c
     }, recipe.format_options(
       'a' => true, 'b' => true, 'c' => true,
-      'x' => true, 'y' => true, 'z' => true
+      'a-long' => true, 'b-long' => true, 'c-long' => true
     )
   end
   

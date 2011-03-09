@@ -41,8 +41,8 @@ end
 # Formats a hash key-value string into command line options using the
 # following heuristics:
 #
-# * Prepend '--' to mulit-char keys and '-' to single-char keys (unless
-#   they already start with '-').
+# * Prepend '--' to mulit-char keys and '-' to single-char keys (unless they
+#   already start with '-').
 # * For true values return the '--key'
 # * For false/nil values return nothing
 # * For all other values, quote (unless already quoted) and return '--key
@@ -50,7 +50,8 @@ end
 #
 # In addition, key formatting is performed on non-string keys (typically
 # symbols) such that underscores are converted to dashes, ie :some_key =>
-# 'some-key'.
+# 'some-key'.  Note that options are sorted, such that short options appear
+# after long options, and so should 'win' given typical option processing.
 def format_options(opts)
   options = []
   
