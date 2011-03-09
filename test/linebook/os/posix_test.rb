@@ -248,32 +248,11 @@ class PosixTest < Test::Unit::TestCase
   
   def test_export_exports_variables
     assert_recipe %q{
-      export ONE=A
-      export TWO=B
-      
+      export ONE="A"
+      export TWO="B C"
     } do
-      export [
-        ['ONE', 'A'],
-        ['TWO', 'B']
-      ]
-    end
-  end
-  
-  def test_export_exports_variables_for_the_duration_of_a_block
-    assert_recipe %q{
-      export ONE=A
-      export TWO=B
-        # content
-      unset ONE
-      unset TWO
-      
-    } do
-      export [
-        ['ONE', 'A'],
-        ['TWO', 'B']
-      ] do
-        target.puts "# content"
-      end
+      export 'ONE', 'A'
+      export 'TWO', 'B C'
     end
   end
   

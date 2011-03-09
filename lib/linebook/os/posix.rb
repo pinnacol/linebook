@@ -143,23 +143,11 @@ module Linebook
         capture { execute(*args, &block) }
       end
       
-      # Exports a list of variables.
-      def export(env=[])
-        #  <% env.to_a.each do |(key, value)| %>
-        #  export <%= key %>=<%= value %>
-        #  <% end %><% if block_given? %>
-        #  <% indent { yield } %>
-        #  <% unset(*env.collect {|(k,v)| k }) %>
-        #  <% end %>
+      # Exports a variable.
+      def export(key, value)
+        #  export <%= key %>=<%= quote(value) %>
         #  
-        #  
-        env.to_a.each do |(key, value)| 
-        _erbout.concat "export "; _erbout.concat(( key ).to_s); _erbout.concat "="; _erbout.concat(( value ).to_s); _erbout.concat "\n"
-        end ;  if block_given? 
-        indent { yield } 
-        unset(*env.collect {|(k,v)| k }) 
-        end 
-        _erbout.concat "\n"
+        _erbout.concat "export "; _erbout.concat(( key ).to_s); _erbout.concat "="; _erbout.concat(( quote(value) ).to_s); _erbout.concat "\n"
         self
       end
       
