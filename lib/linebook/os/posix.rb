@@ -114,7 +114,7 @@ module Linebook
         capture { check_status_function(*args, &block) }
       end
       
-      # Writes a comment
+      # Writes a comment.
       def comment(str)
         #  # <%= str %>
         #  
@@ -193,8 +193,9 @@ module Linebook
         capture { heredoc(*args, &block) }
       end
       
-      def not_if(cmd, &block)
-        only_if("! #{cmd}", &block)
+      # Executes the block when the expression evaluates to a non-zero value.
+      def not_if(expression, &block)
+        only_if("! #{expression}", &block)
         self
       end
       
@@ -202,14 +203,15 @@ module Linebook
         capture { not_if(*args, &block) }
       end
       
-      def only_if(cmd)
-        #  if <%= cmd %>
+      # Executes the block when the expression evaluates to zero.
+      def only_if(expression)
+        #  if <%= expression %>
         #  then
         #  <% indent { yield } %>
         #  fi
         #  
         #  
-        _erbout.concat "if "; _erbout.concat(( cmd ).to_s); _erbout.concat "\n"
+        _erbout.concat "if "; _erbout.concat(( expression ).to_s); _erbout.concat "\n"
         _erbout.concat "then\n"
         indent { yield } 
         _erbout.concat "fi\n"

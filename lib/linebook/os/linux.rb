@@ -7,7 +7,8 @@ module Linebook
       require 'linebook/os/unix'
       include Unix
       
-      # Logs in as a different user for the duration of a block.
+      # Logs in as the specified user for the duration of a block (the current ENV
+      # and pwd are not preserved).
       def login(user='root', &block)
         target_name = guess_target_name(user)
         path = capture_path(target_name, 0700, &block)
@@ -19,7 +20,8 @@ module Linebook
         capture { login(*args, &block) }
       end
       
-      # Switches to a different user for the duration of a block.
+      # Switches to the specified user for the duration of a block.  The current ENV
+      # and pwd are preserved.
       def su(user='root', &block)
         target_name = guess_target_name(user)
         path = capture_path(target_name, 0700, &block)

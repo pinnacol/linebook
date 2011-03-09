@@ -1,4 +1,5 @@
-Switches to a different user for the duration of a block.
+Switches to the specified user for the duration of a block.  The current ENV
+and pwd are preserved.
 (user='root', &block)
 --
   target_name = guess_target_name(user)

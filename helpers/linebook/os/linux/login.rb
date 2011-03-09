@@ -1,4 +1,5 @@
-Logs in as a different user for the duration of a block.
+Logs in as the specified user for the duration of a block (the current ENV
+and pwd are not preserved).
 (user='root', &block)
 --
   target_name = guess_target_name(user)
