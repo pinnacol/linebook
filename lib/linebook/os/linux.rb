@@ -31,16 +31,31 @@ module Linebook
         capture { su(*args, &block) }
       end
       
-      # Adds the user.  Assumes the current user is root, or has root privileges.
-      def useradd(name, options={})
-        #  useradd <%= format_options(options) %> <%= name %>
-        #  
-        _erbout.concat "useradd "; _erbout.concat(( format_options(options) ).to_s); _erbout.concat " "; _erbout.concat(( name ).to_s); _erbout.concat "\n"
+      # Adds the user. Assumes the current user has root privileges. Typically more
+      # reliable in conjunction with login rather than su; some systems prevent
+      # root commands from being available for non-root users.
+      def useradd(name, options={}) 
+        execute 'useradd', name, options
         self
       end
       
       def _useradd(*args, &block) # :nodoc:
         capture { useradd(*args, &block) }
+      end
+      
+      # Removes the user. Assumes the current user has root privileges. Typically more
+      # reliable in conjunction with login rather than su; some systems prevent
+      # root commands from being available for non-root users.
+      def userdel(name, options={}) 
+        # TODO - look into other things that might need to happen before:
+        # * kill processes belonging to user
+        # * remove at/cron/print jobs etc. 
+        execute 'userdel', name, options
+        self
+      end
+      
+      def _userdel(*args, &block) # :nodoc:
+        capture { userdel(*args, &block) }
       end
     end
   end

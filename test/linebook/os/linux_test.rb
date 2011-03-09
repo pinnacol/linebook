@@ -12,7 +12,7 @@ class LinuxTest < Test::Unit::TestCase
   TEST_USER  = 'test_user'
   TEST_GROUP = 'test_group'
   
-  def clean_recipe
+  def clear_test_user
     setup_recipe do
       login do
         target.puts %{userdel #{TEST_USER} > /dev/null 2>&1}
@@ -20,27 +20,6 @@ class LinuxTest < Test::Unit::TestCase
       end
       target.puts "true"
     end
-  end
-  
-  #
-  # useradd test
-  #
-  
-  def test_useradd_adds_user
-    clean_recipe
-    
-    setup_recipe do
-      login do
-        target.puts "id #{TEST_USER} 2>&1"
-        useradd TEST_USER
-        target.puts "id -nu #{TEST_USER}"
-      end
-    end
-    
-    assert_output_equal %{
-      id: #{TEST_USER}: No such user
-      #{TEST_USER}
-    }, *run_package
   end
   
   #
@@ -149,5 +128,44 @@ class LinuxTest < Test::Unit::TestCase
       root:/home/linecook:b
       linecook:/home/linecook:a
     }, *run_package
+  end
+  
+  #
+  # useradd test
+  #
+  
+  def test_useradd_adds_user
+    clear_test_user
+    
+    setup_recipe do
+      login do
+        target.puts "if id #{TEST_USER}; then exit 1; fi"
+        useradd TEST_USER
+        target.puts "if ! id #{TEST_USER}; then exit 1; fi"
+      end
+    end
+    
+    stdout, msg = run_package
+    assert_equal 0, $?.exitstatus, msg
+  end
+  
+  #
+  # userdel test
+  #
+  
+  def test_userdel_removes_user
+    clear_test_user
+    
+    setup_recipe do
+      login do
+        target.puts "useradd #{TEST_USER}"
+        target.puts "if ! id #{TEST_USER}; then exit 1; fi"
+        userdel TEST_USER
+        target.puts "if id #{TEST_USER}; then exit 1; fi"
+      end
+    end
+    
+    stdout, msg = run_package
+    assert_equal 0, $?.exitstatus, msg
   end
 end
