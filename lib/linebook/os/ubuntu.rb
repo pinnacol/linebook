@@ -7,10 +7,10 @@ module Linebook
       require 'linebook/os/linux'
       include Linux
       
-      # Installs a package using apt-get, by default with the options '-q -y'.
-      def package(name, version=nil, options={})
+      # Installs a package using apt-get.
+      def package(name, version=nil, options={:q => true, :y => true})
         name = "#{name}=#{version}" unless blank?(version)
-        execute "apt-get install", name, {:q => true, :y => true}.merge(options)
+        execute "apt-get install", name, options
         self
       end
       

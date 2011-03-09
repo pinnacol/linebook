@@ -1,6 +1,6 @@
-Installs a package using apt-get, by default with the options '-q -y'.
-(name, version=nil, options={})
+Installs a package using apt-get.
+(name, version=nil, options={:q => true, :y => true})
 --
   name = "#{name}=#{version}" unless blank?(version)
-  execute "apt-get install", name, {:q => true, :y => true}.merge(options)
+  execute "apt-get install", name, options
   
