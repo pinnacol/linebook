@@ -82,10 +82,22 @@ def functions
   @functions ||= []
 end
 
-# Defines a function from the block.  Raises an error if the function is
-# already defined with a different body.
-def function(name, &block)
-  function = "#{name}() {\n#{capture(true, &block)}\n}"
+# Defines a function from the block.  The block content is indented and
+# cleaned up some to make a nice function definition.  To avoid formatting,
+# provide the body directly.
+#
+# A body and block given together raises an error. Raises an error if the
+# function is already defined with a different body.
+def function(name, body=nil, &block)
+  if body && block
+    raise "define functions with body or block"
+  end
+  
+  if body.nil?
+    body = "\n#{capture(false) { indent(&block) }.chomp("\n")}\n"
+  end
+  
+  function = "#{name}() {#{body}}"
   
   if current = functions.find {|func| func.index("#{name}()") == 0 }
     if current != function

@@ -87,10 +87,22 @@ module Linebook
         @functions ||= []
       end
       
-      # Defines a function from the block.  Raises an error if the function is
-      # already defined with a different body.
-      def function(name, &block)
-        function = "#{name}() {\n#{capture(true, &block)}\n}"
+      # Defines a function from the block.  The block content is indented and
+      # cleaned up some to make a nice function definition.  To avoid formatting,
+      # provide the body directly.
+      #
+      # A body and block given together raises an error. Raises an error if the
+      # function is already defined with a different body.
+      def function(name, body=nil, &block)
+        if body && block
+          raise "define functions with body or block"
+        end
+        
+        if body.nil?
+          body = "\n#{capture(false) { indent(&block) }.chomp("\n")}\n"
+        end
+        
+        function = "#{name}() {#{body}}"
         
         if current = functions.find {|func| func.index("#{name}()") == 0 }
           if current != function
@@ -128,9 +140,7 @@ module Linebook
       # Adds the check status function.
       def check_status_function()
         @check_status = true
-        #  check_status () { if [ $2 -ne $1 ]; then echo "[$2] $0:${4:-?}"; exit $3; else return $2; fi }
-        #  
-        _erbout.concat "check_status () { if [ $2 -ne $1 ]; then echo \"[$2] $0:${4:-?}\"; exit $3; else return $2; fi }\n"
+        function 'check_status', ' if [ $2 -ne $1 ]; then echo "[$2] $0:${4:-?}"; exit $3; else return $2; fi '
         self
       end
       
@@ -165,6 +175,18 @@ module Linebook
       
       def _execute(*args, &block) # :nodoc:
         capture { execute(*args, &block) }
+      end
+      
+      # Exit with status.
+      def exit_status(status)
+        #    exit <%= status %>
+        #  
+        _erbout.concat "  exit "; _erbout.concat(( status ).to_s); _erbout.concat "\n"
+        self
+      end
+      
+      def _exit_status(*args, &block) # :nodoc:
+        capture { exit_status(*args, &block) }
       end
       
       # Exports a variable.
@@ -233,6 +255,18 @@ module Linebook
       
       def _only_if(*args, &block) # :nodoc:
         capture { only_if(*args, &block) }
+      end
+      
+      # Return with status.
+      def return_status(status)
+        #    return <%= status %>
+        #  
+        _erbout.concat "  return "; _erbout.concat(( status ).to_s); _erbout.concat "\n"
+        self
+      end
+      
+      def _return_status(*args, &block) # :nodoc:
+        capture { return_status(*args, &block) }
       end
       
       # Sets the options to on (true) or off (false) as specified.
