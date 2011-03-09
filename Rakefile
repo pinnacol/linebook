@@ -121,16 +121,20 @@ task :quicktest => :build do
   tests = Dir.glob('test/**/*_test.rb')
   tests.delete_if {|test| test =~ /_test\/test_/ }
   
-  if pattern = ENV['PATTERN']
-    pattern = Regexp.new(pattern)
-    tests.delete_if {|test| test !~ pattern }
-  end
-  
   if ENV['RCOV'] == 'true'
     FileUtils.rm_rf File.expand_path('../coverage', __FILE__)
     sh('rcov', '-w', '--text-report', '--exclude', '^/', *tests)
   else
-    sh('ruby', '-w', '-e', 'ARGV.dup.each {|test| load test}', *tests)
+    
+    if testcase = ENV['TESTCASE']
+      tests << "--testcase=#{testcase}"
+    end
+    
+    if name = ENV['NAME']
+      tests << "--name=#{name}"
+    end
+    
+    sh('ruby', '-w', '-e', 'ARGV.dup.grep(/^test/).each {|test| load test }', *tests)
   end
 end
 
