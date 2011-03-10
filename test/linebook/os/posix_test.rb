@@ -483,6 +483,37 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # redirect test
+  #
+  
+  def test_redirect_chains_redirect_to_file
+    assert_recipe %q{
+      cat source 2> target
+    } do
+      target.puts "cat source"
+      chain :redirect, 2, 'target'
+    end
+  end
+  
+  def test_redirect_treats_numbers_as_file_handles
+    assert_recipe %q{
+      cat source 2>&1
+    } do
+      target.puts "cat source"
+      chain :redirect, 2, 1
+    end
+  end
+  
+  def test_redirect_allows_stdout_and_stderr_as_logical_names
+    assert_recipe %q{
+      cat source 2>&1
+    } do
+      target.puts "cat source"
+      chain :redirect, :stderr, :stdout
+    end
+  end
+  
+  #
   # set test
   #
   
@@ -492,6 +523,28 @@ class PosixTest < Test::Unit::TestCase
       set +o xtrace
     } do
       set(:verbose => true, :xtrace => false)
+    end
+  end
+  
+  #
+  # to test
+  #
+  
+  def test_to_chains_stdout_redirect_to_file
+    assert_recipe %q{
+      cat source > target
+    } do
+      target.puts "cat source"
+      chain :to, 'target'
+    end
+  end
+  
+  def test_to_redirects_to_dev_null_for_nil
+    assert_recipe %q{
+      cat source > /dev/null
+    } do
+      target.puts "cat source"
+      chain :to, nil
     end
   end
   

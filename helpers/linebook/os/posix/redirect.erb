@@ -1,0 +1,8 @@
+Makes a redirect statement.
+(source, target)
+  rstrip if chain?
+  source = handles[source] || source
+  source = nil if source == 1
+  target = handles[target] || target
+--
+ <%= source.nil? || source.kind_of?(Fixnum) ? source : "#{source} " %>><%= target.kind_of?(Fixnum) ? "&#{target}" : " #{target}" %>

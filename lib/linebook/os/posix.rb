@@ -116,6 +116,12 @@ module Linebook
         name
       end
       
+      DEFAULT_HANDLES = {:stdin => 0, :stdout => 1, :stderr => 2}
+      
+      # A hash of logical names for file handles.
+      def handles
+        @handles ||= DEFAULT_HANDLES.dup
+      end
       
       # Adds a check that ensures the last exit status is as indicated. Note that no
       # check will be added unless check_status_function is added beforehand.
@@ -250,6 +256,22 @@ module Linebook
         capture { only_if(*args, &block) }
       end
       
+      # Makes a redirect statement.
+      def redirect(source, target)
+        rstrip if chain?
+        source = handles[source] || source
+        source = nil if source == 1
+        target = handles[target] || target
+        #   <%= source.nil? || source.kind_of?(Fixnum) ? source : "#{source} " %>><%= target.kind_of?(Fixnum) ? "&#{target}" : " #{target}" %>
+        #  
+        _erbout.concat " "; _erbout.concat(( source.nil? || source.kind_of?(Fixnum) ? source : "#{source} " ).to_s); _erbout.concat ">"; _erbout.concat(( target.kind_of?(Fixnum) ? "&#{target}" : " #{target}" ).to_s); _erbout.concat "\n"
+        chain_proxy
+      end
+      
+      def _redirect(*args, &block) # :nodoc:
+        capture { redirect(*args, &block) }
+      end
+      
       # Sets the options to on (true) or off (false) as specified.
       def set(options)
         #  <% options.keys.sort_by {|opt| opt.to_s }.each do |opt| %>
@@ -264,6 +286,16 @@ module Linebook
       
       def _set(*args, &block) # :nodoc:
         capture { set(*args, &block) }
+      end
+      
+      # Adds a redirect of stdout to a file.
+      def to(path=nil)
+        redirect(:stdout, path || '/dev/null')
+        chain_proxy
+      end
+      
+      def _to(*args, &block) # :nodoc:
+        capture { to(*args, &block) }
       end
       
       # Unsets a list of variables.
