@@ -7,6 +7,55 @@ module Linebook
       require 'linebook/os/unix'
       include Unix
       
+      # Returns true if the group exists as determined by checking /etc/group.
+      def group?(name)
+        #  grep "^<%= name %>:" /etc/group >/dev/null 2>&1
+        _erbout.concat "grep \"^"; _erbout.concat(( name ).to_s); _erbout.concat ":\" /etc/group >/dev/null 2>&1";
+        self
+      end
+      
+      def _group?(*args, &block) # :nodoc:
+        capture { group?(*args, &block) }
+      end
+      
+      # Adds the group. Assumes the current user has root privileges. Typically more
+      # reliable in conjunction with login rather than su; some systems prevent
+      # root commands from being available for non-root users.
+      def groupadd(name, options={})
+        execute 'groupadd', name, options
+        self
+      end
+      
+      def _groupadd(*args, &block) # :nodoc:
+        capture { groupadd(*args, &block) }
+      end
+      
+      # Removes the group. Assumes the current user has root privileges. Typically
+      # more reliable in conjunction with login rather than su; some systems prevent
+      # root commands from being available for non-root users.
+      def groupdel(name, options={})
+        execute 'groupdel', name, options
+        self
+      end
+      
+      def _groupdel(*args, &block) # :nodoc:
+        capture { groupdel(*args, &block) }
+      end
+      
+      def groups(user, options={})
+        sep = options[:sep]
+        #  id -Gn <%= quote(user) %><% if sep %> | sed "s/ /<%= sep %>/g"<% end %>
+        #  
+        #  
+        _erbout.concat "id -Gn "; _erbout.concat(( quote(user) ).to_s);  if sep ; _erbout.concat " | sed \"s/ /"; _erbout.concat(( sep ).to_s); _erbout.concat "/g\"";  end ; _erbout.concat "\n"
+        _erbout.concat "\n"
+        self
+      end
+      
+      def _groups(*args, &block) # :nodoc:
+        capture { groups(*args, &block) }
+      end
+      
       # Logs in as the specified user for the duration of a block (the current ENV
       # and pwd are not preserved).
       def login(user='root', &block)
@@ -36,6 +85,17 @@ module Linebook
       
       def _su(*args, &block) # :nodoc:
         capture { su(*args, &block) }
+      end
+      
+      # Returns true if the user exists as determined by id.
+      def user?(name)
+        #  id <%= quote(name) %> >/dev/null 2>&1
+        _erbout.concat "id "; _erbout.concat(( quote(name) ).to_s); _erbout.concat " >/dev/null 2>&1";
+        self
+      end
+      
+      def _user?(*args, &block) # :nodoc:
+        capture { user?(*args, &block) }
       end
       
       # Adds the user. Assumes the current user has root privileges. Typically more

@@ -67,16 +67,6 @@ module Linebook
       capture { file(*args, &block) }
     end
     
-    def group?(name)
-      #  grep "^<%= name %>:" /etc/group >/dev/null 2>&1
-      _erbout.concat "grep \"^"; _erbout.concat(( name ).to_s); _erbout.concat ":\" /etc/group >/dev/null 2>&1";
-      self
-    end
-    
-    def _group?(*args, &block) # :nodoc:
-      capture { group?(*args, &block) }
-    end
-    
     def group(name, options={})
       not_if _group?(name) do
         groupadd name
@@ -88,24 +78,6 @@ module Linebook
       capture { group(*args, &block) }
     end
     
-    def groupadd(name, options={})
-      execute 'groupadd', name, options
-      self
-    end
-    
-    def _groupadd(*args, &block) # :nodoc:
-      capture { groupadd(*args, &block) }
-    end
-    
-    def groupdel(name, options={})
-      execute 'groupdel', name, options
-      self
-    end
-    
-    def _groupdel(*args, &block) # :nodoc:
-      capture { groupdel(*args, &block) }
-    end
-    
     def groupmod(name, options={})
       execute 'groupmod', name, options
       self
@@ -113,20 +85,6 @@ module Linebook
     
     def _groupmod(*args, &block) # :nodoc:
       capture { groupmod(*args, &block) }
-    end
-    
-    def groups(user, options={})
-      sep = options[:sep]
-      #  id -Gn <%= quote(user) %><% if sep %> | sed "s/ /<%= sep %>/g"<% end %>
-      #  
-      #  
-      _erbout.concat "id -Gn "; _erbout.concat(( quote(user) ).to_s);  if sep ; _erbout.concat " | sed \"s/ /"; _erbout.concat(( sep ).to_s); _erbout.concat "/g\"";  end ; _erbout.concat "\n"
-      _erbout.concat "\n"
-      self
-    end
-    
-    def _groups(*args, &block) # :nodoc:
-      capture { groups(*args, &block) }
     end
     
     # Installs a file
@@ -189,16 +147,6 @@ module Linebook
     
     def _template(*args, &block) # :nodoc:
       capture { template(*args, &block) }
-    end
-    
-    def user?(name)
-      #  grep "^<%= name %>" /etc/passwd >/dev/null 2>&1
-      _erbout.concat "grep \"^"; _erbout.concat(( name ).to_s); _erbout.concat "\" /etc/passwd >/dev/null 2>&1";
-      self
-    end
-    
-    def _user?(*args, &block) # :nodoc:
-      capture { user?(*args, &block) }
     end
     
     def user(name, options={})

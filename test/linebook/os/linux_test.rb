@@ -9,17 +9,118 @@ class LinuxTest < Test::Unit::TestCase
     use_helpers Linebook::Os::Linux
   end
   
-  TEST_USER  = 'test_user'
-  TEST_GROUP = 'test_group'
+  TEST_USER      = 'test_user'
+  TEST_GROUP     = 'test_group'
+  TEST_USER_TWO  = 'test_user_two'
+  TEST_GROUP_TWO = 'test_group_two'
   
-  def clear_test_user
+  def clear_test_users
     setup_recipe do
       login do
-        target.puts %{userdel #{TEST_USER} > /dev/null 2>&1}
-        target.puts %{groupdel #{TEST_GROUP} > /dev/null 2>&1}
+        target.puts %{userdel  #{TEST_USER}      > /dev/null 2>&1}
+        target.puts %{userdel  #{TEST_USER_TWO}  > /dev/null 2>&1}
+        target.puts %{groupdel #{TEST_GROUP}     > /dev/null 2>&1}
+        target.puts %{groupdel #{TEST_GROUP_TWO} > /dev/null 2>&1}
       end
       target.puts "true"
     end
+  end
+  
+  #
+  # groupadd test
+  #
+  
+  def test_groupadd_adds_group
+    clear_test_users
+    
+    setup_recipe do
+      login do
+        only_if _group?(TEST_GROUP) do
+          target.puts "exit 1"
+        end
+        
+        groupadd TEST_GROUP
+        
+        not_if _group?(TEST_GROUP) do
+          target.puts "exit 1"
+        end
+      end
+    end
+    
+    stdout, msg = run_package
+    assert_equal 0, $?.exitstatus, msg
+  end
+  
+  #
+  # group? test
+  #
+  
+  def test_group_check_passes_if_the_group_exists
+    clear_test_users
+    
+    setup_recipe do
+      login do
+        not_if _group?("$(id -ng $(whoami))") do
+          target.puts "exit 1"
+        end
+        
+        only_if _group?(TEST_GROUP) do
+          target.puts "exit 1"
+        end
+      end
+    end
+    
+    stdout, msg = run_package
+    assert_equal 0, $?.exitstatus, msg
+  end
+  
+  #
+  # groupdel test
+  #
+  
+  def test_groupdel_removes_group
+    clear_test_users
+    
+    setup_recipe do
+      login do
+        target.puts "groupadd #{TEST_GROUP}"
+        
+        not_if _group?(TEST_GROUP) do
+          target.puts "exit 1"
+        end
+        
+        groupdel TEST_GROUP
+        
+        only_if _group?(TEST_GROUP) do
+          target.puts "exit 1"
+        end
+      end
+    end
+    
+    stdout, msg = run_package
+    assert_equal 0, $?.exitstatus, msg
+  end
+  
+  #
+  # groups test
+  #
+  
+  def test_groups_returns_groups_a_user_belongs_to
+    clear_test_users
+    
+    setup_recipe do
+      login do
+        target.puts "groupadd #{TEST_GROUP}"
+        target.puts "groupadd #{TEST_GROUP_TWO}"
+        target.puts "useradd -g #{TEST_GROUP_TWO} -G #{TEST_GROUP} #{TEST_USER}"
+      end
+      
+      groups(TEST_USER)
+    end
+    
+    assert_output_equal %{
+      #{TEST_GROUP_TWO} #{TEST_GROUP}
+    }, *run_package
   end
   
   #
@@ -167,13 +268,42 @@ class LinuxTest < Test::Unit::TestCase
   #
   
   def test_useradd_adds_user
-    clear_test_user
+    clear_test_users
     
     setup_recipe do
       login do
-        target.puts "if id #{TEST_USER}; then exit 1; fi"
+        only_if _user?(TEST_USER) do
+          target.puts "exit 1"
+        end
+        
         useradd TEST_USER
-        target.puts "if ! id #{TEST_USER}; then exit 1; fi"
+        
+        not_if _user?(TEST_USER) do
+          target.puts "exit 1"
+        end
+      end
+    end
+    
+    stdout, msg = run_package
+    assert_equal 0, $?.exitstatus, msg
+  end
+  
+  #
+  # user? test
+  #
+  
+  def test_user_check_passes_if_the_user_exists
+    clear_test_users
+    
+    setup_recipe do
+      login do
+        not_if _user?("$(whoami)") do
+          target.puts "exit 1"
+        end
+        
+        only_if _user?(TEST_USER) do
+          target.puts "exit 1"
+        end
       end
     end
     
@@ -186,14 +316,21 @@ class LinuxTest < Test::Unit::TestCase
   #
   
   def test_userdel_removes_user
-    clear_test_user
+    clear_test_users
     
     setup_recipe do
       login do
         target.puts "useradd #{TEST_USER}"
-        target.puts "if ! id #{TEST_USER}; then exit 1; fi"
+        
+        not_if _user?(TEST_USER) do
+          target.puts "exit 1"
+        end
+        
         userdel TEST_USER
-        target.puts "if id #{TEST_USER}; then exit 1; fi"
+        
+        only_if _user?(TEST_USER) do
+          target.puts "exit 1"
+        end
       end
     end
     
