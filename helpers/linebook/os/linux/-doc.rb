@@ -1,0 +1,74 @@
+# == login vs su
+#
+# The login and su methods both provide a way to switch users.  Login
+# simulates a login and therefore you end up in the user home directory with
+# the ENV as setup during login. By contrast su switches users such that it
+# preserves exported ENV variables, including the pwd.
+#
+# Say you were the linecook user:
+#
+#   cd
+#   export 'A', 'a'
+#   variable 'B', 'b'
+#   echo "$(whoami):$(pwd):$A:$B"             # => linecook:/home/linecook:a:b
+#   login { echo "$(whoami):$(pwd):$A:$B" }   # => root:/root::
+#   su    { echo "$(whoami):$(pwd):$A:$B" }   # => root:/home/linecook:a:
+#
+# User-management methods in this module assume root privileges (useradd,
+# groupadd, etc) so unless you are already root, you need to wrap them in
+# login or su. In this case login is more reliable than su because some
+# systems leave the user management commands off the non-root PATH; using
+# login ensures PATH will be set for root during the block.
+#
+# For example use:
+#
+#   login { useradd 'username' }
+#
+# Rather than:
+#
+#   su { useradd 'username' }   # => may give 'useradd: command not found'
+#
+# == Permissions
+#
+# The user running the package needs the ability to su without a password,
+# otherwise login/su will choke and fail when run by 'linecook run'.  How this
+# is accomplished is a matter of policy; something each user needs to decide
+# for themselves.
+#
+# First you could run the package as root.
+#
+# Second you can grant the running user (ex 'linecook') su privileges.  This
+# can be accomplished by adding the user to the 'wheel' group and modifiying
+# the PAM config files. Afterwards all wheel users can su without a password.
+# To do so (repeat for '/etc/pam.d/su-l' if it exists):
+#
+#   vi /etc/pam.d/su
+#   # insert:
+#   #   auth       sufficient pam_wheel.so trust
+# 
+# This is the default strategy and it works in a portable way because the
+# {linux spec}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/cmdbehav.html]
+# requires su exists and has the necessary options.
+#
+# Third you can chuck the default login/su, reimplement them with sudo, and
+# give the user (ex 'linecook') sudo privileges.  This can be accomplished by
+# adding the user to a group (ex 'linecook') and modifying the sudo config via
+# visudo. Afterwards all the linecook users can sudo without a password.
+#
+#   visudo
+#   # insert:
+#   #   # Members of the linecook group may sudo without a password
+#   #   %linecook ALL=NOPASSWD: ALL
+#
+# See an old version of the {linebook source}[https://github.com/pinnacol/linebook/tree/b786e1e63c68f5ddf3be15851d9b423bc05e5345/helpers/linebook/os/linux]
+# for hints on how login/su could be reimplemented with sudo.  This strategy
+# was abandonded as the default because sudo is not required by the linux spec
+# and is does not come installed in many cases (ex Debian).  Moreover the
+# options needed to make this strategy work don't exist in sudo < 1.7, so even
+# systems that come with sudo could need an upgrade.
+#
+# Lastly you can chuck all of these strategies and figure out your own way.
+# Surely they exist, for example by running the packages manually and entering
+# in passwords as prompted.
+#
+

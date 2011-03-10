@@ -27,6 +27,27 @@ class LinuxTest < Test::Unit::TestCase
   end
   
   #
+  # doc test
+  #
+  
+  def test_doc
+    setup_recipe do
+      cd
+      export 'A', 'a'
+      variable 'B', 'b'
+      echo "$(whoami):$(pwd):$A:$B"             # => linecook:/home/linecook:a:b
+      login { echo "$(whoami):$(pwd):$A:$B" }   # => root:/root::
+      su { echo "$(whoami):$(pwd):$A:$B" }      # => root:/home/linecook:a:
+    end
+    
+    assert_output_equal %{
+      linecook:/home/linecook:a:b
+      root:/root::
+      root:/home/linecook:a:
+    }, *run_package
+  end
+  
+  #
   # groupadd test
   #
   
