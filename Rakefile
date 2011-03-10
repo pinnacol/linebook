@@ -125,15 +125,6 @@ task :quicktest => :build do
     FileUtils.rm_rf File.expand_path('../coverage', __FILE__)
     sh('rcov', '-w', '--text-report', '--exclude', '^/', *tests)
   else
-    
-    if testcase = ENV['TESTCASE']
-      tests << "--testcase=#{testcase}"
-    end
-    
-    if name = ENV['NAME']
-      tests << "--name=#{name}"
-    end
-    
     sh('ruby', '-w', '-e', 'ARGV.dup.grep(/^test/).each {|test| load test }', *tests)
   end
 end
