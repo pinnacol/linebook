@@ -290,6 +290,16 @@ class PosixTest < Test::Unit::TestCase
     }, *run_package
   end
   
+  def test_execute_sets_up_pipe_on_chain
+    assert_recipe %q{
+      cat file | grep a | grep b
+      ls "$path" | grep c
+    } do
+      execute('cat file').execute('grep a').execute('grep b')
+      execute('ls', '$path').execute('grep c')
+    end
+  end
+  
   #
   # export test
   #

@@ -170,6 +170,10 @@ module Linebook
       # that aren't already quoted. Accepts a trailing hash which will be transformed
       # into command line options.
       def execute(command, *args)
+        if chain?
+          rstrip
+          target << ' | '
+        end
         #  <%= format_cmd(command, *args) %>
         #  
         #  <% check_status %>
