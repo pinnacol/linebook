@@ -10,6 +10,26 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
+  # cat test
+  #
+  
+  def test_cat_allows_chaining
+    setup_recipe do
+      cat.heredoc do
+        target.puts "a"
+        target.puts "b"
+        target.puts "c"
+      end
+    end
+    
+    assert_output_equal %{
+      a
+      b
+      c
+    }, *run_package
+  end
+  
+  #
   # cd test
   #
   

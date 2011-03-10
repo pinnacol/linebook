@@ -5,6 +5,11 @@ Makes a heredoc statement surrounding the contents of the block.  Options:
   quote       quotes the delimiter
 
 (options={})
+  if chain?
+    rstrip
+    target << ' '
+  end
+  
   delimiter = options[:delimiter] || begin
     @heredoc_count ||= -1
     "HEREDOC_#{@heredoc_count += 1}"

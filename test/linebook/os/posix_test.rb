@@ -438,6 +438,19 @@ class PosixTest < Test::Unit::TestCase
     }, *run_package
   end
   
+  def test_heredoc_rstrips_on_chain
+    assert_recipe %q{
+      cat << HEREDOC_0
+      success
+      HEREDOC_0
+    } do
+      target.print "cat  \n   "
+      chain :heredoc do
+        target.puts 'success'
+      end
+    end
+  end
+  
   #
   # not_if test
   #
