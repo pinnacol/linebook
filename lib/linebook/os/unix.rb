@@ -29,6 +29,25 @@ module Linebook
         capture { cat(*args, &block) }
       end
       
+      def cd(dir=nil)
+        if block_given?
+          var = next_variable_name('cd')
+          target.puts %{#{var}=$(pwd)}
+        end
+      
+        execute "cd", dir
+      
+        if block_given?
+          yield
+          execute "cd", "$#{var}"
+        end
+        self
+      end
+      
+      def _cd(*args, &block) # :nodoc:
+        capture { cd(*args, &block) }
+      end
+      
       # Makes a command to chmod a file or directory.  Provide the mode as the
       # literal string that should go into the statement:
       # 

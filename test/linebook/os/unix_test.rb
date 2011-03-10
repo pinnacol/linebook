@@ -10,6 +10,42 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
+  # cd test
+  #
+  
+  def test_cd_changes_dir
+    setup_recipe do
+      target.puts 'pwd'
+      cd '/tmp'
+      target.puts 'pwd'
+    end
+    
+    assert_output_equal %{
+      /home/linecook
+      /tmp
+    }, *run_package
+  end
+  
+  def test_cd_changes_dir_for_duration_of_a_block_if_given
+    setup_recipe do
+      target.puts 'pwd'
+      cd '/tmp' do
+        target.puts 'pwd'
+        cd '/var'
+        target.puts 'pwd'
+      end
+      target.puts 'pwd'
+    end
+    
+    assert_output_equal %{
+      /home/linecook
+      /tmp
+      /var
+      /home/linecook
+    }, *run_package
+  end
+  
+  #
   # chmod test
   #
   
