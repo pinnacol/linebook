@@ -147,46 +147,6 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
-  # set_date test
-  #
-  
-  def test_set_date_sets_the_system_date_to_the_specified_time
-    time = Time.now
-    
-    setup_recipe do
-      path = capture_path('set_date.sh') do
-        set_date time
-      end
-      
-      target.puts %{chmod +x "#{path}"}
-      target.puts %{su root "#{path}" > /dev/null}
-      target.puts "date '+%Y-%m-%d %H:%M'"
-    end
-    
-    assert_output_equal %{
-      #{time.strftime("%Y-%m-%d %H:%M")}
-    }, *run_package
-  end
-  
-  def test_set_date_adjusts_to_utc
-    time  = Time.now
-    
-    setup_recipe do
-      path = capture_path('set_date.sh') do
-        set_date time.dup.utc
-      end
-      
-      target.puts %{chmod +x "#{path}"}
-      target.puts %{su root "#{path}" > /dev/null}
-      target.puts "date '+%Y-%m-%d %H:%M'"
-    end
-    
-    assert_output_equal %{
-      #{time.strftime("%Y-%m-%d %H:%M")}
-    }, *run_package
-  end
-  
-  #
   # date test
   #
   
@@ -216,6 +176,24 @@ class UnixTest < Test::Unit::TestCase
     }){
       echo 'a b c'
     }
+  end
+  
+  #
+  # gsub test
+  #
+  
+  def test_gsub_makes_the_substitution_on_all_lines_of_the_input
+    setup_recipe do
+      gsub('a', 'A').heredoc do
+        target.puts 'a b a b'
+        target.puts 'b a b a'
+      end
+    end
+    
+    assert_output_equal %{
+      A b A b
+      b A b A
+    }, *run_package
   end
   
   #
@@ -344,5 +322,45 @@ class UnixTest < Test::Unit::TestCase
       echo c
       c
     }, stdout, msg
+  end
+  
+  #
+  # set_date test
+  #
+  
+  def test_set_date_sets_the_system_date_to_the_specified_time
+    time = Time.now
+    
+    setup_recipe do
+      path = capture_path('set_date.sh') do
+        set_date time
+      end
+      
+      target.puts %{chmod +x "#{path}"}
+      target.puts %{su root "#{path}" > /dev/null}
+      target.puts "date '+%Y-%m-%d %H:%M'"
+    end
+    
+    assert_output_equal %{
+      #{time.strftime("%Y-%m-%d %H:%M")}
+    }, *run_package
+  end
+  
+  def test_set_date_adjusts_to_utc
+    time  = Time.now
+    
+    setup_recipe do
+      path = capture_path('set_date.sh') do
+        set_date time.dup.utc
+      end
+      
+      target.puts %{chmod +x "#{path}"}
+      target.puts %{su root "#{path}" > /dev/null}
+      target.puts "date '+%Y-%m-%d %H:%M'"
+    end
+    
+    assert_output_equal %{
+      #{time.strftime("%Y-%m-%d %H:%M")}
+    }, *run_package
   end
 end

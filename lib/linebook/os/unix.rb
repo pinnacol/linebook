@@ -169,6 +169,20 @@ module Linebook
         capture { file?(*args, &block) }
       end
       
+      # Sets up a gsub using sed.
+      def gsub(pattern, replacement, *args)
+        unless args.last.kind_of?(Hash)
+          args << {}
+        end
+        args.last[:e] = "s/#{pattern}/#{replacement}/g"
+        sed *args
+        chain_proxy
+      end
+      
+      def _gsub(*args, &block) # :nodoc:
+        capture { gsub(*args, &block) }
+      end
+      
       # Link source to target.  Accepts a hash of command line options.
       def ln(source, target, options={})
         execute 'ln', source, target, options
@@ -270,6 +284,16 @@ module Linebook
       
       def _section(*args, &block) # :nodoc:
         capture { section(*args, &block) }
+      end
+      
+      # Execute sed.
+      def sed(*args)
+        execute 'sed', *args
+        chain_proxy
+      end
+      
+      def _sed(*args, &block) # :nodoc:
+        capture { sed(*args, &block) }
       end
       
       # Sets the options to on (true) or off (false) as specified.  If a block is
