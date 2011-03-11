@@ -1,0 +1,8 @@
+Assign a file descriptor.
+(target, source)
+  rstrip if chain?
+  target = handles[target] || target
+  target = nil if target == 0
+  source = handles[source] || source
+--
+ <%= target %><<%= source.kind_of?(Fixnum) ? "&#{source}" : " #{source}" %>

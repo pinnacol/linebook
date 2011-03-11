@@ -10,6 +10,37 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # assign test
+  #
+  
+  def test_assign_assigns_fd_from_file
+    assert_recipe %q{
+      exec 3< source
+    } do
+      target.puts "exec"
+      chain :assign, 3, 'source'
+    end
+  end
+  
+  def test_redirect_treats_numbers_as_file_handles
+    assert_recipe %q{
+      exec <&3
+    } do
+      target.puts "exec"
+      chain :assign, 0, 3
+    end
+  end
+  
+  def test_redirect_allows_logical_names
+    assert_recipe %q{
+      exec 1<&2
+    } do
+      target.puts "exec"
+      chain :assign, :stdout, :stderr
+    end
+  end
+  
+  #
   # blank test
   #
   
@@ -311,6 +342,19 @@ class PosixTest < Test::Unit::TestCase
     } do
       export 'ONE', 'A'
       export 'TWO', 'B C'
+    end
+  end
+  
+  #
+  # from test
+  #
+  
+  def test_from_chains_stdin_assignment_from_file
+    assert_recipe %q{
+      cat < source
+    } do
+      target.puts "cat"
+      chain :from, 'source'
     end
   end
   

@@ -123,6 +123,22 @@ module Linebook
         @handles ||= DEFAULT_HANDLES.dup
       end
       
+      # Assign a file descriptor.
+      def assign(target, source)
+        rstrip if chain?
+        target = handles[target] || target
+        target = nil if target == 0
+        source = handles[source] || source
+        #   <%= target %><<%= source.kind_of?(Fixnum) ? "&#{source}" : " #{source}" %>
+        #  
+        _erbout.concat " "; _erbout.concat(( target ).to_s); _erbout.concat "<"; _erbout.concat(( source.kind_of?(Fixnum) ? "&#{source}" : " #{source}" ).to_s); _erbout.concat "\n"
+        chain_proxy
+      end
+      
+      def _assign(*args, &block) # :nodoc:
+        capture { assign(*args, &block) }
+      end
+      
       # Adds a check that ensures the last exit status is as indicated. Note that no
       # check will be added unless check_status_function is added beforehand.
       def check_status(expect_status=0, fail_status='$?')
@@ -197,6 +213,17 @@ module Linebook
       
       def _export(*args, &block) # :nodoc:
         capture { export(*args, &block) }
+      end
+      
+      # Assigns stdin to the file.
+      # (path
+      def from()
+        assign(:stdin, path)
+        chain_proxy
+      end
+      
+      def _from(*args, &block) # :nodoc:
+        capture { from(*args, &block) }
       end
       
       # Makes a heredoc statement surrounding the contents of the block.  Options:
