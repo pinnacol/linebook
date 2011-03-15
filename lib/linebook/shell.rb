@@ -16,16 +16,12 @@ module Linebook
       super
     end
     
-    def log_dir
-      '/var/log/linecook'
-    end
-    
     def directory(target, options={})
       unless_ _directory?(target) do 
         mkdir_p target
       end 
       chmod options[:mode] || 755, target
-      chown options[:user], options[:group], target
+      chown options[:owner], options[:group], target
       chain_proxy
     end
     
@@ -62,17 +58,6 @@ module Linebook
       str
     end
     
-    def groupmod(name, options={})
-      execute 'groupmod', name, options
-      chain_proxy
-    end
-    
-    def _groupmod(*args, &block) # :nodoc:
-      str = capture_block { groupmod(*args, &block) }
-      str.strip!
-      str
-    end
-    
     def package(name, version=nil)
       raise NotImplementedError
       chain_proxy
@@ -92,8 +77,8 @@ module Linebook
         self.recipe_path(recipe_name, target_name)
       
       unless_ %{grep -xqs "#{recipe_name}" "#{runlist}"} do
-        writeln %{echo "#{recipe_name}" >> "#{runlist}"}
-        writeln %{"#{shell_path}" "#{recipe_path}" $*}
+        echo(recipe_name).append(runlist)
+        writeln "#{quote(recipe_path)} $*"
         check_status
       end
       chain_proxy

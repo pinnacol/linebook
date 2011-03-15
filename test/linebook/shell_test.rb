@@ -63,7 +63,7 @@ class ShellTest < Test::Unit::TestCase
   
   def test_directory_makes_the_target_directory
     setup_recipe do
-      writeln 'rm -r target'
+      rm_r 'target'
       directory 'target'
       writeln 'ls -la .'
     end
@@ -75,7 +75,7 @@ class ShellTest < Test::Unit::TestCase
   
   def test_directory_makes_parent_dirs_as_needed
     setup_recipe do
-      writeln 'rm -r target'
+      rm_r 'target'
       directory 'target/dir'
       writeln 'ls -la target'
     end
@@ -87,7 +87,7 @@ class ShellTest < Test::Unit::TestCase
   
   def test_directory_sets_mode
     setup_recipe do
-      writeln 'rm -r target'
+      rm_r 'target'
       directory 'target', :mode => 700
       writeln 'ls -la .'
     end
@@ -105,9 +105,9 @@ class ShellTest < Test::Unit::TestCase
     prepare('files/source/file.txt', "content\n")
     
     setup_recipe 'recipe' do
-      writeln 'rm -r target > /dev/null 2>&1'
+      rm_r('target').to(nil).redirect(2, 1)
       file 'source/file.txt', 'target/file.txt'
-      writeln 'cat target/file.txt'
+      cat 'target/file.txt'
     end
     
     assert_output_equal %{
@@ -127,9 +127,9 @@ class ShellTest < Test::Unit::TestCase
     prepare('templates/source/file.txt.erb', "got <%= key %>\n")
     
     setup_recipe 'recipe' do
-      writeln 'rm -r target > /dev/null 2>&1'
+      rm_r('target').to(nil).redirect(2, 1)
       template 'source/file.txt', 'target/file.txt', :locals => {:key => 'value'}
-      writeln 'cat target/file.txt'
+      cat 'target/file.txt'
     end
     
     assert_output_equal %{
@@ -221,14 +221,21 @@ class ShellTest < Test::Unit::TestCase
     }, *run_package('runlist' => runlist)
   end
   
-  #
-  # recipe test
-  #
+  def remote_dir
+    method_dir[(user_dir.length + 1)..-1]
+  end
   
-  def test_recipe_evals_recipe_into_recipe_file
-    prepare('recipes/child.rb') {|io| io << "write  'content'" }
+  def test_recipe_preserves_package_dir
+    prepare('recipes/source/recipe.rb', 'writeln "echo #{package_dir}"')
     
-    package.build_recipe('child')
-    assert_equal 'content', package.content('child')
+    setup_recipe do
+      echo package_dir
+      recipe 'source/recipe'
+    end
+    
+    assert_output_equal %{
+      /home/linecook/#{remote_dir}
+      /home/linecook/#{remote_dir}
+    }, *run_package
   end
 end

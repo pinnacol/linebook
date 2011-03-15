@@ -7,7 +7,7 @@
     self.recipe_path(recipe_name, target_name)
   
   unless_ %{grep -xqs "#{recipe_name}" "#{runlist}"} do
-    writeln %{echo "#{recipe_name}" >> "#{runlist}"}
-    writeln %{"#{shell_path}" "#{recipe_path}" $*}
+    echo(recipe_name).append(runlist)
+    writeln "#{quote(recipe_path)} $*"
     check_status
   end

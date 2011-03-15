@@ -11,7 +11,3 @@ def self.extended(base)
   
   super
 end
-
-def log_dir
-  '/var/log/linecook'
-end
