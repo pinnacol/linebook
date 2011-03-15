@@ -210,11 +210,15 @@ class LinuxTest < Test::Unit::TestCase
         echo 'hello $1'
       end
       login do
+        writeln "echo 'is defined: #{function?('say_hello').inspect}'"
         writeln "say_hello $(whoami)"
       end
     end
-  
-    assert_match(/command not found/, *run_package)
+    
+    assert_alike %{
+      is defined: false
+      :...: say_hello: command not found
+    }, *run_package
   end
   
   def test_nested_login
