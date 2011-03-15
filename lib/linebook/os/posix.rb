@@ -99,7 +99,7 @@ module Linebook
         end
         
         if body.nil?
-          body = "\n#{capture(false) { indent(&block) }.chomp("\n")}\n"
+          body = "\n#{capture_block { indent(&block) }.chomp("\n")}\n"
         end
         
         function = "#{name}() {#{body}}"
@@ -131,12 +131,15 @@ module Linebook
         source = handles[source] || source
         #   <%= target %><<%= source.kind_of?(Fixnum) ? "&#{source}" : " #{source}" %>
         #  
-        _erbout.concat " "; _erbout.concat(( target ).to_s); _erbout.concat "<"; _erbout.concat(( source.kind_of?(Fixnum) ? "&#{source}" : " #{source}" ).to_s); _erbout.concat "\n"
+        write " "; write(( target ).to_s); write "<"; write(( source.kind_of?(Fixnum) ? "&#{source}" : " #{source}" ).to_s); write "\n"
+      
         chain_proxy
       end
       
       def _assign(*args, &block) # :nodoc:
-        capture { assign(*args, &block) }
+        str = capture_block { assign(*args, &block) }
+        str.strip!
+        str
       end
       
       # Adds a check that ensures the last exit status is as indicated. Note that no
@@ -149,14 +152,16 @@ module Linebook
         #  
         #  <% end %>
         if @check_status 
-        _erbout.concat "check_status "; _erbout.concat(( expect_status ).to_s); _erbout.concat " $? "; _erbout.concat(( fail_status ).to_s); _erbout.concat " $LINENO\n"
-        _erbout.concat "\n"
-        end ;
+        write "check_status "; write(( expect_status ).to_s); write " $? "; write(( fail_status ).to_s); write " $LINENO\n"
+        write "\n"
+        end 
         chain_proxy
       end
       
       def _check_status(*args, &block) # :nodoc:
-        capture { check_status(*args, &block) }
+        str = capture_block { check_status(*args, &block) }
+        str.strip!
+        str
       end
       
       # Adds the check status function.
@@ -167,19 +172,24 @@ module Linebook
       end
       
       def _check_status_function(*args, &block) # :nodoc:
-        capture { check_status_function(*args, &block) }
+        str = capture_block { check_status_function(*args, &block) }
+        str.strip!
+        str
       end
       
       # Writes a comment.
       def comment(str)
         #  # <%= str %>
         #  
-        _erbout.concat "# "; _erbout.concat(( str ).to_s); _erbout.concat "\n"
+        write "# "; write(( str ).to_s); write "\n"
+      
         chain_proxy
       end
       
       def _comment(*args, &block) # :nodoc:
-        capture { comment(*args, &block) }
+        str = capture_block { comment(*args, &block) }
+        str.strip!
+        str
       end
       
       # Executes a command and checks the output status.  Quotes all non-option args
@@ -193,37 +203,43 @@ module Linebook
         #  <%= format_cmd(command, *args) %>
         #  
         #  <% check_status %>
-        _erbout.concat(( format_cmd(command, *args) ).to_s)
-        _erbout.concat "\n"
-        check_status ;
+        write(( format_cmd(command, *args) ).to_s)
+        write "\n"
+        check_status 
         chain_proxy
       end
       
       def _execute(*args, &block) # :nodoc:
-        capture { execute(*args, &block) }
+        str = capture_block { execute(*args, &block) }
+        str.strip!
+        str
       end
       
       # Exports a variable.
       def export(key, value)
         #  export <%= key %>=<%= quote(value) %>
         #  
-        _erbout.concat "export "; _erbout.concat(( key ).to_s); _erbout.concat "="; _erbout.concat(( quote(value) ).to_s); _erbout.concat "\n"
+        write "export "; write(( key ).to_s); write "="; write(( quote(value) ).to_s); write "\n"
+      
         chain_proxy
       end
       
       def _export(*args, &block) # :nodoc:
-        capture { export(*args, &block) }
+        str = capture_block { export(*args, &block) }
+        str.strip!
+        str
       end
       
       # Assigns stdin to the file.
-      # (path
-      def from()
+      def from(path)
         assign(:stdin, path)
         chain_proxy
       end
       
       def _from(*args, &block) # :nodoc:
-        capture { from(*args, &block) }
+        str = capture_block { from(*args, &block) }
+        str.strip!
+        str
       end
       
       # Makes a heredoc statement surrounding the contents of the block.  Options:
@@ -246,15 +262,18 @@ module Linebook
         #  <%= delimiter %><% end %>
         #  
         #  
-        _erbout.concat "<<"; _erbout.concat(( options[:outdent] ? '-' : ' ').to_s); _erbout.concat(( options[:quote] ? "\"#{delimiter}\"" : delimiter ).to_s);  outdent(" # :#{delimiter}:") do ; _erbout.concat "\n"
+        write "<<"; write(( options[:outdent] ? '-' : ' ').to_s); write(( options[:quote] ? "\"#{delimiter}\"" : delimiter ).to_s);  outdent(" # :#{delimiter}:") do ; write "\n"
         yield 
-        _erbout.concat(( delimiter ).to_s);  end 
-        _erbout.concat "\n"
+        write(( delimiter ).to_s);  end 
+        write "\n"
+      
         chain_proxy
       end
       
       def _heredoc(*args, &block) # :nodoc:
-        capture { heredoc(*args, &block) }
+        str = capture_block { heredoc(*args, &block) }
+        str.strip!
+        str
       end
       
       # Executes the block when the expression evaluates to a non-zero value.
@@ -264,7 +283,9 @@ module Linebook
       end
       
       def _not_if(*args, &block) # :nodoc:
-        capture { not_if(*args, &block) }
+        str = capture_block { not_if(*args, &block) }
+        str.strip!
+        str
       end
       
       # Executes the block when the expression evaluates to zero.
@@ -275,16 +296,19 @@ module Linebook
         #  fi
         #  
         #  
-        _erbout.concat "if "; _erbout.concat(( expression ).to_s); _erbout.concat "\n"
-        _erbout.concat "then\n"
+        write "if "; write(( expression ).to_s); write "\n"
+        write "then\n"
         indent { yield } 
-        _erbout.concat "fi\n"
-        _erbout.concat "\n"
+        write "fi\n"
+        write "\n"
+      
         chain_proxy
       end
       
       def _only_if(*args, &block) # :nodoc:
-        capture { only_if(*args, &block) }
+        str = capture_block { only_if(*args, &block) }
+        str.strip!
+        str
       end
       
       # Makes a redirect statement.
@@ -295,12 +319,15 @@ module Linebook
         target = handles[target] || target
         #   <%= source.nil? || source.kind_of?(Fixnum) ? source : "#{source} " %>><%= target.kind_of?(Fixnum) ? "&#{target}" : " #{target}" %>
         #  
-        _erbout.concat " "; _erbout.concat(( source.nil? || source.kind_of?(Fixnum) ? source : "#{source} " ).to_s); _erbout.concat ">"; _erbout.concat(( target.kind_of?(Fixnum) ? "&#{target}" : " #{target}" ).to_s); _erbout.concat "\n"
+        write " "; write(( source.nil? || source.kind_of?(Fixnum) ? source : "#{source} " ).to_s); write ">"; write(( target.kind_of?(Fixnum) ? "&#{target}" : " #{target}" ).to_s); write "\n"
+      
         chain_proxy
       end
       
       def _redirect(*args, &block) # :nodoc:
-        capture { redirect(*args, &block) }
+        str = capture_block { redirect(*args, &block) }
+        str.strip!
+        str
       end
       
       # Sets the options to on (true) or off (false) as specified.
@@ -310,13 +337,16 @@ module Linebook
         #  <% end %>
         #  
         options.keys.sort_by {|opt| opt.to_s }.each do |opt| 
-        _erbout.concat "set "; _erbout.concat(( options[opt] ? '-' : '+' ).to_s); _erbout.concat "o "; _erbout.concat(( opt ).to_s); _erbout.concat "\n"
-        end
+        write "set "; write(( options[opt] ? '-' : '+' ).to_s); write "o "; write(( opt ).to_s); write "\n"
+        end 
+      
         chain_proxy
       end
       
       def _set(*args, &block) # :nodoc:
-        capture { set(*args, &block) }
+        str = capture_block { set(*args, &block) }
+        str.strip!
+        str
       end
       
       # Adds a redirect of stdout to a file.
@@ -326,7 +356,9 @@ module Linebook
       end
       
       def _to(*args, &block) # :nodoc:
-        capture { to(*args, &block) }
+        str = capture_block { to(*args, &block) }
+        str.strip!
+        str
       end
       
       # Unsets a list of variables.
@@ -335,13 +367,15 @@ module Linebook
         #  unset <%= key %>
         #  <% end %>
         keys.each do |key| 
-        _erbout.concat "unset "; _erbout.concat(( key ).to_s); _erbout.concat "\n"
-        end ;
+        write "unset "; write(( key ).to_s); write "\n"
+        end 
         chain_proxy
       end
       
       def _unset(*args, &block) # :nodoc:
-        capture { unset(*args, &block) }
+        str = capture_block { unset(*args, &block) }
+        str.strip!
+        str
       end
       
       # Set a variable.
@@ -349,13 +383,16 @@ module Linebook
         #  <%= key %>=<%= quote(value) %>
         #  
         #  
-        _erbout.concat(( key ).to_s); _erbout.concat "="; _erbout.concat(( quote(value) ).to_s)
-        _erbout.concat "\n"
+        write(( key ).to_s); write "="; write(( quote(value) ).to_s)
+        write "\n"
+      
         chain_proxy
       end
       
       def _variable(*args, &block) # :nodoc:
-        capture { variable(*args, &block) }
+        str = capture_block { variable(*args, &block) }
+        str.strip!
+        str
       end
     end
   end

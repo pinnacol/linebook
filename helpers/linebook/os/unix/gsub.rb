@@ -5,4 +5,4 @@ Sets up a gsub using sed.
     args << {}
   end
   args.last[:e] = "s/#{pattern}/#{replacement}/g"
-  sed *args
+  sed(*args)

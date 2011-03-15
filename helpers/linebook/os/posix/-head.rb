@@ -95,7 +95,7 @@ def function(name, body=nil, &block)
   end
   
   if body.nil?
-    body = "\n#{capture(false) { indent(&block) }.chomp("\n")}\n"
+    body = "\n#{capture_block { indent(&block) }.chomp("\n")}\n"
   end
   
   function = "#{name}() {#{body}}"

@@ -22,7 +22,7 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
-  def test_redirect_treats_numbers_as_file_handles
+  def test_assign_treats_numbers_as_file_handles
     assert_recipe %q{
       exec <&3
     } do
@@ -31,7 +31,7 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
-  def test_redirect_allows_logical_names
+  def test_assign_allows_logical_names
     assert_recipe %q{
       exec 1<&2
     } do

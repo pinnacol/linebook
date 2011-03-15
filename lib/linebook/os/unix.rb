@@ -7,12 +7,14 @@ module Linebook
       include Posix
       
       def guess_target_name(source_name)
-        next_target_name File.join("#{target_name}.d", File.basename(source_name))
+        _package_.next_target_name File.join("#{target_name}.d", File.basename(source_name))
       end
       
       def close
-        unless closed?
-          section " (#{target_name}) "
+        unless closed? 
+          if @shebang ||= false
+            section " (#{target_name}) "
+          end
         end
         
         super
@@ -25,12 +27,14 @@ module Linebook
       end
       
       def _cat(*args, &block) # :nodoc:
-        capture { cat(*args, &block) }
+        str = capture_block { cat(*args, &block) }
+        str.strip!
+        str
       end
       
       def cd(dir=nil)
         if block_given?
-          var = next_variable_name('cd')
+          var = _package_.next_variable_name('cd')
           target.puts %{#{var}=$(pwd)}
         end
       
@@ -44,7 +48,9 @@ module Linebook
       end
       
       def _cd(*args, &block) # :nodoc:
-        capture { cd(*args, &block) }
+        str = capture_block { cd(*args, &block) }
+        str.strip!
+        str
       end
       
       # Makes a command to chmod a file or directory.  Provide the mode as the
@@ -59,7 +65,9 @@ module Linebook
       end
       
       def _chmod(*args, &block) # :nodoc:
-        capture { chmod(*args, &block) }
+        str = capture_block { chmod(*args, &block) }
+        str.strip!
+        str
       end
       
       # Makes a command to chown a file or directory.
@@ -71,7 +79,9 @@ module Linebook
       end
       
       def _chown(*args, &block) # :nodoc:
-        capture { chown(*args, &block) }
+        str = capture_block { chown(*args, &block) }
+        str.strip!
+        str
       end
       
       # Copy source to target.  Accepts a hash of command line options.
@@ -81,7 +91,9 @@ module Linebook
       end
       
       def _cp(*args, &block) # :nodoc:
-        capture { cp(*args, &block) }
+        str = capture_block { cp(*args, &block) }
+        str.strip!
+        str
       end
       
       # Copy source to target, with -f.
@@ -91,7 +103,9 @@ module Linebook
       end
       
       def _cp_f(*args, &block) # :nodoc:
-        capture { cp_f(*args, &block) }
+        str = capture_block { cp_f(*args, &block) }
+        str.strip!
+        str
       end
       
       # Copy source to target, with -r.
@@ -101,7 +115,9 @@ module Linebook
       end
       
       def _cp_r(*args, &block) # :nodoc:
-        capture { cp_r(*args, &block) }
+        str = capture_block { cp_r(*args, &block) }
+        str.strip!
+        str
       end
       
       # Copy source to target, with -rf.
@@ -111,7 +127,9 @@ module Linebook
       end
       
       def _cp_rf(*args, &block) # :nodoc:
-        capture { cp_rf(*args, &block) }
+        str = capture_block { cp_rf(*args, &block) }
+        str.strip!
+        str
       end
       
       # Returns the current system time.  A format string may be provided, as well as
@@ -126,17 +144,21 @@ module Linebook
       end
       
       def _date(*args, &block) # :nodoc:
-        capture { date(*args, &block) }
+        str = capture_block { date(*args, &block) }
+        str.strip!
+        str
       end
       
       def directory?(path)
         #  [ -d "<%= path %>" ]
-        _erbout.concat "[ -d \""; _erbout.concat(( path ).to_s); _erbout.concat "\" ]";
+        write "[ -d \""; write(( path ).to_s); write "\" ]"
         chain_proxy
       end
       
       def _directory?(*args, &block) # :nodoc:
-        capture { directory?(*args, &block) }
+        str = capture_block { directory?(*args, &block) }
+        str.strip!
+        str
       end
       
       # Echo the args.
@@ -146,27 +168,33 @@ module Linebook
       end
       
       def _echo(*args, &block) # :nodoc:
-        capture { echo(*args, &block) }
+        str = capture_block { echo(*args, &block) }
+        str.strip!
+        str
       end
       
       def exists?(path)
         #  [ -e "<%= path %>" ]
-        _erbout.concat "[ -e \""; _erbout.concat(( path ).to_s); _erbout.concat "\" ]";
+        write "[ -e \""; write(( path ).to_s); write "\" ]"
         chain_proxy
       end
       
       def _exists?(*args, &block) # :nodoc:
-        capture { exists?(*args, &block) }
+        str = capture_block { exists?(*args, &block) }
+        str.strip!
+        str
       end
       
       def file?(path)
         #  [ -f "<%= path %>" ]
-        _erbout.concat "[ -f \""; _erbout.concat(( path ).to_s); _erbout.concat "\" ]";
+        write "[ -f \""; write(( path ).to_s); write "\" ]"
         chain_proxy
       end
       
       def _file?(*args, &block) # :nodoc:
-        capture { file?(*args, &block) }
+        str = capture_block { file?(*args, &block) }
+        str.strip!
+        str
       end
       
       # Sets up a gsub using sed.
@@ -175,12 +203,14 @@ module Linebook
           args << {}
         end
         args.last[:e] = "s/#{pattern}/#{replacement}/g"
-        sed *args
+        sed(*args)
         chain_proxy
       end
       
       def _gsub(*args, &block) # :nodoc:
-        capture { gsub(*args, &block) }
+        str = capture_block { gsub(*args, &block) }
+        str.strip!
+        str
       end
       
       # Link source to target.  Accepts a hash of command line options.
@@ -190,7 +220,9 @@ module Linebook
       end
       
       def _ln(*args, &block) # :nodoc:
-        capture { ln(*args, &block) }
+        str = capture_block { ln(*args, &block) }
+        str.strip!
+        str
       end
       
       # Copy source to target, with -s.
@@ -200,7 +232,9 @@ module Linebook
       end
       
       def _ln_s(*args, &block) # :nodoc:
-        capture { ln_s(*args, &block) }
+        str = capture_block { ln_s(*args, &block) }
+        str.strip!
+        str
       end
       
       # Make a directory.  Accepts a hash of command line options.
@@ -210,7 +244,9 @@ module Linebook
       end
       
       def _mkdir(*args, &block) # :nodoc:
-        capture { mkdir(*args, &block) }
+        str = capture_block { mkdir(*args, &block) }
+        str.strip!
+        str
       end
       
       # Make a directory, and parent directories as needed.
@@ -220,7 +256,9 @@ module Linebook
       end
       
       def _mkdir_p(*args, &block) # :nodoc:
-        capture { mkdir_p(*args, &block) }
+        str = capture_block { mkdir_p(*args, &block) }
+        str.strip!
+        str
       end
       
       # Move source to target.  Accepts a hash of command line options.
@@ -230,7 +268,9 @@ module Linebook
       end
       
       def _mv(*args, &block) # :nodoc:
-        capture { mv(*args, &block) }
+        str = capture_block { mv(*args, &block) }
+        str.strip!
+        str
       end
       
       # Move source to target, with -f.
@@ -240,7 +280,9 @@ module Linebook
       end
       
       def _mv_f(*args, &block) # :nodoc:
-        capture { mv_f(*args, &block) }
+        str = capture_block { mv_f(*args, &block) }
+        str.strip!
+        str
       end
       
       # Unlink a file.  Accepts a hash of command line options.
@@ -250,7 +292,9 @@ module Linebook
       end
       
       def _rm(*args, &block) # :nodoc:
-        capture { rm(*args, &block) }
+        str = capture_block { rm(*args, &block) }
+        str.strip!
+        str
       end
       
       # Unlink a file or directory, with -r.
@@ -260,7 +304,9 @@ module Linebook
       end
       
       def _rm_r(*args, &block) # :nodoc:
-        capture { rm_r(*args, &block) }
+        str = capture_block { rm_r(*args, &block) }
+        str.strip!
+        str
       end
       
       # Unlink a file or directory, with -rf.
@@ -270,7 +316,9 @@ module Linebook
       end
       
       def _rm_rf(*args, &block) # :nodoc:
-        capture { rm_rf(*args, &block) }
+        str = capture_block { rm_rf(*args, &block) }
+        str.strip!
+        str
       end
       
       def section(comment="")
@@ -278,12 +326,15 @@ module Linebook
         str = "-" * n
         #  #<%= str %><%= comment %><%= str %><%= "-" if comment.length % 2 == 1 %>
         #  
-        _erbout.concat "#"; _erbout.concat(( str ).to_s); _erbout.concat(( comment ).to_s); _erbout.concat(( str ).to_s); _erbout.concat(( "-" if comment.length % 2 == 1 ).to_s); _erbout.concat "\n"
+        write "#"; write(( str ).to_s); write(( comment ).to_s); write(( str ).to_s); write(( "-" if comment.length % 2 == 1 ).to_s); write "\n"
+      
         chain_proxy
       end
       
       def _section(*args, &block) # :nodoc:
-        capture { section(*args, &block) }
+        str = capture_block { section(*args, &block) }
+        str.strip!
+        str
       end
       
       # Execute sed.
@@ -293,14 +344,16 @@ module Linebook
       end
       
       def _sed(*args, &block) # :nodoc:
-        capture { sed(*args, &block) }
+        str = capture_block { sed(*args, &block) }
+        str.strip!
+        str
       end
       
       # Sets the options to on (true) or off (false) as specified.  If a block is
       # given then options will only be reset when the block completes.
       def set(options)
         if block_given?
-          var = next_variable_name('set')
+          var = _package_.next_variable_name('set')
           patterns = options.keys.collect {|key| "-e #{key}" }.sort
           target.puts %{#{var}=$(set +o | grep #{patterns.join(' ')})}
         end
@@ -315,23 +368,28 @@ module Linebook
       end
       
       def _set(*args, &block) # :nodoc:
-        capture { set(*args, &block) }
+        str = capture_block { set(*args, &block) }
+        str.strip!
+        str
       end
       
       # Sets the system time.  Must be root for this to succeed.
       def set_date(time=Time.now) 
         #  date -u <%= time.dup.utc.strftime("%m%d%H%M%Y.%S") %>
         #  <% check_status %>
-        _erbout.concat "date -u "; _erbout.concat(( time.dup.utc.strftime("%m%d%H%M%Y.%S") ).to_s); _erbout.concat "\n"
-        check_status ;
+        write "date -u "; write(( time.dup.utc.strftime("%m%d%H%M%Y.%S") ).to_s); write "\n"
+        check_status 
         chain_proxy
       end
       
       def _set_date(*args, &block) # :nodoc:
-        capture { set_date(*args, &block) }
+        str = capture_block { set_date(*args, &block) }
+        str.strip!
+        str
       end
       
       def shebang(program='/bin/sh', options={})
+        @shebang = true
         #  #!<%= program %>
         #  <% section %>
         #  
@@ -360,38 +418,41 @@ module Linebook
         #  <% section " #{target_name} " %>
         #  
         #  
-        _erbout.concat "#!"; _erbout.concat(( program ).to_s); _erbout.concat "\n"
+        write "#!"; write(( program ).to_s); write "\n"
         section 
-        _erbout.concat "\n"
-        _erbout.concat "usage=\"usage: %s: [-h]\\n\"\n"
-        _erbout.concat "while getopts \"h\" opt\n"
-        _erbout.concat "do\n"
-        _erbout.concat "  case $opt in\n"
-        _erbout.concat "  h  )  printf \"$usage\" $0\n"
-        _erbout.concat "        printf \"       %s   %s\\n\" \"-h\" \"prints this help\"\n"
-        _erbout.concat "        exit 0 ;;\n"
-        _erbout.concat "  \\? )  printf \"$usage\" $0\n"
-        _erbout.concat "        exit 2 ;;\n"
-        _erbout.concat "  esac\n"
-        _erbout.concat "done\n"
-        _erbout.concat "shift $(($OPTIND - 1))\n"
-        _erbout.concat "\n"
+        write "\n"
+        write "usage=\"usage: %s: [-h]\\n\"\n"
+        write "while getopts \"h\" opt\n"
+        write "do\n"
+        write "  case $opt in\n"
+        write "  h  )  printf \"$usage\" $0\n"
+        write "        printf \"       %s   %s\\n\" \"-h\" \"prints this help\"\n"
+        write "        exit 0 ;;\n"
+        write "  \\? )  printf \"$usage\" $0\n"
+        write "        exit 2 ;;\n"
+        write "  esac\n"
+        write "done\n"
+        write "shift $(($OPTIND - 1))\n"
+        write "\n"
         check_status_function 
         yield if block_given? 
-        _erbout.concat "\n"
+        write "\n"
         if options[:info] 
-        _erbout.concat "echo >&2\n"
-        _erbout.concat "echo \"###############################################################################\" >&2\n"
-        _erbout.concat "echo \"# $(whoami)@$(hostname):$(pwd):$0\" >&2\n"
-        _erbout.concat "\n"
+        write "echo >&2\n"
+        write "echo \"###############################################################################\" >&2\n"
+        write "echo \"# $(whoami)@$(hostname):$(pwd):$0\" >&2\n"
+        write "\n"
         end 
         section " #{target_name} " 
-        _erbout.concat "\n"
+        write "\n"
+      
         chain_proxy
       end
       
       def _shebang(*args, &block) # :nodoc:
-        capture { shebang(*args, &block) }
+        str = capture_block { shebang(*args, &block) }
+        str.strip!
+        str
       end
     end
   end

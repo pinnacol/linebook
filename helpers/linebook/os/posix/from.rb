@@ -1,4 +1,4 @@
 Assigns stdin to the file.
-(path
+(path)
 --
   assign(:stdin, path)

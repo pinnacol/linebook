@@ -3,7 +3,7 @@ given then options will only be reset when the block completes.
 (options)
 --
   if block_given?
-    var = next_variable_name('set')
+    var = _package_.next_variable_name('set')
     patterns = options.keys.collect {|key| "-e #{key}" }.sort
     target.puts %{#{var}=$(set +o | grep #{patterns.join(' ')})}
   end

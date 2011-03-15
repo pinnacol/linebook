@@ -1,7 +1,7 @@
 (dir=nil)
 --
   if block_given?
-    var = next_variable_name('cd')
+    var = _package_.next_variable_name('cd')
     target.puts %{#{var}=$(pwd)}
   end
 
