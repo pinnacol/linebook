@@ -112,4 +112,10 @@ def function(name, body=nil, &block)
   name
 end
 
+# Returns true if the function is defined.
+def function?(name)
+  declaration = "#{name}()"
+  functions.any? {|func| func.index(declaration) == 0 }
+end
+
 CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/

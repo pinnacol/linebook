@@ -116,6 +116,12 @@ module Linebook
         name
       end
       
+      # Returns true if the function is defined.
+      def function?(name)
+        declaration = "#{name}()"
+        functions.any? {|func| func.index(declaration) == 0 }
+      end
+      
       CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
       
       # Adds a redirect to append stdout to a file.
@@ -133,13 +139,11 @@ module Linebook
       # Adds a check that ensures the last exit status is as indicated. Note that no
       # check will be added unless check_status_function is added beforehand.
       def check_status(expect_status=0, fail_status='$?')
-        @check_status ||= false
-        
-        #  <% if @check_status %>
+        #  <% if function?('check_status') %>
         #  check_status <%= expect_status %> $? <%= fail_status %> $LINENO
         #  
         #  <% end %>
-        if @check_status 
+        if function?('check_status') 
         write "check_status "; write(( expect_status ).to_s); write " $? "; write(( fail_status ).to_s); write " $LINENO\n"
         write "\n"
         end 
@@ -154,7 +158,6 @@ module Linebook
       
       # Adds the check status function.
       def check_status_function()
-        @check_status = true
         function 'check_status', ' if [ $2 -ne $1 ]; then echo "[$2] $0:${4:-?}"; exit $3; else return $2; fi '
         chain_proxy
       end
