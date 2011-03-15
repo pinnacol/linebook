@@ -197,8 +197,7 @@ module Linebook
       # into command line options.
       def execute(command, *args)
         if chain?
-          rstrip
-          target << ' | '
+          rewrite(/\s*(\ncheck_status.*?\n\s*)?\z/) {|match| ' | ' }
         end
         #  <%= format_cmd(command, *args) %>
         #  

@@ -3,8 +3,7 @@ that aren't already quoted. Accepts a trailing hash which will be transformed
 into command line options.
 (command, *args)
   if chain?
-    rstrip
-    target << ' | '
+    rewrite(/\s*(\ncheck_status.*?\n\s*)?\z/) {|match| ' | ' }
   end
 --
 <%= format_cmd(command, *args) %>

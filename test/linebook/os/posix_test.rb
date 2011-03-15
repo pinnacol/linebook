@@ -331,6 +331,38 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
+  def test_execute_chains_work_with_check_status
+    assert_recipe_matches %q{
+      cat file | grep a | grep b
+      check_status 0 $? $? $LINENO
+      
+      ls "$path" | grep c
+      check_status 0 $? $? $LINENO
+      
+    } do
+      check_status_function
+      execute('cat file').execute('grep a').execute('grep b')
+      execute('ls', '$path').execute('grep c')
+    end
+  end
+  
+  def test_execute_chains_work_with_indent
+    assert_recipe_matches %q{
+      out
+        a | b | c
+        check_status 0 $? $? $LINENO
+        
+      out
+    } do
+      check_status_function
+      writeln "out"
+      indent do
+        execute('a').execute('b').execute('c')
+      end
+      writeln "out"
+    end
+  end
+  
   #
   # export test
   #
