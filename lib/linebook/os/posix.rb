@@ -276,19 +276,19 @@ module Linebook
       end
       
       # Executes the block when the expression evaluates to a non-zero value.
-      def not_if(expression, &block)
-        only_if("! #{expression}", &block)
+      def unless_(expression, &block)
+        if_("! #{expression}", &block)
         chain_proxy
       end
       
-      def _not_if(*args, &block) # :nodoc:
-        str = capture_block { not_if(*args, &block) }
+      def _unless_(*args, &block) # :nodoc:
+        str = capture_block { unless_(*args, &block) }
         str.strip!
         str
       end
       
       # Executes the block when the expression evaluates to zero.
-      def only_if(expression)
+      def if_(expression)
         #  if <%= expression %>
         #  then
         #  <% indent { yield } %>
@@ -304,8 +304,8 @@ module Linebook
         chain_proxy
       end
       
-      def _only_if(*args, &block) # :nodoc:
-        str = capture_block { only_if(*args, &block) }
+      def _if_(*args, &block) # :nodoc:
+        str = capture_block { if_(*args, &block) }
         str.strip!
         str
       end

@@ -45,7 +45,7 @@ module Linebook
     end
     
     def directory(target, options={})
-      not_if _directory?(target) do 
+      unless_ _directory?(target) do 
         mkdir_p target
       end 
       chmod options[:mode] || 755, target
@@ -73,7 +73,7 @@ module Linebook
     end
     
     def group(name, options={})
-      not_if _group?(name) do
+      unless_ _group?(name) do
         groupadd name
       end
       chain_proxy
@@ -99,7 +99,7 @@ module Linebook
     # Installs a file
     def install(source, target, options={})
       nest_opts(options[:backup], :mv => true) do |opts|
-        only_if _file?(target) do
+        if_ _file?(target) do
           backup target, opts
         end
       end
@@ -138,7 +138,7 @@ module Linebook
         target_path(target_name) : 
         self.recipe_path(recipe_name, target_name)
       
-      not_if %{grep -xqs "#{recipe_name}" "#{runlist}"} do
+      unless_ %{grep -xqs "#{recipe_name}" "#{runlist}"} do
         target.puts %{echo "#{recipe_name}" >> "#{runlist}"}
         target.puts %{"#{shell_path}" "#{recipe_path}" $*}
         check_status
@@ -167,7 +167,7 @@ module Linebook
     end
     
     def user(name, options={})
-      not_if _user?(name) do
+      unless_ _user?(name) do
         useradd name
       end
       

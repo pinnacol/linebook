@@ -538,25 +538,25 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
-  # not_if test
+  # unless_ test
   #
   
-  def test_not_if_reverses_condition
+  def test_unless__reverses_condition
     assert_recipe %q{
       if ! condition
       then
       fi
       
     } do
-      not_if('condition') {}
+      unless_('condition') {}
     end
   end
   
   #
-  # only_if test
+  # if_ test
   #
   
-  def test_only_if_encapsulates_block_in_if_statement
+  def test_if__encapsulates_block_in_if_statement
     assert_recipe %q{
       if condition
       then
@@ -564,7 +564,7 @@ class PosixTest < Test::Unit::TestCase
       fi
       
     } do
-      only_if('condition') { target << 'content' }
+      if_('condition') { target << 'content' }
     end
   end
   

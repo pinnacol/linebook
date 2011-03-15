@@ -1,6 +1,6 @@
 (name, options={})
 --
-  not_if _user?(name) do
+  unless_ _user?(name) do
     useradd name
   end
   

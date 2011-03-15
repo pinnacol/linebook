@@ -56,13 +56,13 @@ class LinuxTest < Test::Unit::TestCase
     
     setup_recipe do
       login do
-        only_if _group?(TEST_GROUP) do
+        if_ _group?(TEST_GROUP) do
           target.puts "exit 1"
         end
         
         groupadd TEST_GROUP
         
-        not_if _group?(TEST_GROUP) do
+        unless_ _group?(TEST_GROUP) do
           target.puts "exit 1"
         end
       end
@@ -81,11 +81,11 @@ class LinuxTest < Test::Unit::TestCase
     
     setup_recipe do
       login do
-        not_if _group?("$(id -ng $(whoami))") do
+        unless_ _group?("$(id -ng $(whoami))") do
           target.puts "exit 1"
         end
         
-        only_if _group?(TEST_GROUP) do
+        if_ _group?(TEST_GROUP) do
           target.puts "exit 1"
         end
       end
@@ -106,13 +106,13 @@ class LinuxTest < Test::Unit::TestCase
       login do
         target.puts "groupadd #{TEST_GROUP}"
         
-        not_if _group?(TEST_GROUP) do
+        unless_ _group?(TEST_GROUP) do
           target.puts "exit 1"
         end
         
         groupdel TEST_GROUP
         
-        only_if _group?(TEST_GROUP) do
+        if_ _group?(TEST_GROUP) do
           target.puts "exit 1"
         end
       end
@@ -293,13 +293,13 @@ class LinuxTest < Test::Unit::TestCase
     
     setup_recipe do
       login do
-        only_if _user?(TEST_USER) do
+        if_ _user?(TEST_USER) do
           target.puts "exit 1"
         end
         
         useradd TEST_USER
         
-        not_if _user?(TEST_USER) do
+        unless_ _user?(TEST_USER) do
           target.puts "exit 1"
         end
       end
@@ -318,11 +318,11 @@ class LinuxTest < Test::Unit::TestCase
     
     setup_recipe do
       login do
-        not_if _user?("$(whoami)") do
+        unless_ _user?("$(whoami)") do
           target.puts "exit 1"
         end
         
-        only_if _user?(TEST_USER) do
+        if_ _user?(TEST_USER) do
           target.puts "exit 1"
         end
       end
@@ -343,13 +343,13 @@ class LinuxTest < Test::Unit::TestCase
       login do
         target.puts "useradd #{TEST_USER}"
         
-        not_if _user?(TEST_USER) do
+        unless_ _user?(TEST_USER) do
           target.puts "exit 1"
         end
         
         userdel TEST_USER
         
-        only_if _user?(TEST_USER) do
+        if_ _user?(TEST_USER) do
           target.puts "exit 1"
         end
       end
