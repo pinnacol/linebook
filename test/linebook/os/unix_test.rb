@@ -16,9 +16,9 @@ class UnixTest < Test::Unit::TestCase
   def test_cat_allows_chaining
     setup_recipe do
       cat.heredoc do
-        target.puts "a"
-        target.puts "b"
-        target.puts "c"
+        writeln "a"
+        writeln "b"
+        writeln "c"
       end
     end
     
@@ -35,9 +35,9 @@ class UnixTest < Test::Unit::TestCase
   
   def test_cd_changes_dir
     setup_recipe do
-      target.puts 'pwd'
+      writeln 'pwd'
       cd '/tmp'
-      target.puts 'pwd'
+      writeln 'pwd'
     end
     
     assert_output_equal %{
@@ -48,13 +48,13 @@ class UnixTest < Test::Unit::TestCase
   
   def test_cd_changes_dir_for_duration_of_a_block_if_given
     setup_recipe do
-      target.puts 'pwd'
+      writeln 'pwd'
       cd '/tmp' do
-        target.puts 'pwd'
+        writeln 'pwd'
         cd '/var'
-        target.puts 'pwd'
+        writeln 'pwd'
       end
-      target.puts 'pwd'
+      writeln 'pwd'
     end
     
     assert_output_equal %{
@@ -71,11 +71,11 @@ class UnixTest < Test::Unit::TestCase
   
   def test_chomd_chmods_a_file
     setup_recipe do
-      target.puts 'touch file'
-      target.puts 'chmod 644 file'
-      target.puts 'ls -la file'
+      writeln 'touch file'
+      writeln 'chmod 644 file'
+      writeln 'ls -la file'
       chmod '600', 'file'
-      target.puts 'ls -la file'
+      writeln 'ls -la file'
     end
     
     assert_alike %{
@@ -153,11 +153,11 @@ class UnixTest < Test::Unit::TestCase
   def test_date_prints_date_in_specified_format
     setup_recipe do
       path = capture_path('set_date.sh') do
-        target.puts "date 031008301979"
+        writeln "date 031008301979"
       end
       
-      target.puts %{chmod +x "#{path}"}
-      target.puts %{su root "#{path}" > /dev/null}
+      writeln %{chmod +x "#{path}"}
+      writeln %{su root "#{path}" > /dev/null}
       date "%Y-%m-%d %H:%M"
     end
     
@@ -185,8 +185,8 @@ class UnixTest < Test::Unit::TestCase
   def test_gsub_makes_the_substitution_on_all_lines_of_the_input
     setup_recipe do
       gsub('a', 'A').heredoc do
-        target.puts 'a b a b'
-        target.puts 'b a b a'
+        writeln 'a b a b'
+        writeln 'b a b a'
       end
     end
     
@@ -262,10 +262,10 @@ class UnixTest < Test::Unit::TestCase
   
   def test_rm_removes_a_file
     setup_recipe do
-      target.puts 'touch file'
+      writeln 'touch file'
       rm 'file'
       
-      target.puts 'if ! [ -e file ]; then echo success; fi'
+      writeln 'if ! [ -e file ]; then echo success; fi'
     end
     
     assert_output_equal %{
@@ -303,12 +303,12 @@ class UnixTest < Test::Unit::TestCase
   
   def test_set_sets_options_for_the_duration_of_a_block
     setup_recipe do
-      target.puts 'set -v'
-      target.puts 'echo a'
+      writeln 'set -v'
+      writeln 'echo a'
       set(:verbose => false, :xtrace => false) do
-        target.puts 'echo b'
+        writeln 'echo b'
       end
-      target.puts 'echo c'
+      writeln 'echo c'
     end
     
     # the number of set operations echoed is a little unpredicatable
@@ -336,9 +336,9 @@ class UnixTest < Test::Unit::TestCase
         set_date time
       end
       
-      target.puts %{chmod +x "#{path}"}
-      target.puts %{su root "#{path}" > /dev/null}
-      target.puts "date '+%Y-%m-%d %H:%M'"
+      writeln %{chmod +x "#{path}"}
+      writeln %{su root "#{path}" > /dev/null}
+      writeln "date '+%Y-%m-%d %H:%M'"
     end
     
     assert_output_equal %{
@@ -354,9 +354,9 @@ class UnixTest < Test::Unit::TestCase
         set_date time.dup.utc
       end
       
-      target.puts %{chmod +x "#{path}"}
-      target.puts %{su root "#{path}" > /dev/null}
-      target.puts "date '+%Y-%m-%d %H:%M'"
+      writeln %{chmod +x "#{path}"}
+      writeln %{su root "#{path}" > /dev/null}
+      writeln "date '+%Y-%m-%d %H:%M'"
     end
     
     assert_output_equal %{

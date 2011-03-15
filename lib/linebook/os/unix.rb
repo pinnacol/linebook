@@ -35,7 +35,7 @@ module Linebook
       def cd(dir=nil)
         if block_given?
           var = _package_.next_variable_name('cd')
-          target.puts %{#{var}=$(pwd)}
+          writeln %{#{var}=$(pwd)}
         end
       
         execute "cd", dir
@@ -355,14 +355,14 @@ module Linebook
         if block_given?
           var = _package_.next_variable_name('set')
           patterns = options.keys.collect {|key| "-e #{key}" }.sort
-          target.puts %{#{var}=$(set +o | grep #{patterns.join(' ')})}
+          writeln %{#{var}=$(set +o | grep #{patterns.join(' ')})}
         end
       
         super
       
         if block_given?
           yield
-          target.puts %{eval "$#{var}"}
+          writeln %{eval "$#{var}"}
         end
         chain_proxy
       end

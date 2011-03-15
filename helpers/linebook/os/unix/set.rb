@@ -5,12 +5,12 @@ given then options will only be reset when the block completes.
   if block_given?
     var = _package_.next_variable_name('set')
     patterns = options.keys.collect {|key| "-e #{key}" }.sort
-    target.puts %{#{var}=$(set +o | grep #{patterns.join(' ')})}
+    writeln %{#{var}=$(set +o | grep #{patterns.join(' ')})}
   end
 
   super
 
   if block_given?
     yield
-    target.puts %{eval "$#{var}"}
+    writeln %{eval "$#{var}"}
   end

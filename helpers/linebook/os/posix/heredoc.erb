@@ -7,7 +7,7 @@ Makes a heredoc statement surrounding the contents of the block.  Options:
 (options={})
   if chain?
     rstrip
-    target << ' '
+    write  ' '
   end
   
   delimiter = options[:delimiter] || begin

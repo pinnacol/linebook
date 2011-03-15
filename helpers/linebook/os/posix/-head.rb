@@ -107,7 +107,7 @@ def function(name, body=nil, &block)
   end
   
   functions << function
-  target.puts function
+  writeln function
   
   name
 end

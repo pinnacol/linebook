@@ -1,5 +1,4 @@
 (user, options={})
-  sep = options[:sep]
 --
-id -Gn <%= quote(user) %><% if sep %> | sed "s/ /<%= sep %>/g"<% end %>
+id -Gn <%= quote(user) %>
 

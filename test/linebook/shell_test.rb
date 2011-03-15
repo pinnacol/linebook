@@ -87,9 +87,9 @@ class ShellTest < Test::Unit::TestCase
   
   def test_directory_makes_the_target_directory
     setup_recipe do
-      target.puts 'rm -r target'
+      writeln 'rm -r target'
       directory 'target'
-      target.puts 'ls -la .'
+      writeln 'ls -la .'
     end
     
     assert_alike %{
@@ -99,9 +99,9 @@ class ShellTest < Test::Unit::TestCase
   
   def test_directory_makes_parent_dirs_as_needed
     setup_recipe do
-      target.puts 'rm -r target'
+      writeln 'rm -r target'
       directory 'target/dir'
-      target.puts 'ls -la target'
+      writeln 'ls -la target'
     end
     
     assert_alike %{
@@ -111,9 +111,9 @@ class ShellTest < Test::Unit::TestCase
   
   def test_directory_sets_mod
     setup_recipe do
-      target.puts 'rm -r target'
+      writeln 'rm -r target'
       directory 'target', :mode => 700
-      target.puts 'ls -la .'
+      writeln 'ls -la .'
     end
     
     assert_alike %{
@@ -129,9 +129,9 @@ class ShellTest < Test::Unit::TestCase
     prepare('files/source/file.txt', "content\n")
     
     setup_recipe 'recipe' do
-      target.puts 'rm -r target > /dev/null 2>&1'
+      writeln 'rm -r target > /dev/null 2>&1'
       file 'source/file.txt', 'target/file.txt'
-      target.puts 'cat target/file.txt'
+      writeln 'cat target/file.txt'
     end
     
     assert_output_equal %{
@@ -151,9 +151,9 @@ class ShellTest < Test::Unit::TestCase
     prepare('templates/source/file.txt.erb', "got <%= key %>\n")
     
     setup_recipe 'recipe' do
-      target.puts 'rm -r target > /dev/null 2>&1'
+      writeln 'rm -r target > /dev/null 2>&1'
       template 'source/file.txt', 'target/file.txt', :locals => {:key => 'value'}
-      target.puts 'cat target/file.txt'
+      writeln 'cat target/file.txt'
     end
     
     assert_output_equal %{
@@ -170,7 +170,7 @@ class ShellTest < Test::Unit::TestCase
   #
   
   def test_recipe_builds_and_executes_recipe
-    prepare('recipes/source/recipe.rb', "target.puts 'echo success'")
+    prepare('recipes/source/recipe.rb', "writeln 'echo success'")
     
     setup_recipe do
       recipe 'source/recipe'
@@ -186,7 +186,7 @@ class ShellTest < Test::Unit::TestCase
   end
   
   def test_recipe_only_builds_once
-    prepare('recipes/source/recipe.rb', "target.puts 'echo success'")
+    prepare('recipes/source/recipe.rb', "writeln 'echo success'")
     
     setup_recipe 'a' do
       recipe 'source/recipe'
@@ -205,15 +205,15 @@ class ShellTest < Test::Unit::TestCase
   end
   
   def test_recipe_only_runs_once
-    prepare('recipes/source/recipe.rb', "target.puts 'echo success'")
+    prepare('recipes/source/recipe.rb', "writeln 'echo success'")
     
     setup_recipe 'a' do
-      target.puts "echo a"
+      writeln "echo a"
       recipe 'source/recipe'
     end
     
     setup_recipe 'b' do
-      target.puts "echo b"
+      writeln "echo b"
       recipe 'source/recipe'
     end
     
@@ -225,15 +225,15 @@ class ShellTest < Test::Unit::TestCase
   end
   
   def test_recipe_can_be_run_from_any_file_that_declares_it
-    prepare('recipes/source/recipe.rb', "target.puts 'echo success'")
+    prepare('recipes/source/recipe.rb', "writeln 'echo success'")
     
     setup_recipe 'a' do
-      target.puts "echo a"
+      writeln "echo a"
       recipe 'source/recipe'
     end
     
     setup_recipe 'b' do
-      target.puts "echo b"
+      writeln "echo b"
       recipe 'source/recipe'
     end
     
@@ -251,12 +251,12 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_copies_source_to_target
     setup_recipe 'recipe' do
-      target.puts "cd #{package_dir}"
-      target.puts 'echo content > source'
+      writeln "cd #{package_dir}"
+      writeln 'echo content > source'
       
       install 'source', 'target'
       
-      target.puts 'cat target'
+      writeln 'cat target'
     end
     
     assert_output_equal %{
@@ -266,14 +266,14 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_backs_up_existing_target
     setup_recipe 'recipe' do
-      target.puts "cd #{package_dir}"
-      target.puts 'echo new > source'
-      target.puts 'echo old > target'
+      writeln "cd #{package_dir}"
+      writeln 'echo new > source'
+      writeln 'echo old > target'
       
       install 'source', 'target'
       
-      target.puts 'cat target.bak'
-      target.puts 'cat target'
+      writeln 'cat target.bak'
+      writeln 'cat target'
     end
     
     assert_output_equal %{
@@ -284,13 +284,13 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_can_turn_off_backup
     setup_recipe 'recipe' do
-      target.puts "cd #{package_dir}"
-      target.puts 'echo new > source'
-      target.puts 'echo old > target'
+      writeln "cd #{package_dir}"
+      writeln 'echo new > source'
+      writeln 'echo old > target'
       
       install 'source', 'target', :backup => false
       
-      target.puts 'if ! [ -e target.bak ]; then echo pass; fi'
+      writeln 'if ! [ -e target.bak ]; then echo pass; fi'
     end
     
     assert_output_equal %{
@@ -300,11 +300,11 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_makes_parent_dirs_as_needed
     setup_recipe do
-      target.puts "cd #{package_dir}"
-      target.puts 'echo content > source'
+      writeln "cd #{package_dir}"
+      writeln 'echo content > source'
       install 'source', 'target/file'
       
-      target.puts 'ls -la .'
+      writeln 'ls -la .'
     end
     
     assert_alike %{
@@ -314,11 +314,11 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_allows_passing_options_to_directory
     setup_recipe do
-      target.puts "cd #{package_dir}"
-      target.puts 'echo content > source'
+      writeln "cd #{package_dir}"
+      writeln 'echo content > source'
       install 'source', 'target/file', :directory => {:mode => 700}
       
-      target.puts 'ls -la .'
+      writeln 'ls -la .'
     end
     
     assert_alike %{
@@ -328,10 +328,10 @@ class ShellTest < Test::Unit::TestCase
   
   def test_install_sets_mode
     setup_recipe do
-      target.puts "cd #{package_dir}"
-      target.puts 'echo content > source'
+      writeln "cd #{package_dir}"
+      writeln 'echo content > source'
       install 'source', 'target', :mode => 600
-      target.puts 'ls -la .'
+      writeln 'ls -la .'
     end
     
     assert_alike %{
@@ -344,7 +344,7 @@ class ShellTest < Test::Unit::TestCase
   #
   
   def test_recipe_evals_recipe_into_recipe_file
-    prepare('recipes/child.rb') {|io| io << "target << 'content'" }
+    prepare('recipes/child.rb') {|io| io << "write  'content'" }
     
     package.build_recipe('child')
     assert_equal 'content', package.content('child')

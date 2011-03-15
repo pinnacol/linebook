@@ -139,8 +139,8 @@ module Linebook
         self.recipe_path(recipe_name, target_name)
       
       unless_ %{grep -xqs "#{recipe_name}" "#{runlist}"} do
-        target.puts %{echo "#{recipe_name}" >> "#{runlist}"}
-        target.puts %{"#{shell_path}" "#{recipe_path}" $*}
+        writeln %{echo "#{recipe_name}" >> "#{runlist}"}
+        writeln %{"#{shell_path}" "#{recipe_path}" $*}
         check_status
       end
       chain_proxy

@@ -17,7 +17,7 @@ class PosixTest < Test::Unit::TestCase
     assert_recipe %q{
       exec 3< source
     } do
-      target.puts "exec"
+      writeln "exec"
       chain :assign, 3, 'source'
     end
   end
@@ -26,7 +26,7 @@ class PosixTest < Test::Unit::TestCase
     assert_recipe %q{
       exec <&3
     } do
-      target.puts "exec"
+      writeln "exec"
       chain :assign, 0, 3
     end
   end
@@ -35,7 +35,7 @@ class PosixTest < Test::Unit::TestCase
     assert_recipe %q{
       exec 1<&2
     } do
-      target.puts "exec"
+      writeln "exec"
       chain :assign, :stdout, :stderr
     end
   end
@@ -193,19 +193,19 @@ class PosixTest < Test::Unit::TestCase
     setup_recipe 'pass_true' do
       check_status_function
       
-      target.puts 'true'
+      writeln 'true'
       check_status
       
-      target.puts 'echo pass_true'
+      writeln 'echo pass_true'
     end
     
     setup_recipe 'pass_false' do
       check_status_function
       
-      target.puts 'false'
+      writeln 'false'
       check_status 1
       
-      target.puts 'echo pass_false'
+      writeln 'echo pass_false'
     end
     
     assert_output_equal %{
@@ -218,19 +218,19 @@ class PosixTest < Test::Unit::TestCase
     setup_recipe 'fail_true' do
       check_status_function
       
-      target.puts 'true'
+      writeln 'true'
       check_status 1
       
-      target.puts 'echo flunk'
+      writeln 'echo flunk'
     end
     
     setup_recipe 'fail_false' do
       check_status_function
       
-      target.puts 'false'
+      writeln 'false'
       check_status 0
       
-      target.puts 'echo flunk'
+      writeln 'echo flunk'
     end
     
     # note the LINENO output is not directly tested here because as of 10.10
@@ -260,9 +260,9 @@ class PosixTest < Test::Unit::TestCase
   def test_function_defines_a_function_from_the_block
     setup_recipe do
       function 'say_hello' do
-        target.puts 'echo "hello $1"'
+        writeln 'echo "hello $1"'
       end
-      target.puts "say_hello world"
+      writeln "say_hello world"
     end
     
     assert_output_equal %q{
@@ -274,10 +274,10 @@ class PosixTest < Test::Unit::TestCase
     setup_recipe do
       3.times do
         function 'say_hello' do
-          target.puts 'echo "hello $1"'
+          writeln 'echo "hello $1"'
         end
       end
-      target.puts "say_hello world"
+      writeln "say_hello world"
     end
     
     assert_output_equal %q{
@@ -289,10 +289,10 @@ class PosixTest < Test::Unit::TestCase
     err = assert_raises(RuntimeError) do
       setup_recipe do
         function 'say_hello' do
-          target.puts 'echo "hello $1"'
+          writeln 'echo "hello $1"'
         end
         function 'say_hello' do
-          target.puts 'echo "goodbye $1"'
+          writeln 'echo "goodbye $1"'
         end
       end
     end
@@ -309,10 +309,10 @@ class PosixTest < Test::Unit::TestCase
       check_status_function
       
       execute 'true'
-      target.puts 'echo success'
+      writeln 'echo success'
       
       execute 'false'
-      target.puts 'echo fail'
+      writeln 'echo fail'
     end
     
     assert_alike %{
@@ -385,7 +385,7 @@ class PosixTest < Test::Unit::TestCase
     assert_recipe %q{
       cat < source
     } do
-      target.puts "cat"
+      writeln "cat"
       chain :from, 'source'
     end
   end
@@ -402,8 +402,8 @@ class PosixTest < Test::Unit::TestCase
       EOF
     } do
       heredoc :delimiter => 'EOF' do
-        target.puts 'line one  '
-        target.puts '  line two'
+        writeln 'line one  '
+        writeln '  line two'
       end
     end
   end
@@ -441,7 +441,7 @@ class PosixTest < Test::Unit::TestCase
   def test_heredoc_works_as_a_heredoc
     setup_recipe do
       target.print 'cat '; heredoc do
-        target.puts 'success'
+        writeln 'success'
       end
     end
     
@@ -463,18 +463,18 @@ class PosixTest < Test::Unit::TestCase
       HEREDOC_0
       #
     } do
-      target.puts "#"
+      writeln "#"
       indent do
         target.print 'cat '; heredoc do
-          target.puts "a"
-          target.puts "\tb"
-          target.puts "\t\tc"
-          target.puts "    x"
-          target.puts "  y"
-          target.puts "z"
+          writeln "a"
+          writeln "\tb"
+          writeln "\t\tc"
+          writeln "    x"
+          writeln "  y"
+          writeln "z"
         end
       end
-      target.puts "#"
+      writeln "#"
     end
     
     assert_output_equal %{
@@ -500,18 +500,18 @@ class PosixTest < Test::Unit::TestCase
       HEREDOC_0
       #
     } do
-      target.puts "#"
+      writeln "#"
       indent do
         target.print 'cat '; heredoc :outdent => true do
-          target.puts "a"
-          target.puts "\tb"
-          target.puts "\t\tc"
-          target.puts "    x"
-          target.puts "  y"
-          target.puts "z"
+          writeln "a"
+          writeln "\tb"
+          writeln "\t\tc"
+          writeln "    x"
+          writeln "  y"
+          writeln "z"
         end
       end
-      target.puts "#"
+      writeln "#"
     end
     
     assert_output_equal %{
@@ -532,7 +532,7 @@ class PosixTest < Test::Unit::TestCase
     } do
       target.print "cat  \n   "
       chain :heredoc do
-        target.puts 'success'
+        writeln 'success'
       end
     end
   end
@@ -564,7 +564,7 @@ class PosixTest < Test::Unit::TestCase
       fi
       
     } do
-      if_('condition') { target << 'content' }
+      if_('condition') { write  'content' }
     end
   end
   
@@ -576,7 +576,7 @@ class PosixTest < Test::Unit::TestCase
     assert_recipe %q{
       cat source 2> target
     } do
-      target.puts "cat source"
+      writeln "cat source"
       chain :redirect, 2, 'target'
     end
   end
@@ -585,7 +585,7 @@ class PosixTest < Test::Unit::TestCase
     assert_recipe %q{
       cat source 2>&1
     } do
-      target.puts "cat source"
+      writeln "cat source"
       chain :redirect, 2, 1
     end
   end
@@ -594,7 +594,7 @@ class PosixTest < Test::Unit::TestCase
     assert_recipe %q{
       cat source 2>&1
     } do
-      target.puts "cat source"
+      writeln "cat source"
       chain :redirect, :stderr, :stdout
     end
   end
@@ -620,7 +620,7 @@ class PosixTest < Test::Unit::TestCase
     assert_recipe %q{
       cat source > target
     } do
-      target.puts "cat source"
+      writeln "cat source"
       chain :to, 'target'
     end
   end
@@ -629,7 +629,7 @@ class PosixTest < Test::Unit::TestCase
     assert_recipe %q{
       cat source > /dev/null
     } do
-      target.puts "cat source"
+      writeln "cat source"
       chain :to, nil
     end
   end

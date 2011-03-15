@@ -117,11 +117,10 @@ module Linebook
       end
       
       def groups(user, options={})
-        sep = options[:sep]
-        #  id -Gn <%= quote(user) %><% if sep %> | sed "s/ /<%= sep %>/g"<% end %>
+        #  id -Gn <%= quote(user) %>
         #  
         #  
-        write "id -Gn "; write(( quote(user) ).to_s);  if sep ; write " | sed \"s/ /"; write(( sep ).to_s); write "/g\"";  end ; write "\n"
+        write "id -Gn "; write(( quote(user) ).to_s); write "\n"
         write "\n"
       
         chain_proxy
@@ -154,7 +153,7 @@ module Linebook
         target_name = guess_target_name(user)
         path = capture_path(target_name, 0700) do
           functions.each do |function|
-            target.puts function
+            writeln function
           end
           instance_eval(&block)
         end

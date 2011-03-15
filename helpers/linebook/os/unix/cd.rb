@@ -2,7 +2,7 @@
 --
   if block_given?
     var = _package_.next_variable_name('cd')
-    target.puts %{#{var}=$(pwd)}
+    writeln %{#{var}=$(pwd)}
   end
 
   execute "cd", dir

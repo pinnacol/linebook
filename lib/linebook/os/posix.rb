@@ -111,7 +111,7 @@ module Linebook
         end
         
         functions << function
-        target.puts function
+        writeln function
         
         name
       end
@@ -249,7 +249,7 @@ module Linebook
       def heredoc(options={})
         if chain?
           rstrip
-          target << ' '
+          write  ' '
         end
         
         delimiter = options[:delimiter] || begin
@@ -271,18 +271,6 @@ module Linebook
       
       def _heredoc(*args, &block) # :nodoc:
         str = capture_block { heredoc(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Executes the block when the expression evaluates to a non-zero value.
-      def unless_(expression, &block)
-        if_("! #{expression}", &block)
-        chain_proxy
-      end
-      
-      def _unless_(*args, &block) # :nodoc:
-        str = capture_block { unless_(*args, &block) }
         str.strip!
         str
       end
@@ -356,6 +344,18 @@ module Linebook
       
       def _to(*args, &block) # :nodoc:
         str = capture_block { to(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Executes the block when the expression evaluates to a non-zero value.
+      def unless_(expression, &block)
+        if_("! #{expression}", &block)
+        chain_proxy
+      end
+      
+      def _unless_(*args, &block) # :nodoc:
+        str = capture_block { unless_(*args, &block) }
         str.strip!
         str
       end

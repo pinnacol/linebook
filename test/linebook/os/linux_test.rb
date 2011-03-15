@@ -17,12 +17,12 @@ class LinuxTest < Test::Unit::TestCase
   def clear_test_users
     setup_recipe do
       login do
-        target.puts %{userdel  #{TEST_USER}      > /dev/null 2>&1}
-        target.puts %{userdel  #{TEST_USER_TWO}  > /dev/null 2>&1}
-        target.puts %{groupdel #{TEST_GROUP}     > /dev/null 2>&1}
-        target.puts %{groupdel #{TEST_GROUP_TWO} > /dev/null 2>&1}
+        writeln %{userdel  #{TEST_USER}      > /dev/null 2>&1}
+        writeln %{userdel  #{TEST_USER_TWO}  > /dev/null 2>&1}
+        writeln %{groupdel #{TEST_GROUP}     > /dev/null 2>&1}
+        writeln %{groupdel #{TEST_GROUP_TWO} > /dev/null 2>&1}
       end
-      target.puts "true"
+      writeln "true"
     end
   end
   
@@ -57,13 +57,13 @@ class LinuxTest < Test::Unit::TestCase
     setup_recipe do
       login do
         if_ _group?(TEST_GROUP) do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
         
         groupadd TEST_GROUP
         
         unless_ _group?(TEST_GROUP) do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
       end
     end
@@ -82,11 +82,11 @@ class LinuxTest < Test::Unit::TestCase
     setup_recipe do
       login do
         unless_ _group?("$(id -ng $(whoami))") do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
         
         if_ _group?(TEST_GROUP) do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
       end
     end
@@ -104,16 +104,16 @@ class LinuxTest < Test::Unit::TestCase
     
     setup_recipe do
       login do
-        target.puts "groupadd #{TEST_GROUP}"
+        writeln "groupadd #{TEST_GROUP}"
         
         unless_ _group?(TEST_GROUP) do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
         
         groupdel TEST_GROUP
         
         if_ _group?(TEST_GROUP) do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
       end
     end
@@ -131,9 +131,9 @@ class LinuxTest < Test::Unit::TestCase
     
     setup_recipe do
       login do
-        target.puts "groupadd #{TEST_GROUP}"
-        target.puts "groupadd #{TEST_GROUP_TWO}"
-        target.puts "useradd -g #{TEST_GROUP_TWO} -G #{TEST_GROUP} #{TEST_USER}"
+        writeln "groupadd #{TEST_GROUP}"
+        writeln "groupadd #{TEST_GROUP_TWO}"
+        writeln "useradd -g #{TEST_GROUP_TWO} -G #{TEST_GROUP} #{TEST_USER}"
       end
       
       groups(TEST_USER)
@@ -150,14 +150,14 @@ class LinuxTest < Test::Unit::TestCase
   
   def test_login_logs_in_as_user_for_duration_of_a_block
     setup_recipe do
-      target.puts "export VAR=a"
-      target.puts CONTEXT_CHECK
+      writeln "export VAR=a"
+      writeln CONTEXT_CHECK
       login 'root' do
-        target.puts CONTEXT_CHECK
-        target.puts "export VAR=b"
-        target.puts CONTEXT_CHECK
+        writeln CONTEXT_CHECK
+        writeln "export VAR=b"
+        writeln CONTEXT_CHECK
       end
-      target.puts CONTEXT_CHECK
+      writeln CONTEXT_CHECK
     end
   
     assert_output_equal %{
@@ -174,7 +174,7 @@ class LinuxTest < Test::Unit::TestCase
         echo 'hello $1'
       end
       login do
-        target.puts "say_hello $(whoami)"
+        writeln "say_hello $(whoami)"
       end
     end
   
@@ -183,20 +183,20 @@ class LinuxTest < Test::Unit::TestCase
   
   def test_nested_login
     setup_recipe do
-      target.puts "export VAR=a"
-      target.puts CONTEXT_CHECK
+      writeln "export VAR=a"
+      writeln CONTEXT_CHECK
       login 'root' do
-        target.puts CONTEXT_CHECK
-        target.puts "export VAR=b"
-        target.puts CONTEXT_CHECK
+        writeln CONTEXT_CHECK
+        writeln "export VAR=b"
+        writeln CONTEXT_CHECK
         login 'linecook' do
-          target.puts CONTEXT_CHECK
-          target.puts "export VAR=c"
-          target.puts CONTEXT_CHECK
+          writeln CONTEXT_CHECK
+          writeln "export VAR=c"
+          writeln CONTEXT_CHECK
         end
-        target.puts CONTEXT_CHECK
+        writeln CONTEXT_CHECK
       end
-      target.puts CONTEXT_CHECK
+      writeln CONTEXT_CHECK
     end
   
     assert_output_equal %{
@@ -218,14 +218,14 @@ class LinuxTest < Test::Unit::TestCase
   
   def test_su_switches_user_for_duration_of_a_block
     setup_recipe do
-      target.puts "export VAR=a"
-      target.puts CONTEXT_CHECK
+      writeln "export VAR=a"
+      writeln CONTEXT_CHECK
       su 'root' do
-        target.puts CONTEXT_CHECK
-        target.puts "export VAR=b"
-        target.puts CONTEXT_CHECK
+        writeln CONTEXT_CHECK
+        writeln "export VAR=b"
+        writeln CONTEXT_CHECK
       end
-      target.puts CONTEXT_CHECK
+      writeln CONTEXT_CHECK
     end
   
     assert_output_equal %{
@@ -241,11 +241,11 @@ class LinuxTest < Test::Unit::TestCase
       function "say_hello" do
         echo 'hello $1'
       end
-      target.puts "say_hello $(whoami)"
+      writeln "say_hello $(whoami)"
       su do
-        target.puts "say_hello $(whoami)"
+        writeln "say_hello $(whoami)"
       end
-      target.puts "say_hello $(whoami)"
+      writeln "say_hello $(whoami)"
     end
   
     assert_output_equal %{
@@ -257,20 +257,20 @@ class LinuxTest < Test::Unit::TestCase
   
   def test_nested_su
     setup_recipe do
-      target.puts "export VAR=a"
-      target.puts CONTEXT_CHECK
+      writeln "export VAR=a"
+      writeln CONTEXT_CHECK
       su 'root' do
-        target.puts CONTEXT_CHECK
-        target.puts "export VAR=b"
-        target.puts CONTEXT_CHECK
+        writeln CONTEXT_CHECK
+        writeln "export VAR=b"
+        writeln CONTEXT_CHECK
         su 'linecook' do
-          target.puts CONTEXT_CHECK
-          target.puts "export VAR=c"
-          target.puts CONTEXT_CHECK
+          writeln CONTEXT_CHECK
+          writeln "export VAR=c"
+          writeln CONTEXT_CHECK
         end
-        target.puts CONTEXT_CHECK
+        writeln CONTEXT_CHECK
       end
-      target.puts CONTEXT_CHECK
+      writeln CONTEXT_CHECK
     end
   
     assert_output_equal %{
@@ -294,13 +294,13 @@ class LinuxTest < Test::Unit::TestCase
     setup_recipe do
       login do
         if_ _user?(TEST_USER) do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
         
         useradd TEST_USER
         
         unless_ _user?(TEST_USER) do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
       end
     end
@@ -319,11 +319,11 @@ class LinuxTest < Test::Unit::TestCase
     setup_recipe do
       login do
         unless_ _user?("$(whoami)") do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
         
         if_ _user?(TEST_USER) do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
       end
     end
@@ -341,16 +341,16 @@ class LinuxTest < Test::Unit::TestCase
     
     setup_recipe do
       login do
-        target.puts "useradd #{TEST_USER}"
+        writeln "useradd #{TEST_USER}"
         
         unless_ _user?(TEST_USER) do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
         
         userdel TEST_USER
         
         if_ _user?(TEST_USER) do
-          target.puts "exit 1"
+          writeln "exit 1"
         end
       end
     end
