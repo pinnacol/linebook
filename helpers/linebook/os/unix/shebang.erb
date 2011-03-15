@@ -1,7 +1,7 @@
-(program='/bin/sh', options={})
+(options={})
   @shebang = true
 --
-#!<%= program %>
+#!<%= options[:program] || '/bin/sh' %>
 <% section %>
 
 usage="usage: %s: [-h]\n"

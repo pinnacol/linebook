@@ -388,9 +388,9 @@ module Linebook
         str
       end
       
-      def shebang(program='/bin/sh', options={})
+      def shebang(options={})
         @shebang = true
-        #  #!<%= program %>
+        #  #!<%= options[:program] || '/bin/sh' %>
         #  <% section %>
         #  
         #  usage="usage: %s: [-h]\n"
@@ -418,7 +418,7 @@ module Linebook
         #  <% section " #{target_name} " %>
         #  
         #  
-        write "#!"; write(( program ).to_s); write "\n"
+        write "#!"; write(( options[:program] || '/bin/sh' ).to_s); write "\n"
         section 
         write "\n"
         write "usage=\"usage: %s: [-h]\\n\"\n"
