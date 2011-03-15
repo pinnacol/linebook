@@ -357,7 +357,7 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
-  def test_execute_chains_work_with_indent
+  def test_execute_chains_work_with_indent_and_check_status
     assert_recipe_matches %q{
       out
         a | b | c
@@ -374,13 +374,31 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
-  def test_execute_chains_work_with_to_from
+  def test_execute_chains_work_with_to_from_and_check_status
     assert_recipe_matches %q{
       grep "abc" < source > target
       check_status 0 $? $? $LINENO
     } do
       check_status_function
       execute('grep', 'abc').from('source').to('target')
+    end
+  end
+  
+  def test_execute_chains_work_with_to_heredoc_and_check_status
+    assert_recipe_matches %q{
+      grep "abc" > target << DOC
+      a
+      b
+      c
+      DOC
+      check_status 0 $? $? $LINENO
+    } do
+      check_status_function
+      execute('grep', 'abc').to('target').heredoc('DOC') do
+        writeln "a"
+        writeln "b"
+        writeln "c"
+      end
     end
   end
   

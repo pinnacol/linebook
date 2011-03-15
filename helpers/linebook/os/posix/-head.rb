@@ -125,3 +125,14 @@ CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
 def pipe
   rewrite(CHECK_STATUS) {|match| ' | ' }
 end
+
+# When chaining append performs a rewrite that appends str after the last
+# command, preserving the trailing check_status.  Same as write when not
+# chaining.
+def append(str)
+  if chain?
+    rewrite(CHECK_STATUS) {|m| "#{str}#{m[1]}" }
+  else
+    write str
+  end
+end

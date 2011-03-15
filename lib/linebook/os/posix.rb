@@ -130,6 +130,17 @@ module Linebook
         rewrite(CHECK_STATUS) {|match| ' | ' }
       end
       
+      # When chaining append performs a rewrite that appends str after the last
+      # command, preserving the trailing check_status.  Same as write when not
+      # chaining.
+      def append(str)
+        if chain?
+          rewrite(CHECK_STATUS) {|m| "#{str}#{m[1]}" }
+        else
+          write str
+        end
+      end
+      
       # Assign a file descriptor.
       def assign(target, source)
         target = handles[target] || target
@@ -138,11 +149,7 @@ module Linebook
         source = handles[source] || source
         source = source.kind_of?(Fixnum) ? "&#{source}" : " #{source}"
         
-        if chain?
-          rewrite(CHECK_STATUS) {|m| " #{target}<#{source}#{m[1]}" }
-        else
-          writeln " #{target}<#{source}"
-        end
+        append " #{target}<#{source}"
         chain_proxy
       end
       
@@ -255,9 +262,16 @@ module Linebook
       #   outdent     add '-' before the delimiter
       #   quote       quotes the delimiter
       def heredoc(options={})
+        tail = "\n"
         if chain?
-          rstrip
-          write  ' '
+          rewrite(CHECK_STATUS) do |m|
+            tail += m[1].lstrip
+            ' '
+          end
+        end
+        
+        unless options.kind_of?(Hash)
+          options = {:delimiter => options}
         end
         
         delimiter = options[:delimiter] || begin
@@ -267,13 +281,11 @@ module Linebook
         #  <<<%= options[:outdent] ? '-' : ' '%><%= options[:quote] ? "\"#{delimiter}\"" : delimiter %><% outdent(" # :#{delimiter}:") do %>
         #  <% yield %>
         #  <%= delimiter %><% end %>
-        #  
-        #  
+        #  <%= tail %>
         write "<<"; write(( options[:outdent] ? '-' : ' ').to_s); write(( options[:quote] ? "\"#{delimiter}\"" : delimiter ).to_s);  outdent(" # :#{delimiter}:") do ; write "\n"
         yield 
         write(( delimiter ).to_s);  end 
-        write "\n"
-      
+        write(( tail ).to_s)
         chain_proxy
       end
       
@@ -315,11 +327,7 @@ module Linebook
         target = handles[target] || target
         target = target.kind_of?(Fixnum) ? "&#{target}" : " #{target}"
         
-        if chain?
-          rewrite(CHECK_STATUS) {|m| " #{source}>#{target}#{m[1]}" }
-        else
-          writeln " #{source}>#{target}"
-        end
+        append " #{source}>#{target}"
         chain_proxy
       end
       
