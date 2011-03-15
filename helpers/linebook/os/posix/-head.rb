@@ -120,22 +120,3 @@ def handles
 end
 
 CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
-
-# Performs a rewrite that chomps the last check status and adds a pipe.
-def pipe
-  rewrite(CHECK_STATUS)
-  write ' | '
-end
-
-# When chaining append performs a rewrite that appends str after the last
-# command, preserving the trailing check_status.  Same as write when not
-# chaining.
-def append(str)
-  if chain?
-    match = rewrite(CHECK_STATUS)
-    write str
-    write match[1]
-  else
-    write str
-  end
-end

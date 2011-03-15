@@ -125,25 +125,6 @@ module Linebook
       
       CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
       
-      # Performs a rewrite that chomps the last check status and adds a pipe.
-      def pipe
-        rewrite(CHECK_STATUS)
-        write ' | '
-      end
-      
-      # When chaining append performs a rewrite that appends str after the last
-      # command, preserving the trailing check_status.  Same as write when not
-      # chaining.
-      def append(str)
-        if chain?
-          match = rewrite(CHECK_STATUS)
-          write str
-          write match[1]
-        else
-          write str
-        end
-      end
-      
       # Assign a file descriptor.
       def assign(target, source)
         target = handles[target] || target
@@ -152,7 +133,9 @@ module Linebook
         source = handles[source] || source
         source = source.kind_of?(Fixnum) ? "&#{source}" : " #{source}"
         
-        append " #{target}<#{source}"
+        match = chain? ? rewrite(CHECK_STATUS) : nil
+        write " #{target}<#{source}"
+        write match[1] if match
         chain_proxy
       end
       
@@ -216,7 +199,10 @@ module Linebook
       # that aren't already quoted. Accepts a trailing hash which will be transformed
       # into command line options.
       def execute(command, *args)
-        pipe if chain?
+        if chain?
+          rewrite(CHECK_STATUS)
+          write ' | '
+        end
         #  <%= format_cmd(command, *args) %>
         #  
         #  <% check_status %>
@@ -326,7 +312,9 @@ module Linebook
         target = handles[target] || target
         target = target.kind_of?(Fixnum) ? "&#{target}" : " #{target}"
         
-        append " #{source}>#{target}"
+        match = chain? ? rewrite(CHECK_STATUS) : nil
+        write " #{source}>#{target}"
+        write match[1] if match
         chain_proxy
       end
       

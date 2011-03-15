@@ -8,5 +8,7 @@ Makes a redirect statement.
   target = handles[target] || target
   target = target.kind_of?(Fixnum) ? "&#{target}" : " #{target}"
   
-  append " #{source}>#{target}"
+  match = chain? ? rewrite(CHECK_STATUS) : nil
+  write " #{source}>#{target}"
+  write match[1] if match
   

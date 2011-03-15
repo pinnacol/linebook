@@ -7,4 +7,6 @@ Assign a file descriptor.
   source = handles[source] || source
   source = source.kind_of?(Fixnum) ? "&#{source}" : " #{source}"
   
-  append " #{target}<#{source}"
+  match = chain? ? rewrite(CHECK_STATUS) : nil
+  write " #{target}<#{source}"
+  write match[1] if match
