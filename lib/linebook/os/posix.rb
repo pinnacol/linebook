@@ -116,13 +116,6 @@ module Linebook
         name
       end
       
-      DEFAULT_HANDLES = {:stdin => 0, :stdout => 1, :stderr => 2}
-      
-      # A hash of logical names for file handles.
-      def handles
-        @handles ||= DEFAULT_HANDLES.dup
-      end
-      
       CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
       
       # Adds a redirect to append stdout to a file.
@@ -297,10 +290,7 @@ module Linebook
       
       # Makes a redirect statement.
       def redirect(source, target, redirection='>')
-        source = handles[source] || source
         source = source.nil? || source.kind_of?(Fixnum) ? source : "#{source} "
-        
-        target = handles[target] || target
         target = target.nil? || target.kind_of?(Fixnum) ? "&#{target}" : " #{target}"
         
         match = chain? ? rewrite(CHECK_STATUS) : nil

@@ -112,11 +112,4 @@ def function(name, body=nil, &block)
   name
 end
 
-DEFAULT_HANDLES = {:stdin => 0, :stdout => 1, :stderr => 2}
-
-# A hash of logical names for file handles.
-def handles
-  @handles ||= DEFAULT_HANDLES.dup
-end
-
 CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/

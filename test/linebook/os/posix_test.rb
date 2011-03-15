@@ -612,15 +612,6 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
-  def test_redirect_allows_stdout_and_stderr_as_logical_names
-    assert_recipe %q{
-      cat source 2>&1
-    } do
-      writeln "cat source"
-      chain :redirect, :stderr, :stdout
-    end
-  end
-  
   def test_redirect_works_with_check_status
     assert_recipe_matches %q{
       cat source 2>&1
@@ -628,7 +619,7 @@ class PosixTest < Test::Unit::TestCase
     } do
       check_status_function
       execute 'cat source'
-      chain :redirect, :stderr, :stdout
+      chain :redirect, 2, 1
     end
   end
   
