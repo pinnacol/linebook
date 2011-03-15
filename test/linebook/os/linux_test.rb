@@ -145,6 +145,42 @@ class LinuxTest < Test::Unit::TestCase
   end
   
   #
+  # install test
+  #
+  
+  def test_install_copies_source_to_target
+    setup_recipe 'recipe' do
+      cd package_dir
+      echo('content').to('source')
+      
+      install 'source', 'target'
+      cat 'target'
+    end
+    
+    assert_output_equal %{
+      content
+    }, *run_package
+  end
+  
+  def test_install_backs_up_existing_target_if_specified
+    setup_recipe 'recipe' do
+      cd package_dir
+      echo('new').to('source')
+      echo('old').to('target')
+      
+      install 'source', 'target', :backup => true
+      
+      cat 'target~'
+      cat 'target'
+    end
+    
+    assert_output_equal %{
+      old
+      new
+    }, *run_package
+  end
+  
+  #
   # login test
   #
   

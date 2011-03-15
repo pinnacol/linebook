@@ -20,30 +20,6 @@ module Linebook
       '/var/log/linecook'
     end
     
-    def nest_opts(opts, default={})
-      opts = default if opts.nil? || opts == true
-      opts && block_given? ? yield(opts) : opts
-    end
-    
-    # Backup a file.
-    def backup(path, options={})
-      backup_path = "#{path}.bak"
-      if options[:mv]
-        mv_f path, backup_path
-      else
-        cp_f path, backup_path
-      end
-      
-      chmod 644, backup_path
-      chain_proxy
-    end
-    
-    def _backup(*args, &block) # :nodoc:
-      str = capture_block { backup(*args, &block) }
-      str.strip!
-      str
-    end
-    
     def directory(target, options={})
       unless_ _directory?(target) do 
         mkdir_p target
@@ -62,6 +38,7 @@ module Linebook
     # Installs a file from the package.
     def file(file_name, target, options={})
       source = file_path(file_name, guess_target_name(target))
+      options = {:D => true}.merge(options)
       install(source, target, options)
       chain_proxy
     end
@@ -92,30 +69,6 @@ module Linebook
     
     def _groupmod(*args, &block) # :nodoc:
       str = capture_block { groupmod(*args, &block) }
-      str.strip!
-      str
-    end
-    
-    # Installs a file
-    def install(source, target, options={})
-      nest_opts(options[:backup], :mv => true) do |opts|
-        if_ _file?(target) do
-          backup target, opts
-        end
-      end
-      
-      nest_opts(options[:directory]) do |opts|
-        directory File.dirname(target), opts
-      end
-      
-      cp source, target
-      chmod options[:mode] || 644, target
-      chown options[:user], options[:group], target
-      chain_proxy
-    end
-    
-    def _install(*args, &block) # :nodoc:
-      str = capture_block { install(*args, &block) }
       str.strip!
       str
     end
@@ -154,8 +107,9 @@ module Linebook
     
     # Installs a template from the package.
     def template(template_name, target, options={})
-      locals = options[:locals] || {}
+      locals = options.delete(:locals) || {}
       source = template_path(template_name, guess_target_name(target), 0600, locals)
+      options = {:D => true}.merge(options)
       install(source, target, options)
       chain_proxy
     end

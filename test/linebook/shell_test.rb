@@ -57,30 +57,6 @@ class ShellTest < Test::Unit::TestCase
     assert_equal true, setup_recipe.kind_of?(Linebook::Shell::Bash)
   end
   
-  # #
-  # # backup test
-  # #
-  # 
-  # def test_backup_set_backup_permissions_to_644
-  #   target = prepare('target', 'content')
-  #   File.chmod(0754, target)
-  #   
-  #   build_package { backup target }
-  #   assert_script "sh #{package['recipe']}"
-  #   
-  #   assert_equal '100644', sprintf("%o", File.stat("#{target}.bak").mode)
-  # end
-  # 
-  # def test_backup_will_copy_if_specified
-  #   target = prepare('target', 'content')
-  #   
-  #   build_package { backup target, :mv => false }
-  #   assert_script "sh #{package['recipe']}"
-  #   
-  #   assert_equal 'content', File.read(target)
-  #   assert_equal 'content', File.read("#{target}.bak")
-  # end
-  
   #
   # directory test
   #
@@ -109,7 +85,7 @@ class ShellTest < Test::Unit::TestCase
     }, *run_package
   end
   
-  def test_directory_sets_mod
+  def test_directory_sets_mode
     setup_recipe do
       writeln 'rm -r target'
       directory 'target', :mode => 700
@@ -243,100 +219,6 @@ class ShellTest < Test::Unit::TestCase
       b
       success
     }, *run_package('runlist' => runlist)
-  end
-  
-  #
-  # install test
-  #
-  
-  def test_install_copies_source_to_target
-    setup_recipe 'recipe' do
-      writeln "cd #{package_dir}"
-      writeln 'echo content > source'
-      
-      install 'source', 'target'
-      
-      writeln 'cat target'
-    end
-    
-    assert_output_equal %{
-      content
-    }, *run_package
-  end
-  
-  def test_install_backs_up_existing_target
-    setup_recipe 'recipe' do
-      writeln "cd #{package_dir}"
-      writeln 'echo new > source'
-      writeln 'echo old > target'
-      
-      install 'source', 'target'
-      
-      writeln 'cat target.bak'
-      writeln 'cat target'
-    end
-    
-    assert_output_equal %{
-      old
-      new
-    }, *run_package
-  end
-  
-  def test_install_can_turn_off_backup
-    setup_recipe 'recipe' do
-      writeln "cd #{package_dir}"
-      writeln 'echo new > source'
-      writeln 'echo old > target'
-      
-      install 'source', 'target', :backup => false
-      
-      writeln 'if ! [ -e target.bak ]; then echo pass; fi'
-    end
-    
-    assert_output_equal %{
-      pass
-    }, *run_package
-  end
-  
-  def test_install_makes_parent_dirs_as_needed
-    setup_recipe do
-      writeln "cd #{package_dir}"
-      writeln 'echo content > source'
-      install 'source', 'target/file'
-      
-      writeln 'ls -la .'
-    end
-    
-    assert_alike %{
-      drwxr-xr-x :...: target
-    }, *run_package
-  end
-  
-  def test_install_allows_passing_options_to_directory
-    setup_recipe do
-      writeln "cd #{package_dir}"
-      writeln 'echo content > source'
-      install 'source', 'target/file', :directory => {:mode => 700}
-      
-      writeln 'ls -la .'
-    end
-    
-    assert_alike %{
-      drwx------ :...: target
-    }, *run_package
-  end
-  
-  def test_install_sets_mode
-    setup_recipe do
-      writeln "cd #{package_dir}"
-      writeln 'echo content > source'
-      install 'source', 'target', :mode => 600
-      writeln 'ls -la .'
-    end
-    
-    assert_alike %{
-      -rw------- :...: target
-    }, *run_package
   end
   
   #

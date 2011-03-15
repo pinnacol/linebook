@@ -132,6 +132,17 @@ module Linebook
         str
       end
       
+      def install(source, target, options={})
+        execute 'install', source, target, options
+        chain_proxy
+      end
+      
+      def _install(*args, &block) # :nodoc:
+        str = capture_block { install(*args, &block) }
+        str.strip!
+        str
+      end
+      
       # Logs in as the specified user for the duration of a block (the current ENV
       # and pwd are reset as during a normal login).
       def login(user='root', &block)
