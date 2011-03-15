@@ -5,13 +5,7 @@ Makes a heredoc statement surrounding the contents of the block.  Options:
   quote       quotes the delimiter
 
 (options={})
-  tail = "\n"
-  if chain?
-    rewrite(CHECK_STATUS) do |m|
-      tail += m[1].lstrip
-      ' '
-    end
-  end
+  tail = chain? ? rewrite(CHECK_STATUS) {|m| write ' '; m[1].lstrip } : nil
   
   unless options.kind_of?(Hash)
     options = {:delimiter => options}
@@ -25,4 +19,5 @@ Makes a heredoc statement surrounding the contents of the block.  Options:
 <<<%= options[:outdent] ? '-' : ' '%><%= options[:quote] ? "\"#{delimiter}\"" : delimiter %><% outdent(" # :#{delimiter}:") do %>
 <% yield %>
 <%= delimiter %><% end %>
+
 <%= tail %>

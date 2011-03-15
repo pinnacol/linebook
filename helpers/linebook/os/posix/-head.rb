@@ -123,7 +123,8 @@ CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
 
 # Performs a rewrite that chomps the last check status and adds a pipe.
 def pipe
-  rewrite(CHECK_STATUS) {|match| ' | ' }
+  rewrite(CHECK_STATUS)
+  write ' | '
 end
 
 # When chaining append performs a rewrite that appends str after the last
@@ -131,7 +132,9 @@ end
 # chaining.
 def append(str)
   if chain?
-    rewrite(CHECK_STATUS) {|m| "#{str}#{m[1]}" }
+    match = rewrite(CHECK_STATUS)
+    write str
+    write match[1]
   else
     write str
   end
