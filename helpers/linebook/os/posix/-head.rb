@@ -118,3 +118,10 @@ DEFAULT_HANDLES = {:stdin => 0, :stdout => 1, :stderr => 2}
 def handles
   @handles ||= DEFAULT_HANDLES.dup
 end
+
+CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
+
+# Performs a rewrite that chomps the last check status and adds a pipe.
+def pipe
+  rewrite(CHECK_STATUS) {|match| ' | ' }
+end

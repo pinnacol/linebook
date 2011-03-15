@@ -40,6 +40,17 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
+  def test_assign_works_with_check_status
+    assert_recipe_matches %q{
+      cat 1<&2
+      check_status 0 $? $? $LINENO
+    } do
+      check_status_function
+      execute 'cat'
+      chain :assign, :stdout, :stderr
+    end
+  end
+  
   #
   # blank test
   #
@@ -363,6 +374,16 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
+  def test_execute_chains_work_with_to_from
+    assert_recipe_matches %q{
+      grep "abc" < source > target
+      check_status 0 $? $? $LINENO
+    } do
+      check_status_function
+      execute('grep', 'abc').from('source').to('target')
+    end
+  end
+  
   #
   # export test
   #
@@ -595,6 +616,17 @@ class PosixTest < Test::Unit::TestCase
       cat source 2>&1
     } do
       writeln "cat source"
+      chain :redirect, :stderr, :stdout
+    end
+  end
+  
+  def test_redirect_works_with_check_status
+    assert_recipe_matches %q{
+      cat source 2>&1
+      check_status 0 $? $? $LINENO
+    } do
+      check_status_function
+      execute 'cat source'
       chain :redirect, :stderr, :stdout
     end
   end

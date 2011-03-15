@@ -123,16 +123,26 @@ module Linebook
         @handles ||= DEFAULT_HANDLES.dup
       end
       
+      CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
+      
+      # Performs a rewrite that chomps the last check status and adds a pipe.
+      def pipe
+        rewrite(CHECK_STATUS) {|match| ' | ' }
+      end
+      
       # Assign a file descriptor.
       def assign(target, source)
-        rstrip if chain?
         target = handles[target] || target
         target = nil if target == 0
+        
         source = handles[source] || source
-        #   <%= target %><<%= source.kind_of?(Fixnum) ? "&#{source}" : " #{source}" %>
-        #  
-        write " "; write(( target ).to_s); write "<"; write(( source.kind_of?(Fixnum) ? "&#{source}" : " #{source}" ).to_s); write "\n"
-      
+        source = source.kind_of?(Fixnum) ? "&#{source}" : " #{source}"
+        
+        if chain?
+          rewrite(CHECK_STATUS) {|m| " #{target}<#{source}#{m[1]}" }
+        else
+          writeln " #{target}<#{source}"
+        end
         chain_proxy
       end
       
@@ -196,9 +206,7 @@ module Linebook
       # that aren't already quoted. Accepts a trailing hash which will be transformed
       # into command line options.
       def execute(command, *args)
-        if chain?
-          rewrite(/\s*(\ncheck_status.*?\n\s*)?\z/) {|match| ' | ' }
-        end
+        pipe if chain?
         #  <%= format_cmd(command, *args) %>
         #  
         #  <% check_status %>
@@ -300,14 +308,18 @@ module Linebook
       
       # Makes a redirect statement.
       def redirect(source, target)
-        rstrip if chain?
         source = handles[source] || source
         source = nil if source == 1
+        source = source.nil? || source.kind_of?(Fixnum) ? source : "#{source} "
+        
         target = handles[target] || target
-        #   <%= source.nil? || source.kind_of?(Fixnum) ? source : "#{source} " %>><%= target.kind_of?(Fixnum) ? "&#{target}" : " #{target}" %>
-        #  
-        write " "; write(( source.nil? || source.kind_of?(Fixnum) ? source : "#{source} " ).to_s); write ">"; write(( target.kind_of?(Fixnum) ? "&#{target}" : " #{target}" ).to_s); write "\n"
-      
+        target = target.kind_of?(Fixnum) ? "&#{target}" : " #{target}"
+        
+        if chain?
+          rewrite(CHECK_STATUS) {|m| " #{source}>#{target}#{m[1]}" }
+        else
+          writeln " #{source}>#{target}"
+        end
         chain_proxy
       end
       
