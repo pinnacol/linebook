@@ -125,22 +125,14 @@ module Linebook
       
       CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
       
-      # Assign a file descriptor.
-      def assign(target, source)
-        target = handles[target] || target
-        target = nil if target == 0
-        
-        source = handles[source] || source
-        source = source.kind_of?(Fixnum) ? "&#{source}" : " #{source}"
-        
-        match = chain? ? rewrite(CHECK_STATUS) : nil
-        write " #{target}<#{source}"
-        write match[1] if match
+      # Adds a redirect to append stdout to a file.
+      def append(path)
+        redirect(nil, path, '>>')
         chain_proxy
       end
       
-      def _assign(*args, &block) # :nodoc:
-        str = capture_block { assign(*args, &block) }
+      def _append(*args, &block) # :nodoc:
+        str = capture_block { append(*args, &block) }
         str.strip!
         str
       end
@@ -235,7 +227,7 @@ module Linebook
       
       # Assigns stdin to the file.
       def from(path)
-        assign(:stdin, path)
+        redirect(nil, path, '<')
         chain_proxy
       end
       
@@ -304,16 +296,15 @@ module Linebook
       end
       
       # Makes a redirect statement.
-      def redirect(source, target)
+      def redirect(source, target, redirection='>')
         source = handles[source] || source
-        source = nil if source == 1
         source = source.nil? || source.kind_of?(Fixnum) ? source : "#{source} "
         
         target = handles[target] || target
-        target = target.kind_of?(Fixnum) ? "&#{target}" : " #{target}"
+        target = target.nil? || target.kind_of?(Fixnum) ? "&#{target}" : " #{target}"
         
         match = chain? ? rewrite(CHECK_STATUS) : nil
-        write " #{source}>#{target}"
+        write " #{source}#{redirection}#{target}"
         write match[1] if match
         chain_proxy
       end
@@ -345,7 +336,7 @@ module Linebook
       
       # Adds a redirect of stdout to a file.
       def to(path=nil)
-        redirect(:stdout, path || '/dev/null')
+        redirect(nil, path || '/dev/null')
         chain_proxy
       end
       

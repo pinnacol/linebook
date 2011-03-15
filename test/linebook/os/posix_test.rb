@@ -10,48 +10,6 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
-  # assign test
-  #
-  
-  def test_assign_assigns_fd_from_file
-    assert_recipe %q{
-      exec 3< source
-    } do
-      writeln "exec"
-      chain :assign, 3, 'source'
-    end
-  end
-  
-  def test_assign_treats_numbers_as_file_handles
-    assert_recipe %q{
-      exec <&3
-    } do
-      writeln "exec"
-      chain :assign, 0, 3
-    end
-  end
-  
-  def test_assign_allows_logical_names
-    assert_recipe %q{
-      exec 1<&2
-    } do
-      writeln "exec"
-      chain :assign, :stdout, :stderr
-    end
-  end
-  
-  def test_assign_works_with_check_status
-    assert_recipe_matches %q{
-      cat 1<&2
-      check_status 0 $? $? $LINENO
-    } do
-      check_status_function
-      execute 'cat'
-      chain :assign, :stdout, :stderr
-    end
-  end
-  
-  #
   # blank test
   #
   
@@ -180,6 +138,19 @@ class PosixTest < Test::Unit::TestCase
       'a' => true, 'b' => true, 'c' => true,
       'a-long' => true, 'b-long' => true, 'c-long' => true
     )
+  end
+  
+  #
+  # append test
+  #
+  
+  def test_append_adds_stdout_append_to_file
+    assert_recipe %q{
+      cat source >> target
+    } do
+      writeln "cat source"
+      chain :append, 'target'
+    end
   end
   
   #
@@ -626,6 +597,18 @@ class PosixTest < Test::Unit::TestCase
     } do
       writeln "cat source"
       chain :redirect, 2, 1
+    end
+  end
+  
+  def test_redirect_allows_specification_of_redirection_type
+    assert_recipe %q{
+      cat a < source
+      cat b >> target
+    } do
+      writeln "cat a"
+      chain :redirect, nil, 'source', '<'
+      writeln "cat b"
+      chain :redirect, nil, 'target', '>>'
     end
   end
   
