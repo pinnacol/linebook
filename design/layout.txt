@@ -1,29 +1,67 @@
+[config/run]
+release: [simple, hash]  # hash sets up symlinks, only scp if necessary
+remote_dir: dir
+runlist:
+  - bin/install $LINECOOK_ID  # calc/set this and ensure passed to determine log dir
+  - bin/check $LINECOOK_ID
+
+#############################################################################
 var
   linecook
     current -> id
-    shared
-      ...            # if there is anything needed?  LINECOOK_SHARE_DIR
+    share
+      log
+      tmp
     packages
       id
-        run  -> scripts/run
-        test -> scripts/test
-        blobs
-          ch/ecksum  # store once, link to elsewhere?
-        scripts/
+        bin
+          install    -> scripts/package_install
+          uninstall  -> scripts/package_uninstall
+          check      -> scripts/package_check
+        hooks
+          before
+          before_x   # before_install, before_uninstall, etc.
+          after
+          after_x    # after_install, after_uninstall, etc.
+        lib
           name
-          name.d
-        ...
-        tmp          # remove/remake each run
-          callback   # run after linecook finishes, add post-lc hooks here
-          callback1  # to start services, etc.
-          ...
-          callbackN
-          profile
-          profile1
-          ...
-          profileN
-          runlist
+            space
+              install
+              uninstall
+              check
+              ...
         log
-          time
+          id
             stdout
             stderr
+        tmp
+          lock       # time - only run if not running
+          id
+            name
+              space
+                ...
+
+#############################################################################
+helpers 'linebook/?'
+#############################################################################
+# * removes target file, shebang and add bin helpers
+# * in shell recipes are always constructed under lib dir
+# * hooks are always available (no need for symbol madness)
+
+[:install, :uninstall, :check].each do |script|
+  # writes bin script
+  # * accept or generate id and lock tmp (with trap)
+  # * make log/tmp dirs for id
+  # * ensures LINECOOK_PACKAGE_DIR is set correcty regardless of execution
+  #   via $0, but then ensures all recipes will be executed $0.
+  bin script do
+    check_prerequisites
+    before_hooks script
+
+    recipe "linebook/a/#{script}"
+    recipe "linebook/b/#{script}"
+    recipe "linebook/c/#{script}"
+
+    after_hooks script
+  end
+end
