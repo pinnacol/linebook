@@ -87,7 +87,7 @@ module Linebook
       end
       
       def _group?(*args, &block) # :nodoc:
-        str = capture_block { group?(*args, &block) }
+        str = capture_str { group?(*args, &block) }
         str.strip!
         str
       end
@@ -99,7 +99,7 @@ module Linebook
       end
       
       def _groupadd(*args, &block) # :nodoc:
-        str = capture_block { groupadd(*args, &block) }
+        str = capture_str { groupadd(*args, &block) }
         str.strip!
         str
       end
@@ -111,7 +111,7 @@ module Linebook
       end
       
       def _groupdel(*args, &block) # :nodoc:
-        str = capture_block { groupdel(*args, &block) }
+        str = capture_str { groupdel(*args, &block) }
         str.strip!
         str
       end
@@ -127,7 +127,7 @@ module Linebook
       end
       
       def _groups(*args, &block) # :nodoc:
-        str = capture_block { groups(*args, &block) }
+        str = capture_str { groups(*args, &block) }
         str.strip!
         str
       end
@@ -138,7 +138,7 @@ module Linebook
       end
       
       def _install(*args, &block) # :nodoc:
-        str = capture_block { install(*args, &block) }
+        str = capture_str { install(*args, &block) }
         str.strip!
         str
       end
@@ -165,7 +165,7 @@ module Linebook
       end
       
       def _login(*args, &block) # :nodoc:
-        str = capture_block { login(*args, &block) }
+        str = capture_str { login(*args, &block) }
         str.strip!
         str
       end
@@ -189,7 +189,7 @@ module Linebook
       end
       
       def _su(*args, &block) # :nodoc:
-        str = capture_block { su(*args, &block) }
+        str = capture_str { su(*args, &block) }
         str.strip!
         str
       end
@@ -202,7 +202,7 @@ module Linebook
       end
       
       def _user?(*args, &block) # :nodoc:
-        str = capture_block { user?(*args, &block) }
+        str = capture_str { user?(*args, &block) }
         str.strip!
         str
       end
@@ -214,7 +214,7 @@ module Linebook
       end
       
       def _useradd(*args, &block) # :nodoc:
-        str = capture_block { useradd(*args, &block) }
+        str = capture_str { useradd(*args, &block) }
         str.strip!
         str
       end
@@ -229,7 +229,7 @@ module Linebook
       end
       
       def _userdel(*args, &block) # :nodoc:
-        str = capture_block { userdel(*args, &block) }
+        str = capture_str { userdel(*args, &block) }
         str.strip!
         str
       end

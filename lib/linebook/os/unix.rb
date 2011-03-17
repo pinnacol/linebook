@@ -30,7 +30,7 @@ module Linebook
       end
       
       def _cat(*args, &block) # :nodoc:
-        str = capture_block { cat(*args, &block) }
+        str = capture_str { cat(*args, &block) }
         str.strip!
         str
       end
@@ -51,7 +51,7 @@ module Linebook
       end
       
       def _cd(*args, &block) # :nodoc:
-        str = capture_block { cd(*args, &block) }
+        str = capture_str { cd(*args, &block) }
         str.strip!
         str
       end
@@ -68,7 +68,7 @@ module Linebook
       end
       
       def _chmod(*args, &block) # :nodoc:
-        str = capture_block { chmod(*args, &block) }
+        str = capture_str { chmod(*args, &block) }
         str.strip!
         str
       end
@@ -82,7 +82,7 @@ module Linebook
       end
       
       def _chown(*args, &block) # :nodoc:
-        str = capture_block { chown(*args, &block) }
+        str = capture_str { chown(*args, &block) }
         str.strip!
         str
       end
@@ -94,7 +94,7 @@ module Linebook
       end
       
       def _cp(*args, &block) # :nodoc:
-        str = capture_block { cp(*args, &block) }
+        str = capture_str { cp(*args, &block) }
         str.strip!
         str
       end
@@ -106,7 +106,7 @@ module Linebook
       end
       
       def _cp_f(*args, &block) # :nodoc:
-        str = capture_block { cp_f(*args, &block) }
+        str = capture_str { cp_f(*args, &block) }
         str.strip!
         str
       end
@@ -118,7 +118,7 @@ module Linebook
       end
       
       def _cp_r(*args, &block) # :nodoc:
-        str = capture_block { cp_r(*args, &block) }
+        str = capture_str { cp_r(*args, &block) }
         str.strip!
         str
       end
@@ -130,7 +130,7 @@ module Linebook
       end
       
       def _cp_rf(*args, &block) # :nodoc:
-        str = capture_block { cp_rf(*args, &block) }
+        str = capture_str { cp_rf(*args, &block) }
         str.strip!
         str
       end
@@ -147,7 +147,7 @@ module Linebook
       end
       
       def _date(*args, &block) # :nodoc:
-        str = capture_block { date(*args, &block) }
+        str = capture_str { date(*args, &block) }
         str.strip!
         str
       end
@@ -159,7 +159,7 @@ module Linebook
       end
       
       def _directory?(*args, &block) # :nodoc:
-        str = capture_block { directory?(*args, &block) }
+        str = capture_str { directory?(*args, &block) }
         str.strip!
         str
       end
@@ -171,7 +171,7 @@ module Linebook
       end
       
       def _echo(*args, &block) # :nodoc:
-        str = capture_block { echo(*args, &block) }
+        str = capture_str { echo(*args, &block) }
         str.strip!
         str
       end
@@ -183,7 +183,7 @@ module Linebook
       end
       
       def _exists?(*args, &block) # :nodoc:
-        str = capture_block { exists?(*args, &block) }
+        str = capture_str { exists?(*args, &block) }
         str.strip!
         str
       end
@@ -195,7 +195,7 @@ module Linebook
       end
       
       def _file?(*args, &block) # :nodoc:
-        str = capture_block { file?(*args, &block) }
+        str = capture_str { file?(*args, &block) }
         str.strip!
         str
       end
@@ -211,7 +211,7 @@ module Linebook
       end
       
       def _gsub(*args, &block) # :nodoc:
-        str = capture_block { gsub(*args, &block) }
+        str = capture_str { gsub(*args, &block) }
         str.strip!
         str
       end
@@ -223,7 +223,7 @@ module Linebook
       end
       
       def _ln(*args, &block) # :nodoc:
-        str = capture_block { ln(*args, &block) }
+        str = capture_str { ln(*args, &block) }
         str.strip!
         str
       end
@@ -235,7 +235,7 @@ module Linebook
       end
       
       def _ln_s(*args, &block) # :nodoc:
-        str = capture_block { ln_s(*args, &block) }
+        str = capture_str { ln_s(*args, &block) }
         str.strip!
         str
       end
@@ -247,7 +247,7 @@ module Linebook
       end
       
       def _mkdir(*args, &block) # :nodoc:
-        str = capture_block { mkdir(*args, &block) }
+        str = capture_str { mkdir(*args, &block) }
         str.strip!
         str
       end
@@ -259,7 +259,7 @@ module Linebook
       end
       
       def _mkdir_p(*args, &block) # :nodoc:
-        str = capture_block { mkdir_p(*args, &block) }
+        str = capture_str { mkdir_p(*args, &block) }
         str.strip!
         str
       end
@@ -271,7 +271,7 @@ module Linebook
       end
       
       def _mv(*args, &block) # :nodoc:
-        str = capture_block { mv(*args, &block) }
+        str = capture_str { mv(*args, &block) }
         str.strip!
         str
       end
@@ -283,7 +283,7 @@ module Linebook
       end
       
       def _mv_f(*args, &block) # :nodoc:
-        str = capture_block { mv_f(*args, &block) }
+        str = capture_str { mv_f(*args, &block) }
         str.strip!
         str
       end
@@ -295,7 +295,7 @@ module Linebook
       end
       
       def _rm(*args, &block) # :nodoc:
-        str = capture_block { rm(*args, &block) }
+        str = capture_str { rm(*args, &block) }
         str.strip!
         str
       end
@@ -307,7 +307,7 @@ module Linebook
       end
       
       def _rm_r(*args, &block) # :nodoc:
-        str = capture_block { rm_r(*args, &block) }
+        str = capture_str { rm_r(*args, &block) }
         str.strip!
         str
       end
@@ -319,7 +319,7 @@ module Linebook
       end
       
       def _rm_rf(*args, &block) # :nodoc:
-        str = capture_block { rm_rf(*args, &block) }
+        str = capture_str { rm_rf(*args, &block) }
         str.strip!
         str
       end
@@ -335,7 +335,7 @@ module Linebook
       end
       
       def _section(*args, &block) # :nodoc:
-        str = capture_block { section(*args, &block) }
+        str = capture_str { section(*args, &block) }
         str.strip!
         str
       end
@@ -347,7 +347,7 @@ module Linebook
       end
       
       def _sed(*args, &block) # :nodoc:
-        str = capture_block { sed(*args, &block) }
+        str = capture_str { sed(*args, &block) }
         str.strip!
         str
       end
@@ -371,7 +371,7 @@ module Linebook
       end
       
       def _set(*args, &block) # :nodoc:
-        str = capture_block { set(*args, &block) }
+        str = capture_str { set(*args, &block) }
         str.strip!
         str
       end
@@ -386,7 +386,7 @@ module Linebook
       end
       
       def _set_date(*args, &block) # :nodoc:
-        str = capture_block { set_date(*args, &block) }
+        str = capture_str { set_date(*args, &block) }
         str.strip!
         str
       end
@@ -453,7 +453,7 @@ module Linebook
       end
       
       def _shebang(*args, &block) # :nodoc:
-        str = capture_block { shebang(*args, &block) }
+        str = capture_str { shebang(*args, &block) }
         str.strip!
         str
       end

@@ -93,13 +93,14 @@ module Linebook
       #
       # A body and block given together raises an error. Raises an error if the
       # function is already defined with a different body.
-      def function(name, body=nil, &block)
-        if body && block
+      def function(name, body=nil)
+        if body && block_given?
           raise "define functions with body or block"
         end
         
         if body.nil?
-          body = "\n#{capture_block { indent(&block) }.chomp("\n")}\n"
+          str  = capture_str { indent { yield } }
+          body = "\n#{str.chomp("\n")}\n"
         end
         
         function = "#{name}() {#{body}}"
@@ -131,7 +132,7 @@ module Linebook
       end
       
       def _append(*args, &block) # :nodoc:
-        str = capture_block { append(*args, &block) }
+        str = capture_str { append(*args, &block) }
         str.strip!
         str
       end
@@ -151,7 +152,7 @@ module Linebook
       end
       
       def _check_status(*args, &block) # :nodoc:
-        str = capture_block { check_status(*args, &block) }
+        str = capture_str { check_status(*args, &block) }
         str.strip!
         str
       end
@@ -163,7 +164,7 @@ module Linebook
       end
       
       def _check_status_function(*args, &block) # :nodoc:
-        str = capture_block { check_status_function(*args, &block) }
+        str = capture_str { check_status_function(*args, &block) }
         str.strip!
         str
       end
@@ -178,7 +179,7 @@ module Linebook
       end
       
       def _comment(*args, &block) # :nodoc:
-        str = capture_block { comment(*args, &block) }
+        str = capture_str { comment(*args, &block) }
         str.strip!
         str
       end
@@ -201,7 +202,7 @@ module Linebook
       end
       
       def _execute(*args, &block) # :nodoc:
-        str = capture_block { execute(*args, &block) }
+        str = capture_str { execute(*args, &block) }
         str.strip!
         str
       end
@@ -216,7 +217,7 @@ module Linebook
       end
       
       def _export(*args, &block) # :nodoc:
-        str = capture_block { export(*args, &block) }
+        str = capture_str { export(*args, &block) }
         str.strip!
         str
       end
@@ -228,7 +229,7 @@ module Linebook
       end
       
       def _from(*args, &block) # :nodoc:
-        str = capture_block { from(*args, &block) }
+        str = capture_str { from(*args, &block) }
         str.strip!
         str
       end
@@ -263,7 +264,7 @@ module Linebook
       end
       
       def _heredoc(*args, &block) # :nodoc:
-        str = capture_block { heredoc(*args, &block) }
+        str = capture_str { heredoc(*args, &block) }
         str.strip!
         str
       end
@@ -286,7 +287,7 @@ module Linebook
       end
       
       def _if_(*args, &block) # :nodoc:
-        str = capture_block { if_(*args, &block) }
+        str = capture_str { if_(*args, &block) }
         str.strip!
         str
       end
@@ -303,7 +304,7 @@ module Linebook
       end
       
       def _redirect(*args, &block) # :nodoc:
-        str = capture_block { redirect(*args, &block) }
+        str = capture_str { redirect(*args, &block) }
         str.strip!
         str
       end
@@ -322,7 +323,7 @@ module Linebook
       end
       
       def _set(*args, &block) # :nodoc:
-        str = capture_block { set(*args, &block) }
+        str = capture_str { set(*args, &block) }
         str.strip!
         str
       end
@@ -334,7 +335,7 @@ module Linebook
       end
       
       def _to(*args, &block) # :nodoc:
-        str = capture_block { to(*args, &block) }
+        str = capture_str { to(*args, &block) }
         str.strip!
         str
       end
@@ -346,7 +347,7 @@ module Linebook
       end
       
       def _unless_(*args, &block) # :nodoc:
-        str = capture_block { unless_(*args, &block) }
+        str = capture_str { unless_(*args, &block) }
         str.strip!
         str
       end
@@ -363,7 +364,7 @@ module Linebook
       end
       
       def _unset(*args, &block) # :nodoc:
-        str = capture_block { unset(*args, &block) }
+        str = capture_str { unset(*args, &block) }
         str.strip!
         str
       end
@@ -380,7 +381,7 @@ module Linebook
       end
       
       def _variable(*args, &block) # :nodoc:
-        str = capture_block { variable(*args, &block) }
+        str = capture_str { variable(*args, &block) }
         str.strip!
         str
       end

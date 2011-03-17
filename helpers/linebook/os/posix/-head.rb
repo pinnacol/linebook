@@ -89,13 +89,14 @@ end
 #
 # A body and block given together raises an error. Raises an error if the
 # function is already defined with a different body.
-def function(name, body=nil, &block)
-  if body && block
+def function(name, body=nil)
+  if body && block_given?
     raise "define functions with body or block"
   end
   
   if body.nil?
-    body = "\n#{capture_block { indent(&block) }.chomp("\n")}\n"
+    str  = capture_str { indent { yield } }
+    body = "\n#{str.chomp("\n")}\n"
   end
   
   function = "#{name}() {#{body}}"

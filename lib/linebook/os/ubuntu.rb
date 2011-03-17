@@ -14,7 +14,7 @@ module Linebook
       end
       
       def _package(*args, &block) # :nodoc:
-        str = capture_block { package(*args, &block) }
+        str = capture_str { package(*args, &block) }
         str.strip!
         str
       end

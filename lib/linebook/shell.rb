@@ -26,7 +26,7 @@ module Linebook
     end
     
     def _directory(*args, &block) # :nodoc:
-      str = capture_block { directory(*args, &block) }
+      str = capture_str { directory(*args, &block) }
       str.strip!
       str
     end
@@ -40,7 +40,7 @@ module Linebook
     end
     
     def _file(*args, &block) # :nodoc:
-      str = capture_block { file(*args, &block) }
+      str = capture_str { file(*args, &block) }
       str.strip!
       str
     end
@@ -53,7 +53,7 @@ module Linebook
     end
     
     def _group(*args, &block) # :nodoc:
-      str = capture_block { group(*args, &block) }
+      str = capture_str { group(*args, &block) }
       str.strip!
       str
     end
@@ -64,7 +64,7 @@ module Linebook
     end
     
     def _package(*args, &block) # :nodoc:
-      str = capture_block { package(*args, &block) }
+      str = capture_str { package(*args, &block) }
       str.strip!
       str
     end
@@ -85,7 +85,7 @@ module Linebook
     end
     
     def _recipe(*args, &block) # :nodoc:
-      str = capture_block { recipe(*args, &block) }
+      str = capture_str { recipe(*args, &block) }
       str.strip!
       str
     end
@@ -100,7 +100,7 @@ module Linebook
     end
     
     def _template(*args, &block) # :nodoc:
-      str = capture_block { template(*args, &block) }
+      str = capture_str { template(*args, &block) }
       str.strip!
       str
     end
@@ -119,7 +119,7 @@ module Linebook
     end
     
     def _user(*args, &block) # :nodoc:
-      str = capture_block { user(*args, &block) }
+      str = capture_str { user(*args, &block) }
       str.strip!
       str
     end
@@ -130,7 +130,7 @@ module Linebook
     end
     
     def _userdel(*args, &block) # :nodoc:
-      str = capture_block { userdel(*args, &block) }
+      str = capture_str { userdel(*args, &block) }
       str.strip!
       str
     end
@@ -141,7 +141,7 @@ module Linebook
     end
     
     def _usermod(*args, &block) # :nodoc:
-      str = capture_block { usermod(*args, &block) }
+      str = capture_str { usermod(*args, &block) }
       str.strip!
       str
     end
