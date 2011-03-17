@@ -145,7 +145,7 @@ module Linebook
       
       # Logs in as the specified user for the duration of a block (the current ENV
       # and pwd are reset as during a normal login).
-      def login(user='root', options={}, &block)
+      def login(user='root', options={})
         current = functions
         begin
           @functions = []
@@ -155,7 +155,7 @@ module Linebook
           end
           
           target_name = options[:target_name] || guess_target_name(user)
-          path = capture_path(target_name, options[:mode] || 0700, &block)
+          path = capture_path(target_name, options[:mode] || 0700) { yield }
           
           execute 'su', user, path, :l => true
         ensure
@@ -172,7 +172,7 @@ module Linebook
       
       # Switches to the specified user for the duration of a block.  The current ENV
       # and pwd are preserved.
-      def su(user='root', options={}, &block)
+      def su(user='root', options={})
         unless options.kind_of?(Hash)
           options = {:target_name => guess_target_name(options)}
         end
@@ -182,7 +182,7 @@ module Linebook
           functions.each do |function|
             writeln function
           end
-          instance_eval(&block)
+          yield
         end
         execute 'su', user, path, :m => true
         chain_proxy

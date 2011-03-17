@@ -341,8 +341,8 @@ module Linebook
       end
       
       # Executes the block when the expression evaluates to a non-zero value.
-      def unless_(expression, &block)
-        if_("! #{expression}", &block)
+      def unless_(expression)
+        if_("! #{expression}") { yield }
         chain_proxy
       end
       

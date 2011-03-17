@@ -184,7 +184,7 @@ end
 #
 
 desc 'Run the benchmarks assuming the vm is running'
-task :quickbench => :bundle do
+task :quickbench => :build do
   benchmarks = Dir.glob('benchmark/**/*_bench.rb')
   sh('ruby', '-w', '-e', 'ARGV.dup.each {|test| load test}', *benchmarks)
 end

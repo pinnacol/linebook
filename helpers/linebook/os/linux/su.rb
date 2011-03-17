@@ -1,6 +1,6 @@
 Switches to the specified user for the duration of a block.  The current ENV
 and pwd are preserved.
-(user='root', options={}, &block)
+(user='root', options={})
 --
   unless options.kind_of?(Hash)
     options = {:target_name => guess_target_name(options)}
@@ -11,7 +11,7 @@ and pwd are preserved.
     functions.each do |function|
       writeln function
     end
-    instance_eval(&block)
+    yield
   end
   execute 'su', user, path, :m => true
   

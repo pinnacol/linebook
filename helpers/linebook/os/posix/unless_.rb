@@ -1,4 +1,4 @@
 Executes the block when the expression evaluates to a non-zero value.
-(expression, &block)
+(expression)
 --
-  if_("! #{expression}", &block)
+  if_("! #{expression}") { yield }
