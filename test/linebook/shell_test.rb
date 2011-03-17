@@ -15,14 +15,9 @@ class ShellTest < Test::Unit::TestCase
   # guess_target_name test
   #
   
-  def test_guess_target_name_is_the_base_name_of_the_source_under_the_target_name_directory
-    recipe = setup_recipe 'recipe'
-    assert_equal 'recipe.d/name.txt', recipe.guess_target_name('source/name.txt')
-  end
-  
-  def test_guess_target_name_preserves_nested_recipe_names
-    recipe = setup_recipe 'nest/recipe'
-    assert_equal 'nest/recipe.d/name.txt', recipe.guess_target_name('source/name.txt')
+  def test_guess_target_name_is_the_base_name_of_the_source_under_the_target_namespace
+    recipe = setup_recipe 'name/space/recipe'
+    assert_equal 'name/space/name.txt', recipe.guess_target_name('source/name.txt')
   end
   
   #
@@ -112,7 +107,7 @@ class ShellTest < Test::Unit::TestCase
     
     assert_output_equal %{
       content
-    }, package.content('recipe.d/file.txt')
+    }, package.content('file.txt')
     
     assert_output_equal %{
       content
@@ -134,7 +129,7 @@ class ShellTest < Test::Unit::TestCase
     
     assert_output_equal %{
       got value
-    }, package.content('recipe.d/file.txt')
+    }, package.content('file.txt')
     
     assert_output_equal %{
       got value
