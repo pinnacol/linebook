@@ -43,7 +43,8 @@ Login as root, start sshd, stop the firewall, and setup su for the linecook user
   # insert:
   #   auth       sufficient pam_wheel.so trust
   
-  vm: usermod -A wheel linecook
+  vm: groupadd linecook
+  vm: usermod -g linecook -A wheel linecook
   
 Transfer your ssh key to the vm. Help to generate ssh keys can be found on
 {GitHub}[http://help.github.com/key-setup-redirect]:
@@ -69,3 +70,5 @@ Now take the standard snapshots:
 To cleanup the port forwarding (run later, if ever):
 
   VBoxManage modifyvm opensuse --natpf1 delete 'opensuse-ssh'
+
+https://bugzilla.novell.com/show_bug.cgi?id=556077#c7

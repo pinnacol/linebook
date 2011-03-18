@@ -47,7 +47,7 @@ install iso, take a snapshot and setup port forwarding.
 Transfer your ssh key to the vm. Help to generate ssh keys can be found on
 GitHub (http://help.github.com/key-setup-redirect):
 
-  scp -P 2228 -o UserKnownHostsFile=/dev/null ~/.ssh/id_rsa.pub linecook@localhost:id_rsa.pub
+  scp -P 2223 -o UserKnownHostsFile=/dev/null ~/.ssh/id_rsa.pub linecook@localhost:id_rsa.pub
 
 Login as root and setup su for the linecook user:
 
