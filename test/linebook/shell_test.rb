@@ -233,4 +233,22 @@ class ShellTest < Test::Unit::TestCase
       /home/linecook/#{remote_dir}
     }, *run_package
   end
+  
+  def test_recipe_can_be_run_by_non_root_users
+    prepare('recipes/source/recipe.rb', "writeln 'echo success'")
+    
+    setup_recipe do
+      rm_rf target_path('tmp')
+      directory target_path('tmp'), :mode => 770
+      login do 
+        group 'linecook'
+        user 'recipe_by_non_root_user_user', :g => 'linecook'
+      end
+      su('recipe_by_non_root_user_user') { recipe 'source/recipe' }
+    end
+    
+    assert_output_equal %{
+      success
+    }, *run_package
+  end
 end

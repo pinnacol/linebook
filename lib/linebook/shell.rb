@@ -71,13 +71,17 @@ module Linebook
     
     def recipe(recipe_name)
       target_name = File.join('recipes', recipe_name)
-      runlist = target_path "runlist.log"
       recipe_path = _package_.registry.has_key?(target_name) ? 
         target_path(target_name) : 
-        self.recipe_path(recipe_name, target_name)
-      
-      unless_ %{grep -xqs "#{recipe_name}" "#{runlist}"} do
-        echo(recipe_name).append(runlist)
+        self.recipe_path(recipe_name, target_name, 0777)
+    
+      dir = target_path File.join('tmp', recipe_name)
+      unless_ _directory?(dir) do
+        current = target_path('tmp')
+        recipe_name.split('/').each do |segment|
+          current = File.join(current, segment)
+          directory current, :mode => 770
+        end
         writeln "#{quote(recipe_path)} $*"
         check_status
       end
@@ -107,13 +111,7 @@ module Linebook
     
     def user(name, options={})
       unless_ _user?(name) do
-        useradd name
-      end
-      
-      
-      if groups = options[:groups]
-        groups = groups.gsub('*') { "$(#{_groups(name, :sep => ',')})" }
-        usermod name, :groups => groups
+        useradd name, options
       end
       chain_proxy
     end

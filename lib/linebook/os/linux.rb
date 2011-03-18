@@ -79,6 +79,24 @@ module Linebook
       require 'linebook/os/unix'
       include Unix
       
+      def capture_script(options={})
+        unless options.kind_of?(Hash)
+          options = {:target_name => guess_target_name(options)}
+        end
+      
+        target_name = options[:target_name] || guess_target_name('script')
+        path = capture_path(target_name, options[:mode] || 0770) { yield }
+      
+        owner, group = options[:owner], options[:group]
+        if owner || group
+          callback 'before' do
+            chown owner, group, path
+          end
+        end
+      
+        path
+      end
+      
       # Returns true if the group exists as determined by checking /etc/group.
       def group?(name)
         #  grep "^<%= name %>:" /etc/group >/dev/null 2>&1
@@ -150,13 +168,7 @@ module Linebook
         begin
           @functions = []
           
-          unless options.kind_of?(Hash)
-            options = {:target_name => guess_target_name(options)}
-          end
-          
-          target_name = options[:target_name] || guess_target_name(user)
-          path = capture_path(target_name, options[:mode] || 0700) { yield }
-          
+          path = capture_script(options) { yield }
           execute 'su', user, path, :l => true
         ensure
           @functions = current
@@ -173,12 +185,7 @@ module Linebook
       # Switches to the specified user for the duration of a block.  The current ENV
       # and pwd are preserved.
       def su(user='root', options={})
-        unless options.kind_of?(Hash)
-          options = {:target_name => guess_target_name(options)}
-        end
-        
-        target_name = options[:target_name] || guess_target_name(user)
-        path = capture_path(target_name, options[:mode] || 0700) do
+        path = capture_script(options) do
           functions.each do |function|
             writeln function
           end
