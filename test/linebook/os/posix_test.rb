@@ -688,4 +688,24 @@ class PosixTest < Test::Unit::TestCase
       unset 'ONE', 'TWO'
     end
   end
+  
+  #
+  # variable test
+  #
+  
+  def test_variable_sets_a_variable
+    assert_recipe %q{
+      KEY="VALUE"
+    } do
+      variable 'KEY', 'VALUE'
+    end
+  end
+  
+  def test_variable_respects_quoted_values
+    assert_recipe %q{
+      KEY='VALUE'
+    } do
+      variable 'KEY', "'VALUE'"
+    end
+  end
 end
