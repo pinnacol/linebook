@@ -126,8 +126,8 @@ module Linebook
       CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
       
       # Adds a redirect to append stdout to a file.
-      def append(path)
-        redirect(nil, path, '>>')
+      def append(path=nil)
+        redirect(nil, path || '/dev/null', '>>')
         chain_proxy
       end
       

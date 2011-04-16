@@ -22,6 +22,15 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
+  def test_append_redirects_to_dev_null_for_no_input
+    assert_recipe %q{
+      cat source >> /dev/null
+    } do
+      writeln "cat source"
+      chain :append
+    end
+  end
+  
   #
   # blank test
   #
@@ -655,6 +664,15 @@ class PosixTest < Test::Unit::TestCase
     } do
       writeln "cat source"
       chain :to, nil
+    end
+  end
+  
+  def test_to_redirects_to_dev_null_for_no_file
+    assert_recipe %q{
+      cat source > /dev/null
+    } do
+      writeln "cat source"
+      chain :to
     end
   end
   
