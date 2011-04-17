@@ -1,0 +1,37 @@
+# posix
+# http://pubs.opengroup.org/onlinepubs/009695399/idx/sbi.html
+break
+colon
+continue
+dot 
+eval
+exec
+exit
+export  
+readonly
+return  
+set  
+shift
+times
+trap 
+unset
+
+# reserved words
+# http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html
+!
+{
+}
+case
+do
+done
+elif
+else
+esac
+fi
+for
+if
+in
+then
+until
+while
+
