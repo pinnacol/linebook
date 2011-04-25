@@ -208,12 +208,10 @@ class ShellTest < Test::Unit::TestCase
       recipe 'source/recipe'
     end
     
-    runlist = prepare('runlist') {|io| io.puts "b" }
-    
     assert_output_equal %{
       b
       success
-    }, *run_package('runlist' => runlist)
+    }, *run_package('remote_script' => 'b')
   end
   
   def remote_dir
