@@ -1,16 +1,11 @@
 = Linebook
 
-Cookbooks for {Linecook}[http://gemcutter.org/gems/linecook].
+The {Linecook}[http://gemcutter.org/gems/linecook] standard library.
 
 == Description
 
-Linebook is a distribution module used by
-{Linecook}[http://gemcutter.org/gems/linecook]. Linebook has no content and
-exists solely to claim the namespace.
-
-== Usage
-
-None!
+The standard library for Linecook, and a namespace for distributing Linecook
+cookbooks.
 
 == Installation
 
@@ -20,5 +15,5 @@ Linebook is available as a gem on {Gemcutter}[http://gemcutter.org/gems/linebook
 
 == Info 
 
-Developer:: {Simon Chiang}[http://bahuvrihi.wordpress.com]
+Developer:: {Simon Chiang}[http://github.com/thinkerbot]
 License:: {MIT-Style}[link:files/License_txt.html]

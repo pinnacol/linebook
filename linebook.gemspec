@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.author   = 'Simon Chiang'
   s.email    = 'simon.a.chiang@gmail.com'
   s.homepage = 'http://rubygems.org/gems/linebook'
-  s.summary  = 'Cookbooks for Linecook'
-  s.description = 'Linebook is a distribution module used by Linecook.'
+  s.summary  = 'The Linecook standard library'
+  s.description = 'The standard library for Linecook, and a namespace for distributing Linecook cookbooks.'
 
   s.rubyforge_project = ''
   s.require_path = 'lib'

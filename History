@@ -1,3 +1,7 @@
+== 0.7.0 2011/04/26
+
+Updated to linecook-1.0.0
+
 == 0.6.0 2011/03/15
 
 Updated to linecook-0.19.1.  Sketched out use of method chaining.
