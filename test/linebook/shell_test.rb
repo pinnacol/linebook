@@ -119,11 +119,11 @@ class ShellTest < Test::Unit::TestCase
   #
   
   def test_template_builds_and_installs_the_corresponding_template_to_target
-    prepare('templates/source/file.txt.erb', "got <%= key %>\n")
+    prepare('templates/source/file.erb', "got <%= key %>\n")
     
     setup_recipe 'recipe' do
       rm_r('target').to(nil).redirect(2, 1)
-      template 'source/file.txt', 'target/file.txt', :locals => {:key => 'value'}
+      template 'source/file.erb', 'target/file.txt', :locals => {:key => 'value'}
       cat 'target/file.txt'
     end
     
