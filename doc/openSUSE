@@ -17,7 +17,8 @@ server and install (use default settings unless specified):
 
   - Desktop Selection: Other > Minimal Server Selection
   - user/password: linecook
-
+  - deselect automatic login
+  
 When the server has rebooted and is ready at the login screen, remove the
 install iso, take a snapshot and setup port forwarding.
 

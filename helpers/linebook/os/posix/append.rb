@@ -1,4 +1,4 @@
 Adds a redirect to append stdout to a file.
-(path)
+(path=nil)
 --
-  redirect(nil, path, '>>')
+  redirect(nil, path || '/dev/null', '>>')

@@ -1,3 +1,9 @@
+
+Trailing underscore for flow control (including technical exceptions like exit_ and return_)
+Leading underscore to capture for input (a non-printing capture)
+Canonical utility names are respected, if present.  Not all utilites are present.
+All else is fair game -- could mean anything.
+
 = Posix
 # common utilities
 

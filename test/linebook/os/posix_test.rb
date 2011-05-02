@@ -22,6 +22,15 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
+  def test_append_redirects_to_dev_null_for_no_input
+    assert_recipe %q{
+      cat source >> /dev/null
+    } do
+      writeln "cat source"
+      chain :append
+    end
+  end
+  
   #
   # blank test
   #
@@ -658,6 +667,15 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
+  def test_to_redirects_to_dev_null_for_no_file
+    assert_recipe %q{
+      cat source > /dev/null
+    } do
+      writeln "cat source"
+      chain :to
+    end
+  end
+  
   #
   # unset test
   #
@@ -668,6 +686,26 @@ class PosixTest < Test::Unit::TestCase
       unset TWO
     } do
       unset 'ONE', 'TWO'
+    end
+  end
+  
+  #
+  # variable test
+  #
+  
+  def test_variable_sets_a_variable
+    assert_recipe %q{
+      KEY="VALUE"
+    } do
+      variable 'KEY', 'VALUE'
+    end
+  end
+  
+  def test_variable_respects_quoted_values
+    assert_recipe %q{
+      KEY='VALUE'
+    } do
+      variable 'KEY', "'VALUE'"
     end
   end
 end
