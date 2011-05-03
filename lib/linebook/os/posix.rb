@@ -260,6 +260,30 @@ module Linebook
         str
       end
       
+      # Eval a string at runtime.
+      def eval(*args)
+        execute 'eval', *args
+        chain_proxy
+      end
+      
+      def _eval(*args, &block) # :nodoc:
+        str = capture_str { eval(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Exec a command at runtime.
+      def exec(*args)
+        execute 'exec', *args
+        chain_proxy
+      end
+      
+      def _exec(*args, &block) # :nodoc:
+        str = capture_str { exec(*args, &block) }
+        str.strip!
+        str
+      end
+      
       # Executes a command and checks the output status.  Quotes all non-option args
       # that aren't already quoted. Accepts a trailing hash which will be transformed
       # into command line options.

@@ -185,6 +185,30 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # eval test
+  #
+  
+  def test_eval_makes_an_eval_statement
+    assert_recipe %q{
+      eval "$cmd"
+    } do
+      eval '$cmd'
+    end
+  end
+  
+  #
+  # exec test
+  #
+  
+  def test_exec_makes_an_exec_statement
+    assert_recipe %q{
+      exec "bash"
+    } do
+      exec 'bash'
+    end
+  end
+  
+  #
   # exit_ test
   #
   
