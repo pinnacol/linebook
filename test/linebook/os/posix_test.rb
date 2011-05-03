@@ -827,6 +827,22 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # until_ test
+  #
+  
+  def test_until__makes_a_until_statement
+    assert_recipe %q{
+      until condition
+      do
+        content
+      done
+      
+    } do
+      until_('condition') { write  'content' }
+    end
+  end
+  
+  #
   # variable test
   #
   
@@ -843,6 +859,22 @@ class PosixTest < Test::Unit::TestCase
       KEY='VALUE'
     } do
       variable 'KEY', "'VALUE'"
+    end
+  end
+  
+  #
+  # while_ test
+  #
+  
+  def test_while__makes_a_while_statement
+    assert_recipe %q{
+      while condition
+      do
+        content
+      done
+      
+    } do
+      while_('condition') { write  'content' }
     end
   end
 end

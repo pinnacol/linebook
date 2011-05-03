@@ -475,6 +475,29 @@ module Linebook
         str
       end
       
+      # Executes the block until the expression evaluates to zero.
+      def until_(expression)
+        #  until <%= expression %>
+        #  do
+        #  <% indent { yield } %>
+        #  done
+        #  
+        #  
+        write "until "; write(( expression ).to_s); write "\n"
+        write "do\n"
+        indent { yield } 
+        write "done\n"
+        write "\n"
+      
+        chain_proxy
+      end
+      
+      def _until_(*args, &block) # :nodoc:
+        str = capture_str { until_(*args, &block) }
+        str.strip!
+        str
+      end
+      
       # Set a variable.
       def variable(key, value)
         #  <%= key %>=<%= quote(value) %>
@@ -488,6 +511,29 @@ module Linebook
       
       def _variable(*args, &block) # :nodoc:
         str = capture_str { variable(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Executes the block while the expression evaluates to zero.
+      def while_(expression)
+        #  while <%= expression %>
+        #  do
+        #  <% indent { yield } %>
+        #  done
+        #  
+        #  
+        write "while "; write(( expression ).to_s); write "\n"
+        write "do\n"
+        indent { yield } 
+        write "done\n"
+        write "\n"
+      
+        chain_proxy
+      end
+      
+      def _while_(*args, &block) # :nodoc:
+        str = capture_str { while_(*args, &block) }
         str.strip!
         str
       end
