@@ -133,6 +133,34 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # elif_ test
+  #
+  
+  def test_elif__raises_error_if_not_used_with_if_
+    err = assert_raises(RuntimeError) do
+      setup_recipe do
+        elif_('fail') {}
+      end
+    end
+    
+    assert_equal 'elif_ used outside of if_ statement', err.message
+  end
+  
+  #
+  # else_ test
+  #
+  
+  def test_else__raises_error_if_not_used_with_if_
+    err = assert_raises(RuntimeError) do
+      setup_recipe do
+        else_ {}
+      end
+    end
+    
+    assert_equal 'else_ used outside of if_ statement', err.message
+  end
+  
+  #
   # format_cmd test
   #
   
@@ -523,6 +551,21 @@ class PosixTest < Test::Unit::TestCase
     end
   end
   
+  def test_unless__with_else_
+    assert_recipe %q{
+      if ! A
+      then
+        a
+      else
+        b
+      fi
+      
+    } do
+      unless_('A') { write  'a' }
+      else_ { write  'b' }
+    end
+  end
+  
   #
   # if_ test
   #
@@ -536,6 +579,48 @@ class PosixTest < Test::Unit::TestCase
       
     } do
       if_('condition') { write  'content' }
+    end
+  end
+  
+  def test_if__with_elif___and_else_
+    assert_recipe %q{
+      if A
+      then
+        a
+      elif B
+      then
+        b
+      else
+        c
+      fi
+      
+    } do
+      if_('A') { write  'a' }
+      elif_('B') { write 'b' }
+      else_ { write  'c' }
+    end
+  end
+  
+  def test_if__with_elif___and_else__using_chains
+    assert_recipe %q{
+      if A
+      then
+        a
+      elif B
+      then
+        b
+      else
+        c
+      fi
+      
+    } do
+      if_('A') { 
+        write  'a'
+      }.elif_('B') {
+        write 'b'
+      }.else_ {
+        write  'c'
+      }
     end
   end
   

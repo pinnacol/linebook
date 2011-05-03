@@ -184,6 +184,52 @@ module Linebook
         str
       end
       
+      # Chains to if_ to make an else-if statement.
+      def elif_(expression)
+        unless match = rewrite(/(\s+)(fi\s*)/)
+          raise "elif_ used outside of if_ statement"
+        end
+        #  <%= match[1] %>
+        #  elif <%= expression %>
+        #  then
+        #  <% indent { yield } %>
+        #  <%= match[2] %>
+        write(( match[1] ).to_s)
+        write "elif "; write(( expression ).to_s); write "\n"
+        write "then\n"
+        indent { yield } 
+        write(( match[2] ).to_s)
+        chain_proxy
+      end
+      
+      def _elif_(*args, &block) # :nodoc:
+        str = capture_str { elif_(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Chains to if_ or unless_ to make an else statement.
+      def else_()
+        unless match = rewrite(/(\s+)(fi\s*)/)
+          raise "else_ used outside of if_ statement"
+        end
+        #  <%= match[1] %>
+        #  else
+        #  <% indent { yield } %>
+        #  <%= match[2] %>
+        write(( match[1] ).to_s)
+        write "else\n"
+        indent { yield } 
+        write(( match[2] ).to_s)
+        chain_proxy
+      end
+      
+      def _else_(*args, &block) # :nodoc:
+        str = capture_str { else_(*args, &block) }
+        str.strip!
+        str
+      end
+      
       # Executes a command and checks the output status.  Quotes all non-option args
       # that aren't already quoted. Accepts a trailing hash which will be transformed
       # into command line options.
