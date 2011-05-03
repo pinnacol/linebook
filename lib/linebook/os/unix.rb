@@ -99,42 +99,6 @@ module Linebook
         str
       end
       
-      # Copy source to target, with -f.
-      def cp_f(source, target)
-        cp source, target, '-f' => true
-        chain_proxy
-      end
-      
-      def _cp_f(*args, &block) # :nodoc:
-        str = capture_str { cp_f(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Copy source to target, with -r.
-      def cp_r(source, target)
-        cp source, target, '-r'=> true
-        chain_proxy
-      end
-      
-      def _cp_r(*args, &block) # :nodoc:
-        str = capture_str { cp_r(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Copy source to target, with -rf.
-      def cp_rf(source, target)
-        cp source, target, '-rf' => true
-        chain_proxy
-      end
-      
-      def _cp_rf(*args, &block) # :nodoc:
-        str = capture_str { cp_rf(*args, &block) }
-        str.strip!
-        str
-      end
-      
       # Returns the current system time.  A format string may be provided, as well as
       # a hash of command line options.
       def date(format=nil, options={})
@@ -152,9 +116,12 @@ module Linebook
         str
       end
       
-      def directory?(path)
-        #  [ -d "<%= path %>" ]
-        write "[ -d \""; write(( path ).to_s); write "\" ]"
+      # Checks that dir exists and is a directory.
+      def directory?(dir)
+        #  [ -d "<%= dir %>" ]
+        #  
+        write "[ -d \""; write(( dir ).to_s); write "\" ]\n"
+      
         chain_proxy
       end
       
@@ -176,9 +143,27 @@ module Linebook
         str
       end
       
-      def exists?(path)
-        #  [ -e "<%= path %>" ]
-        write "[ -e \""; write(( path ).to_s); write "\" ]"
+      # Checks that file exists and is executable, or file is a directory that can be searched.
+      def executable?(file)
+        #  [ -x "<%= file %>" ]
+        #  
+        write "[ -x \""; write(( file ).to_s); write "\" ]\n"
+      
+        chain_proxy
+      end
+      
+      def _executable?(*args, &block) # :nodoc:
+        str = capture_str { executable?(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Checks that file exists.
+      def exists?(file)
+        #  [ -e "<%= file %>" ]
+        #  
+        write "[ -e \""; write(( file ).to_s); write "\" ]\n"
+      
         chain_proxy
       end
       
@@ -188,9 +173,12 @@ module Linebook
         str
       end
       
-      def file?(path)
-        #  [ -f "<%= path %>" ]
-        write "[ -f \""; write(( path ).to_s); write "\" ]"
+      # Checks that file exists and is a regular file.
+      def file?(file)
+        #  [ -f "<%= file %>" ]
+        #  
+        write "[ -f \""; write(( file ).to_s); write "\" ]\n"
+      
         chain_proxy
       end
       
@@ -216,6 +204,36 @@ module Linebook
         str
       end
       
+      # Checks that file exists and is not empty.
+      def has_content?(file)
+        #  [ -s "<%= file %>" ]
+        #  
+        write "[ -s \""; write(( file ).to_s); write "\" ]\n"
+      
+        chain_proxy
+      end
+      
+      def _has_content?(*args, &block) # :nodoc:
+        str = capture_str { has_content?(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Checks that file exists and is a symbolic link.
+      def link?(file)
+        #  [ -L "<%= file %>" ]
+        #  
+        write "[ -L \""; write(( file ).to_s); write "\" ]\n"
+      
+        chain_proxy
+      end
+      
+      def _link?(*args, &block) # :nodoc:
+        str = capture_str { link?(*args, &block) }
+        str.strip!
+        str
+      end
+      
       # Link source to target.  Accepts a hash of command line options.
       def ln(source, target, options={})
         execute 'ln', source, target, options
@@ -224,18 +242,6 @@ module Linebook
       
       def _ln(*args, &block) # :nodoc:
         str = capture_str { ln(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Copy source to target, with -s.
-      def ln_s(source, target)
-        ln source, target, '-s' => true
-        chain_proxy
-      end
-      
-      def _ln_s(*args, &block) # :nodoc:
-        str = capture_str { ln_s(*args, &block) }
         str.strip!
         str
       end
@@ -252,18 +258,6 @@ module Linebook
         str
       end
       
-      # Make a directory, and parent directories as needed.
-      def mkdir_p(path)
-        mkdir path, '-p' => true
-        chain_proxy
-      end
-      
-      def _mkdir_p(*args, &block) # :nodoc:
-        str = capture_str { mkdir_p(*args, &block) }
-        str.strip!
-        str
-      end
-      
       # Move source to target.  Accepts a hash of command line options.
       def mv(source, target, options={})
         execute 'mv', source, target, options
@@ -276,14 +270,17 @@ module Linebook
         str
       end
       
-      # Move source to target, with -f.
-      def mv_f(source, target)
-        mv source, target, '-f' => true
+      # Checks that file exists and is readable.
+      def readable?(file)
+        #  [ -r "<%= file %>" ]
+        #  
+        write "[ -r \""; write(( file ).to_s); write "\" ]\n"
+      
         chain_proxy
       end
       
-      def _mv_f(*args, &block) # :nodoc:
-        str = capture_str { mv_f(*args, &block) }
+      def _readable?(*args, &block) # :nodoc:
+        str = capture_str { readable?(*args, &block) }
         str.strip!
         str
       end
@@ -296,30 +293,6 @@ module Linebook
       
       def _rm(*args, &block) # :nodoc:
         str = capture_str { rm(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Unlink a file or directory, with -r.
-      def rm_r(path)
-        rm path, '-r' => true
-        chain_proxy
-      end
-      
-      def _rm_r(*args, &block) # :nodoc:
-        str = capture_str { rm_r(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Unlink a file or directory, with -rf.
-      def rm_rf(path)
-        rm path, '-rf' => true
-        chain_proxy
-      end
-      
-      def _rm_rf(*args, &block) # :nodoc:
-        str = capture_str { rm_rf(*args, &block) }
         str.strip!
         str
       end
@@ -454,6 +427,21 @@ module Linebook
       
       def _shebang(*args, &block) # :nodoc:
         str = capture_str { shebang(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Checks that file exists and is writable.
+      def writable?(file)
+        #  [ -w "<%= file %>" ]
+        #  
+        write "[ -w \""; write(( file ).to_s); write "\" ]\n"
+      
+        chain_proxy
+      end
+      
+      def _writable?(*args, &block) # :nodoc:
+        str = capture_str { writable?(*args, &block) }
         str.strip!
         str
       end

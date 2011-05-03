@@ -143,6 +143,28 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
+  # directory? test
+  #
+  
+  def test_directory_check_checks_dir_exists_and_is_a_directory
+    setup_recipe do
+      cd package_dir
+      writeln 'mkdir dir'
+      writeln 'touch file'
+      writeln 'ln -s file link'
+      
+      if_ _directory?('dir')  do echo 'dir'  end
+      if_ _directory?('file') do echo 'file' end
+      if_ _directory?('link') do echo 'link' end
+      if_ _directory?('non')  do echo 'fail' end
+    end
+    
+    assert_output_equal %{
+      dir
+    }, *run_package
+  end
+  
+  #
   # echo test
   #
   
@@ -152,6 +174,73 @@ class UnixTest < Test::Unit::TestCase
     }){
       echo 'a b c'
     }
+  end
+  
+  #
+  # executable? test
+  #
+  
+  def test_executable_check_checks_file_is_executable
+    setup_recipe do
+      cd package_dir
+      writeln 'touch file'
+      writeln 'chmod +x file'
+      if_ _executable?('file')  do echo 'success'  end
+      
+      writeln 'chmod -x file'
+      if_ _executable?('file')  do echo 'fail'  end
+    end
+    
+    assert_output_equal %{
+      success
+    }, *run_package
+  end
+  
+  #
+  # exists? test
+  #
+  
+  def test_exists_check_checks_file_exists
+    setup_recipe do
+      cd package_dir
+      writeln 'mkdir dir'
+      writeln 'touch file'
+      writeln 'ln -s file link'
+      
+      if_ _exists?('dir')  do echo 'dir'  end
+      if_ _exists?('file') do echo 'file' end
+      if_ _exists?('link') do echo 'link' end
+      if_ _exists?('fail') do echo 'fail' end
+    end
+    
+    assert_output_equal %{
+      dir
+      file
+      link
+    }, *run_package
+  end
+  
+  #
+  # file? test
+  #
+  
+  def test_file_check_checks_file_exists_and_is_a_file
+    setup_recipe do
+      cd package_dir
+      writeln 'mkdir dir'
+      writeln 'touch file'
+      writeln 'ln -s file link'
+      
+      if_ _file?('dir')  do echo 'dir'  end
+      if_ _file?('file') do echo 'file' end
+      if_ _file?('link') do echo 'link' end
+      if_ _file?('non')  do echo 'fail' end
+    end
+    
+    assert_output_equal %{
+      file
+      link
+    }, *run_package
   end
   
   #
@@ -169,6 +258,47 @@ class UnixTest < Test::Unit::TestCase
     assert_output_equal %{
       A b A b
       b A b A
+    }, *run_package
+  end
+  
+  #
+  # has_content? test
+  #
+  
+  def test_has_content_check_checks_file_exists_and_has_content
+    setup_recipe do
+      cd package_dir
+      writeln 'touch file'
+      if_ _has_content?('file')  do echo 'fail'  end
+      
+      writeln 'echo content > file'
+      if_ _has_content?('file')  do echo 'success'  end
+    end
+    
+    assert_output_equal %{
+      success
+    }, *run_package
+  end
+  
+  #
+  # link? test
+  #
+  
+  def test_link_check_checks_link_exists_and_is_a_link
+    setup_recipe do
+      cd package_dir
+      writeln 'mkdir dir'
+      writeln 'touch file'
+      writeln 'ln -s file link'
+      
+      if_ _link?('dir')  do echo 'dir'  end
+      if_ _link?('file') do echo 'file' end
+      if_ _link?('link') do echo 'link' end
+      if_ _link?('non')  do echo 'fail' end
+    end
+    
+    assert_output_equal %{
+      link
     }, *run_package
   end
   
@@ -206,6 +336,26 @@ class UnixTest < Test::Unit::TestCase
     } do
       mv 'source', 'target'
     end
+  end
+  
+  #
+  # readable? test
+  #
+  
+  def test_readable_check_checks_file_is_readable
+    setup_recipe do
+      cd package_dir
+      writeln 'touch file'
+      writeln 'chmod +r file'
+      if_ _readable?('file')  do echo 'success'  end
+      
+      writeln 'chmod -r file'
+      if_ _readable?('file')  do echo 'fail'  end
+    end
+    
+    assert_output_equal %{
+      success
+    }, *run_package
   end
   
   #
@@ -313,6 +463,26 @@ class UnixTest < Test::Unit::TestCase
     
     assert_output_equal %{
       #{time.strftime("%Y-%m-%d %H:%M")}
+    }, *run_package
+  end
+  
+  #
+  # writable? test
+  #
+  
+  def test_writable_check_checks_file_is_writable
+    setup_recipe do
+      cd package_dir
+      writeln 'touch file'
+      writeln 'chmod +w file'
+      if_ _writable?('file')  do echo 'success'  end
+      
+      writeln 'chmod -w file'
+      if_ _writable?('file')  do echo 'fail'  end
+    end
+    
+    assert_output_equal %{
+      success
     }, *run_package
   end
 end
