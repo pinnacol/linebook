@@ -51,6 +51,18 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # break test
+  #
+  
+  def test_break__adds_a_break_statement
+    assert_recipe %q{
+      break
+    } do
+      break_
+    end
+  end
+  
+  #
   # check_status test
   #
   
@@ -133,6 +145,18 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # continue_ test
+  #
+  
+  def test_continue__adds_a_continue_statement
+    assert_recipe %q{
+      continue
+    } do
+      continue_
+    end
+  end
+  
+  #
   # elif_ test
   #
   
@@ -158,6 +182,20 @@ class PosixTest < Test::Unit::TestCase
     end
     
     assert_equal 'else_ used outside of if_ statement', err.message
+  end
+  
+  #
+  # exit_ test
+  #
+  
+  def test_exit__adds_an_exit_0_statement
+    assert_recipe %q{
+      exit 0
+      exit 8
+    } do
+      exit_
+      exit_ 8
+    end
   end
   
   #
@@ -714,6 +752,20 @@ class PosixTest < Test::Unit::TestCase
       check_status_function
       execute 'cat source'
       chain :redirect, 2, 1
+    end
+  end
+  
+  #
+  # return_ test
+  #
+  
+  def test_return__adds_a_return_statement
+    assert_recipe %q{
+      return 0
+      return 8
+    } do
+      return_
+      return_ 8
     end
   end
   

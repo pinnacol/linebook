@@ -137,6 +137,21 @@ module Linebook
         str
       end
       
+      # Adds a break statement.
+      def break_()
+        #  break
+        #  
+        write "break\n"
+      
+        chain_proxy
+      end
+      
+      def _break_(*args, &block) # :nodoc:
+        str = capture_str { break_(*args, &block) }
+        str.strip!
+        str
+      end
+      
       # Adds a check that ensures the last exit status is as indicated. Note that no
       # check will be added unless check_status_function is added beforehand.
       def check_status(expect_status=0, fail_status='$?')
@@ -180,6 +195,21 @@ module Linebook
       
       def _comment(*args, &block) # :nodoc:
         str = capture_str { comment(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Makes a continue statement.
+      def continue_()
+        #  continue
+        #  
+        write "continue\n"
+      
+        chain_proxy
+      end
+      
+      def _continue_(*args, &block) # :nodoc:
+        str = capture_str { continue_(*args, &block) }
         str.strip!
         str
       end
@@ -249,6 +279,21 @@ module Linebook
       
       def _execute(*args, &block) # :nodoc:
         str = capture_str { execute(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Makes an exit statement.
+      def exit_(status=0)
+        #  exit <%= status %>
+        #  
+        write "exit "; write(( status ).to_s); write "\n"
+      
+        chain_proxy
+      end
+      
+      def _exit_(*args, &block) # :nodoc:
+        str = capture_str { exit_(*args, &block) }
         str.strip!
         str
       end
@@ -351,6 +396,21 @@ module Linebook
       
       def _redirect(*args, &block) # :nodoc:
         str = capture_str { redirect(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Makes a return statement.
+      def return_(status=0)
+        #  return <%= status %>
+        #  
+        write "return "; write(( status ).to_s); write "\n"
+      
+        chain_proxy
+      end
+      
+      def _return_(*args, &block) # :nodoc:
+        str = capture_str { return_(*args, &block) }
         str.strip!
         str
       end
