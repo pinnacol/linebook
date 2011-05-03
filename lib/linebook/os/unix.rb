@@ -116,11 +116,11 @@ module Linebook
         str
       end
       
-      # Checks that dir exists and is a directory.
-      def directory?(dir)
-        #  [ -d "<%= dir %>" ]
+      # Checks that file exists and is a directory.
+      def directory?(file)
+        #  [ -d "<%= file %>" ]
         #  
-        write "[ -d \""; write(( dir ).to_s); write "\" ]\n"
+        write "[ -d \""; write(( file ).to_s); write "\" ]\n"
       
         chain_proxy
       end
@@ -242,6 +242,18 @@ module Linebook
       
       def _ln(*args, &block) # :nodoc:
         str = capture_str { ln(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # List directory contents
+      def ls(file, options={})
+        execute 'ls', file, options
+        chain_proxy
+      end
+      
+      def _ls(*args, &block) # :nodoc:
+        str = capture_str { ls(*args, &block) }
         str.strip!
         str
       end

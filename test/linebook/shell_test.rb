@@ -58,9 +58,9 @@ class ShellTest < Test::Unit::TestCase
   
   def test_directory_makes_the_target_directory
     setup_recipe do
-      rm_r 'target'
+      rm '-r', 'target'
       directory 'target'
-      writeln 'ls -la .'
+      ls '-la', '.'
     end
     
     assert_alike %{
@@ -70,9 +70,9 @@ class ShellTest < Test::Unit::TestCase
   
   def test_directory_makes_parent_dirs_as_needed
     setup_recipe do
-      rm_r 'target'
+      rm '-r', 'target'
       directory 'target/dir'
-      writeln 'ls -la target'
+      ls '-la', '.'
     end
     
     assert_alike %{
@@ -82,9 +82,9 @@ class ShellTest < Test::Unit::TestCase
   
   def test_directory_sets_mode
     setup_recipe do
-      rm_r 'target'
+      rm '-r', 'target'
       directory 'target', :mode => 700
-      writeln 'ls -la .'
+      ls '-la', '.'
     end
     
     assert_alike %{
@@ -100,7 +100,7 @@ class ShellTest < Test::Unit::TestCase
     prepare('files/source/file.txt', "content\n")
     
     setup_recipe 'recipe' do
-      rm_r('target').to(nil).redirect(2, 1)
+      rm('-r', 'target').to(nil).redirect(2, 1)
       file 'source/file.txt', 'target/file.txt'
       cat 'target/file.txt'
     end
@@ -122,7 +122,7 @@ class ShellTest < Test::Unit::TestCase
     prepare('templates/source/file.erb', "got <%= key %>\n")
     
     setup_recipe 'recipe' do
-      rm_r('target').to(nil).redirect(2, 1)
+      rm('-r', 'target').to(nil).redirect(2, 1)
       template 'source/file.erb', 'target/file.txt', :locals => {:key => 'value'}
       cat 'target/file.txt'
     end
@@ -236,7 +236,7 @@ class ShellTest < Test::Unit::TestCase
     prepare('recipes/source/recipe.rb', "writeln 'echo success'")
     
     setup_recipe do
-      rm_rf target_path('tmp')
+      rm '-rf', target_path('tmp')
       directory target_path('tmp'), :mode => 770
       login do 
         group 'linecook'
