@@ -122,30 +122,6 @@ class UnixTest < Test::Unit::TestCase
     end
   end
   
-  def test_cp_f
-    assert_recipe %q{
-      cp -f "source" "target"
-    } do
-      cp_f 'source', 'target'
-    end
-  end
-  
-  def test_cp_r
-    assert_recipe %q{
-      cp -r "source" "target"
-    } do
-      cp_r 'source', 'target'
-    end
-  end
-  
-  def test_cp_rf
-    assert_recipe %q{
-      cp -rf "source" "target"
-    } do
-      cp_rf 'source', 'target'
-    end
-  end
-  
   #
   # date test
   #
@@ -208,14 +184,6 @@ class UnixTest < Test::Unit::TestCase
     end
   end
   
-  def test_ln_s
-    assert_recipe %q{
-      ln -s "source" "target"
-    } do
-      ln_s 'source', 'target'
-    end
-  end
-  
   #
   # mkdir test
   #
@@ -228,14 +196,6 @@ class UnixTest < Test::Unit::TestCase
     end
   end
   
-  def test_mkdir_p
-    assert_recipe %q{
-      mkdir -p "target"
-    } do
-      mkdir_p 'target'
-    end
-  end
-  
   #
   # mv test
   #
@@ -245,14 +205,6 @@ class UnixTest < Test::Unit::TestCase
       mv "source" "target"
     } do
       mv 'source', 'target'
-    end
-  end
-  
-  def test_mv_f
-    assert_recipe %q{
-      mv -f "source" "target"
-    } do
-      mv_f 'source', 'target'
     end
   end
   
@@ -285,7 +237,7 @@ class UnixTest < Test::Unit::TestCase
     assert_recipe %q{
       rm -r "target"
     } do
-      rm_r 'target'
+      rm 'target', :r => true
     end
   end
   
@@ -293,7 +245,7 @@ class UnixTest < Test::Unit::TestCase
     assert_recipe %q{
       rm -rf "target"
     } do
-      rm_rf 'target'
+      rm '-rf', 'target'
     end
   end
   
