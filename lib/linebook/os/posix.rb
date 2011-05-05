@@ -8,6 +8,11 @@ module Linebook
     # and {Special Built-in
     # Utilites}[http://pubs.opengroup.org/onlinepubs/009695399/idx/sbi.html]
     module Posix
+      # Returns "$0", the program name.
+      def program_name
+        "$0"
+      end
+      
       # Returns true if the obj converts to a string which is whitespace or empty.
       def blank?(obj)
         # shortcut for nil...
@@ -190,9 +195,17 @@ module Linebook
         str
       end
       
-      # Adds the check status function.
+      # Defines the check status function.
       def check_status_function()
-        function 'check_status', ' if [ $2 -ne $1 ]; then echo "[$2] $0:${4:-?}"; exit $3; else return $2; fi '
+        function 'check_status' do |expected, actual, error, message|
+          if_ "[ #{actual} -ne #{expected} ]" do
+            writeln "echo [#{actual}] #{program_name}:${4:-?}"
+            exit_ error
+          end
+          else_ do
+            return_ actual
+          end
+        end
         chain_proxy
       end
       

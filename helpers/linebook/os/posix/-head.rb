@@ -1,4 +1,9 @@
 
+# Returns "$0", the program name.
+def program_name
+  "$0"
+end
+
 # Returns true if the obj converts to a string which is whitespace or empty.
 def blank?(obj)
   # shortcut for nil...
