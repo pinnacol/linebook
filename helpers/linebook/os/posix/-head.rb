@@ -1,7 +1,7 @@
 
 # Returns "$0", the program name.
 def program_name
-  "$0"
+  Variable.new(0)
 end
 
 # Returns true if the obj converts to a string which is whitespace or empty.
@@ -128,9 +128,13 @@ end
 # block.  Splat blocks are supported; the splat variable (I think) behaves
 # like $*.
 def signature(arity)
-  variables = Array.new(arity.abs) {|i| "$#{i+1}" }
+  variables = Array.new(arity.abs) {|i| Variable.new(i + 1) }
   
   if arity < 0
+    # This works for defaults...
+    # $(shift 1; echo ${*:-NONE})
+    # You can't do this:
+    # ${$(shift 1; echo $*):-NONE}
     variables[-1] = "$(shift #{arity.abs - 1}; echo $*)"
   end
   
@@ -140,3 +144,90 @@ end
 def trailer
   /(\s*)\z/
 end
+
+class Variable
+  attr_accessor :varname
+  attr_accessor :default
+  
+  def initialize(varname, default=nil)
+    @varname = varname.to_s
+    @default = default
+  end
+  
+  def lstrip(pattern)
+    "${#{varname}##{pattern}}"
+  end
+  
+  def llstrip(pattern)
+    "${#{varname}###{pattern}}"
+  end
+  
+  def rstrip(pattern)
+    "${#{varname}%#{pattern}}"
+  end
+  
+  def rrstrip(pattern)
+    "${#{varname}%%#{pattern}}"
+  end
+  
+  def sub(pattern, replacement)
+    "${#{varname}/#{pattern}/#{replacement}}"
+  end
+  
+  def gsub(pattern, replacement)
+    "${#{varname}//#{pattern}/#{replacement}}"
+  end
+  
+  def length
+    "${##{varname}}"
+  end
+  
+  def substring(offset, length=nil)
+    length ? "${#{varname}:#{offset}:#{length}}": "${#{varname}:#{offset}}"
+  end
+  
+  def eq(another)
+    "[ #{self} -eq #{another} ]"
+  end
+  
+  def ne(another)
+    "[ #{self} -ne #{another} ]"
+  end
+  
+  def gt(another)
+    "[ #{self} -gt #{another} ]"
+  end
+  
+  def lt(another)
+    "[ #{self} -lt #{another} ]"
+  end
+  
+  def ==(another)
+    "[ #{self} = #{another} ]"
+  end
+  
+  # def !=(another)
+  #   "[ #{self} != #{another} ]"
+  # end
+  
+  def >(another)
+    "[ #{self} > #{another} ]"
+  end
+  
+  def <(another)
+    "[ #{self} < #{another} ]"
+  end
+  
+  def null?
+    "[ -z #{self} ]"
+  end
+  
+  def not_null?
+    "[ -n #{self} ]"
+  end
+  
+  def to_s
+    default.nil? ? "$#{varname}" : "${#{varname}:-#{default}}"
+  end
+end
+
