@@ -3,14 +3,10 @@
 module Linebook
   module Os
     # Defines basic POSIX utilities, and POSIX-compliant functionality. See the
-    # online documentation of:
-    #
-    # * {POSIX Shell Command
-    #   Language}[http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_cha
-    #   p02.html]
-    # * {Special Built-in
-    #   Utilites}[http://pubs.opengroup.org/onlinepubs/009695399/idx/sbi.html]
-    #
+    # online documentation of {POSIX Shell Command Language
+    # }[http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html]
+    # and {Special Built-in
+    # Utilites}[http://pubs.opengroup.org/onlinepubs/009695399/idx/sbi.html]
     module Posix
       # Returns true if the obj converts to a string which is whitespace or empty.
       def blank?(obj)
@@ -265,30 +261,6 @@ module Linebook
       
       def _else_(*args, &block) # :nodoc:
         str = capture_str { else_(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Eval a string at runtime.
-      def eval(*args)
-        execute 'eval', *args
-        chain_proxy
-      end
-      
-      def _eval(*args, &block) # :nodoc:
-        str = capture_str { eval(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Exec a command at runtime.
-      def exec(*args)
-        execute 'exec', *args
-        chain_proxy
-      end
-      
-      def _exec(*args, &block) # :nodoc:
-        str = capture_str { exec(*args, &block) }
         str.strip!
         str
       end

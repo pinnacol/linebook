@@ -1,4 +1,5 @@
-Sets up a gsub using sed.
+Perform a gsub using sed.  Intended for use in chains.
+
 (pattern, replacement, *args)
 --
   unless args.last.kind_of?(Hash)

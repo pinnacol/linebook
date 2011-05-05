@@ -35,33 +35,23 @@ class UnixTest < Test::Unit::TestCase
   
   def test_cd_changes_dir
     setup_recipe do
-      writeln 'pwd'
+      mkdir '/tmp/a/b', :p => true
+      
       cd '/tmp'
-      writeln 'pwd'
-    end
-    
-    assert_output_equal %{
-      /home/linecook
-      /tmp
-    }, *run_package
-  end
-  
-  def test_cd_changes_dir_for_duration_of_a_block_if_given
-    setup_recipe do
-      writeln 'pwd'
-      cd '/tmp' do
-        writeln 'pwd'
-        cd '/var'
-        writeln 'pwd'
+      pwd
+      cd 'a' do
+        pwd
+        cd 'b'
+        pwd
       end
-      writeln 'pwd'
+      pwd
     end
     
     assert_output_equal %{
-      /home/linecook
       /tmp
-      /var
-      /home/linecook
+      /tmp/a
+      /tmp/a/b
+      /tmp
     }, *run_package
   end
   
@@ -71,8 +61,10 @@ class UnixTest < Test::Unit::TestCase
   
   def test_chomd_chmods_a_file
     setup_recipe do
-      writeln 'touch file'
-      writeln 'chmod 644 file'
+      cd package_dir
+      
+      touch 'file'
+      chmod '644', 'file'
       writeln 'ls -la file'
       chmod '600', 'file'
       writeln 'ls -la file'
@@ -84,10 +76,18 @@ class UnixTest < Test::Unit::TestCase
     }, *run_package
   end
   
+  def test_chomd_converts_fixnums_to_octal
+    assert_recipe %q{
+      chmod "644" "file"
+    } do
+      chmod 0644, 'file'
+    end
+  end
+  
   def test_chmod_does_nothing_for_no_mode
     assert_recipe %q{
     } do
-      chmod nil, 'target'
+      chmod nil, 'file'
     end
   end
   
@@ -95,18 +95,21 @@ class UnixTest < Test::Unit::TestCase
   # chown test
   #
   
+  # Don't know how to encapsulate test chown at this point... technically user
+  # management commands do not have to exist yet!
+  
   def test_chown_sets_up_file_chown
     assert_recipe_matches %q{
-      chown "user:group" "target"
+      chown "owner:group" "file"
     } do
-      chown 'user', 'group', 'target'
+      chown 'owner', 'group', 'file'
     end
   end
   
-  def test_chown_does_nothing_for_no_user_or_group
+  def test_chown_does_nothing_for_nil_user_and_group
     assert_recipe %q{
     } do
-      chown nil, nil, 'target'
+      chown nil, nil, 'file'
     end
   end
   
@@ -126,20 +129,12 @@ class UnixTest < Test::Unit::TestCase
   # date test
   #
   
-  def test_date_prints_date_in_specified_format
-    setup_recipe do
-      path = capture_path('set_date.sh') do
-        writeln "date 031008301979"
-      end
-      
-      writeln %{chmod +x "#{path}"}
-      writeln %{su root "#{path}" > /dev/null}
-      date "%Y-%m-%d %H:%M"
+  def test_date
+    assert_recipe %q{
+      date
+    } do
+      date
     end
-    
-    assert_output_equal %{
-      1979-03-10 08:30
-    }, *run_package
   end
   
   #
@@ -149,6 +144,7 @@ class UnixTest < Test::Unit::TestCase
   def test_directory_check_checks_dir_exists_and_is_a_directory
     setup_recipe do
       cd package_dir
+      
       writeln 'mkdir dir'
       writeln 'touch file'
       writeln 'ln -s file link'
@@ -183,6 +179,7 @@ class UnixTest < Test::Unit::TestCase
   def test_executable_check_checks_file_is_executable
     setup_recipe do
       cd package_dir
+      
       writeln 'touch file'
       writeln 'chmod +x file'
       if_ _executable?('file')  do echo 'success'  end
@@ -203,6 +200,7 @@ class UnixTest < Test::Unit::TestCase
   def test_exists_check_checks_file_exists
     setup_recipe do
       cd package_dir
+      
       writeln 'mkdir dir'
       writeln 'touch file'
       writeln 'ln -s file link'
@@ -227,6 +225,7 @@ class UnixTest < Test::Unit::TestCase
   def test_file_check_checks_file_exists_and_is_a_file
     setup_recipe do
       cd package_dir
+      
       writeln 'mkdir dir'
       writeln 'touch file'
       writeln 'ln -s file link'
@@ -268,6 +267,7 @@ class UnixTest < Test::Unit::TestCase
   def test_has_content_check_checks_file_exists_and_has_content
     setup_recipe do
       cd package_dir
+      
       writeln 'touch file'
       if_ _has_content?('file')  do echo 'fail'  end
       
@@ -287,6 +287,7 @@ class UnixTest < Test::Unit::TestCase
   def test_link_check_checks_link_exists_and_is_a_link
     setup_recipe do
       cd package_dir
+      
       writeln 'mkdir dir'
       writeln 'touch file'
       writeln 'ln -s file link'
@@ -339,12 +340,25 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
+  # pwd test
+  #
+  
+  def test_pwd
+    assert_recipe %q{
+      pwd
+    } do
+      pwd
+    end
+  end
+  
+  #
   # readable? test
   #
   
   def test_readable_check_checks_file_is_readable
     setup_recipe do
       cd package_dir
+      
       writeln 'touch file'
       writeln 'chmod +r file'
       if_ _readable?('file')  do echo 'success'  end
@@ -364,10 +378,12 @@ class UnixTest < Test::Unit::TestCase
   
   def test_rm_removes_a_file
     setup_recipe do
-      writeln 'touch file'
+      cd package_dir
+      
+      touch 'file'
       rm 'file'
       
-      writeln 'if ! [ -e file ]; then echo success; fi'
+      unless_ _exists?('file') do echo 'success' end
     end
     
     assert_output_equal %{
@@ -377,25 +393,9 @@ class UnixTest < Test::Unit::TestCase
   
   def test_rm
     assert_recipe %q{
-      rm "target"
+      rm "file"
     } do
-      rm 'target'
-    end
-  end
-  
-  def test_rm_r
-    assert_recipe %q{
-      rm -r "target"
-    } do
-      rm 'target', :r => true
-    end
-  end
-  
-  def test_rm_rf
-    assert_recipe %q{
-      rm -rf "target"
-    } do
-      rm '-rf', 'target'
+      rm 'file'
     end
   end
   
@@ -467,6 +467,28 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
+  # touch test
+  #
+  
+  def test_touch_touches_a_file
+    setup_recipe do
+      cd package_dir
+      if_ _exists?('file') do
+        echo 'fail'
+      end
+      
+      touch 'file'
+      if_ _exists?('file') do 
+        echo 'success'
+      end
+    end
+    
+    assert_output_equal %{
+      success
+    }, *run_package
+  end
+  
+  #
   # writable? test
   #
   
@@ -475,10 +497,14 @@ class UnixTest < Test::Unit::TestCase
       cd package_dir
       writeln 'touch file'
       writeln 'chmod +w file'
-      if_ _writable?('file')  do echo 'success'  end
+      if_ _writable?('file') do
+        echo 'success'
+      end
       
       writeln 'chmod -w file'
-      if_ _writable?('file')  do echo 'fail'  end
+      if_ _writable?('file') do
+        echo 'fail'
+      end
     end
     
     assert_output_equal %{

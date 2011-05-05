@@ -1,4 +1,5 @@
-Move source to target.  Accepts a hash of command line options.
+Move source to target.
+
 (source, target, options={})
 --
   execute 'mv', source, target, options

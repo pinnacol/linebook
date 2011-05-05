@@ -1,10 +1,12 @@
-Makes a command to chmod a file or directory.  Provide the mode as the
-literal string that should go into the statement:
+Changes the file mode. The file mode may be specified as a String or a Fixnum.
+If a Fixnum is provided, then it will be formatted into an octal string using
+sprintf "%o".
 
-  chmod "600" target
-
-(mode, target)
+(mode, file, options={})
 --
-  if mode
-    execute 'chmod', mode, target
+  unless mode.nil?
+    if mode.kind_of?(Fixnum)
+      mode = sprintf("%o", mode)
+    end
+    execute 'chmod', mode, file, options
   end

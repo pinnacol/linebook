@@ -1,7 +1,8 @@
-Makes a command to chown a file or directory.
-(user, group, target)
+Changes file ownership. A nil value as owner or group will preserve the
+existing value.
+
+(owner, group, file, options={})
 --
-  if user || group
-    execute 'chown', "#{user}:#{group}", target
+  unless owner.nil? && group.nil?
+    execute 'chown', "#{owner}:#{group}", file, options
   end
-  

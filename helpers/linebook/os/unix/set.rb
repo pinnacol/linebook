@@ -1,5 +1,6 @@
-Sets the options to on (true) or off (false) as specified.  If a block is
-given then options will only be reset when the block completes.
+Sets the options to on (true) or off (false) as specified. If a block is given
+then options will only be reset when the block completes.
+
 (options)
 --
   if block_given?

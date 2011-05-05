@@ -1,4 +1,5 @@
-Executes 'cat' with the sources.
-(*sources)
+Executes cat.
+
+(*files)
 --
-  execute 'cat', *sources
+  execute 'cat', *files

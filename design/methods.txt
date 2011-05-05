@@ -1,7 +1,7 @@
 
 Trailing underscore for flow control (including technical exceptions like exit_ and return_)
 Leading underscore to capture for input (a non-printing capture)
-Canonical utility names are respected, if present.  Not all utilites are present.
+Canonical utility names are respected, if present, such that the method will work like utility (although the functionality may be constrained/focused). Not all utilites are present.
 All else is fair game -- could mean anything.
 
 = Posix

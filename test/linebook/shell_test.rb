@@ -58,33 +58,37 @@ class ShellTest < Test::Unit::TestCase
   
   def test_directory_makes_the_target_directory
     setup_recipe do
-      rm '-r', 'target'
+      cd package_dir
       directory 'target'
-      ls '-la', '.'
+      if_ _directory?('target') do
+        echo 'success'
+      end
     end
     
     assert_alike %{
-      drwxr-xr-x :...: target
+      success
     }, *run_package
   end
   
   def test_directory_makes_parent_dirs_as_needed
     setup_recipe do
-      rm '-r', 'target'
+      cd package_dir
       directory 'target/dir'
-      ls '-la', '.'
+      if_ _directory?('target/dir') do
+        echo 'success'
+      end
     end
     
     assert_alike %{
-      drwxr-xr-x :...: dir
+      success
     }, *run_package
   end
   
   def test_directory_sets_mode
     setup_recipe do
-      rm '-r', 'target'
-      directory 'target', :mode => 700
-      ls '-la', '.'
+      cd package_dir
+      directory 'target', :mode => 0700
+      writeln 'ls -la'
     end
     
     assert_alike %{
@@ -100,7 +104,7 @@ class ShellTest < Test::Unit::TestCase
     prepare('files/source/file.txt', "content\n")
     
     setup_recipe 'recipe' do
-      rm('-r', 'target').to(nil).redirect(2, 1)
+      cd package_dir
       file 'source/file.txt', 'target/file.txt'
       cat 'target/file.txt'
     end
@@ -122,7 +126,7 @@ class ShellTest < Test::Unit::TestCase
     prepare('templates/source/file.erb', "got <%= key %>\n")
     
     setup_recipe 'recipe' do
-      rm('-r', 'target').to(nil).redirect(2, 1)
+      cd package_dir
       template 'source/file.erb', 'target/file.txt', :locals => {:key => 'value'}
       cat 'target/file.txt'
     end
@@ -236,8 +240,8 @@ class ShellTest < Test::Unit::TestCase
     prepare('recipes/source/recipe.rb', "writeln 'echo success'")
     
     setup_recipe do
-      rm '-rf', target_path('tmp')
-      directory target_path('tmp'), :mode => 770
+      cd package_dir
+      directory target_path('tmp'), :mode => 0770
       login do 
         group 'linecook'
         user 'recipe_by_non_root_user_user', :g => 'linecook'

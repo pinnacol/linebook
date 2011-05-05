@@ -1,4 +1,5 @@
-Copy source to target.  Accepts a hash of command line options.
+Copies source to target.
+
 (source, target, options={})
 --
   execute 'cp', source, target, options

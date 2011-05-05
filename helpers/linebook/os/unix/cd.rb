@@ -1,3 +1,5 @@
+Changes pwd using cd, for the duration of a block if given.
+
 (dir=nil)
 --
   if block_given?

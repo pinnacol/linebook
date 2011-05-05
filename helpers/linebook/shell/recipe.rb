@@ -10,7 +10,7 @@
     current = target_path('tmp')
     recipe_name.split('/').each do |segment|
       current = File.join(current, segment)
-      directory current, :mode => 770
+      directory current, :mode => 0770
     end
     writeln "#{quote(recipe_path)} $*"
     check_status

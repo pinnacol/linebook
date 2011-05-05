@@ -1,4 +1,5 @@
-Link source to target.  Accepts a hash of command line options.
+Link source to target.
+
 (source, target, options={})
 --
   execute 'ln', source, target, options

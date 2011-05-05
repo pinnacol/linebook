@@ -1,4 +1,5 @@
-List directory contents
-(file, options={})
+List directory contents.
+
+(file='.', options={})
 --
   execute 'ls', file, options

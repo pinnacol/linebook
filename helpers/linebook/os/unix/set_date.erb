@@ -1,4 +1,5 @@
-Sets the system time.  Must be root for this to succeed.
+Sets the system time.
+
 (time=Time.now) 
 --
 date -u <%= time.dup.utc.strftime("%m%d%H%M%Y.%S") %>

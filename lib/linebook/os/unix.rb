@@ -2,6 +2,11 @@
 
 module Linebook
   module Os
+    # Defines basic UNIX utilities, and UNIX-compliant functionality. See the
+    # online {Open Group Specification of UNIX
+    # }[http://pubs.opengroup.org/onlinepubs/000095399/toc.htm] and specifically
+    # the {list of standard utilties
+    # }[http://pubs.opengroup.org/onlinepubs/000095399/idx/utilities.html].
     module Unix
       require 'linebook/os/posix'
       include Posix
@@ -23,9 +28,9 @@ module Linebook
         super
       end
       
-      # Executes 'cat' with the sources.
-      def cat(*sources)
-        execute 'cat', *sources
+      # Executes cat.
+      def cat(*files)
+        execute 'cat', *files
         chain_proxy
       end
       
@@ -35,6 +40,7 @@ module Linebook
         str
       end
       
+      # Changes pwd using cd, for the duration of a block if given.
       def cd(dir=nil)
         if block_given?
           var = _package_.next_variable_name('cd')
@@ -56,13 +62,15 @@ module Linebook
         str
       end
       
-      # Makes a command to chmod a file or directory.  Provide the mode as the
-      # literal string that should go into the statement:
-      # 
-      #   chmod "600" target
-      def chmod(mode, target)
-        if mode
-          execute 'chmod', mode, target
+      # Changes the file mode. The file mode may be specified as a String or a Fixnum.
+      # If a Fixnum is provided, then it will be formatted into an octal string using
+      # sprintf "%o".
+      def chmod(mode, file, options={})
+        unless mode.nil?
+          if mode.kind_of?(Fixnum)
+            mode = sprintf("%o", mode)
+          end
+          execute 'chmod', mode, file, options
         end
         chain_proxy
       end
@@ -73,10 +81,11 @@ module Linebook
         str
       end
       
-      # Makes a command to chown a file or directory.
-      def chown(user, group, target)
-        if user || group
-          execute 'chown', "#{user}:#{group}", target
+      # Changes file ownership. A nil value as owner or group will preserve the
+      # existing value.
+      def chown(owner, group, file, options={})
+        unless owner.nil? && group.nil?
+          execute 'chown', "#{owner}:#{group}", file, options
         end
         chain_proxy
       end
@@ -87,7 +96,7 @@ module Linebook
         str
       end
       
-      # Copy source to target.  Accepts a hash of command line options.
+      # Copies source to target.
       def cp(source, target, options={})
         execute 'cp', source, target, options
         chain_proxy
@@ -99,14 +108,9 @@ module Linebook
         str
       end
       
-      # Returns the current system time.  A format string may be provided, as well as
-      # a hash of command line options.
-      def date(format=nil, options={})
-        if format
-          format = "+#{quote(format)}"
-        end
-        
-        execute "date", format, options
+      # Writes the date and time.
+      def date(options={})
+        execute 'date', options
         chain_proxy
       end
       
@@ -117,10 +121,10 @@ module Linebook
       end
       
       # Checks that file exists and is a directory.
-      def directory?(file)
-        #  [ -d "<%= file %>" ]
+      def directory?(dir)
+        #  [ -d "<%= dir %>" ]
         #  
-        write "[ -d \""; write(( file ).to_s); write "\" ]\n"
+        write "[ -d \""; write(( dir ).to_s); write "\" ]\n"
       
         chain_proxy
       end
@@ -143,7 +147,8 @@ module Linebook
         str
       end
       
-      # Checks that file exists and is executable, or file is a directory that can be searched.
+      # Checks that file exists and is executable, or file is a directory that can be
+      # searched.
       def executable?(file)
         #  [ -x "<%= file %>" ]
         #  
@@ -188,7 +193,7 @@ module Linebook
         str
       end
       
-      # Sets up a gsub using sed.
+      # Perform a gsub using sed.  Intended for use in chains.
       def gsub(pattern, replacement, *args)
         unless args.last.kind_of?(Hash)
           args << {}
@@ -234,7 +239,7 @@ module Linebook
         str
       end
       
-      # Link source to target.  Accepts a hash of command line options.
+      # Link source to target.
       def ln(source, target, options={})
         execute 'ln', source, target, options
         chain_proxy
@@ -246,8 +251,8 @@ module Linebook
         str
       end
       
-      # List directory contents
-      def ls(file, options={})
+      # List directory contents.
+      def ls(file='.', options={})
         execute 'ls', file, options
         chain_proxy
       end
@@ -258,9 +263,9 @@ module Linebook
         str
       end
       
-      # Make a directory.  Accepts a hash of command line options.
-      def mkdir(path, options={})
-        execute 'mkdir', path, options
+      # Make a directory.
+      def mkdir(dir, options={})
+        execute 'mkdir', dir, options
         chain_proxy
       end
       
@@ -270,7 +275,7 @@ module Linebook
         str
       end
       
-      # Move source to target.  Accepts a hash of command line options.
+      # Move source to target.
       def mv(source, target, options={})
         execute 'mv', source, target, options
         chain_proxy
@@ -278,6 +283,18 @@ module Linebook
       
       def _mv(*args, &block) # :nodoc:
         str = capture_str { mv(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Writes the working directory name
+      def pwd(options={})
+        execute 'pwd', options
+        chain_proxy
+      end
+      
+      def _pwd(*args, &block) # :nodoc:
+        str = capture_str { pwd(*args, &block) }
         str.strip!
         str
       end
@@ -297,9 +314,9 @@ module Linebook
         str
       end
       
-      # Unlink a file.  Accepts a hash of command line options.
-      def rm(path, options={})
-        execute 'rm', path, options
+      # Remove directory entries.
+      def rm(file, options={})
+        execute 'rm', file, options
         chain_proxy
       end
       
@@ -309,12 +326,15 @@ module Linebook
         str
       end
       
-      def section(comment="")
-        n = (78 - comment.length)/2
+      # Write a comment to delimit sections.  The comment takes the format:
+      # 
+      #   #### name ###
+      def section(name="")
+        n = (78 - name.length)/2
         str = "-" * n
-        #  #<%= str %><%= comment %><%= str %><%= "-" if comment.length % 2 == 1 %>
+        #  #<%= str %><%= name %><%= str %><%= "-" if name.length % 2 == 1 %>
         #  
-        write "#"; write(( str ).to_s); write(( comment ).to_s); write(( str ).to_s); write(( "-" if comment.length % 2 == 1 ).to_s); write "\n"
+        write "#"; write(( str ).to_s); write(( name ).to_s); write(( str ).to_s); write(( "-" if name.length % 2 == 1 ).to_s); write "\n"
       
         chain_proxy
       end
@@ -337,8 +357,8 @@ module Linebook
         str
       end
       
-      # Sets the options to on (true) or off (false) as specified.  If a block is
-      # given then options will only be reset when the block completes.
+      # Sets the options to on (true) or off (false) as specified. If a block is given
+      # then options will only be reset when the block completes.
       def set(options)
         if block_given?
           var = _package_.next_variable_name('set')
@@ -361,7 +381,7 @@ module Linebook
         str
       end
       
-      # Sets the system time.  Must be root for this to succeed.
+      # Sets the system time.
       def set_date(time=Time.now) 
         #  date -u <%= time.dup.utc.strftime("%m%d%H%M%Y.%S") %>
         #  <% check_status %>
@@ -439,6 +459,18 @@ module Linebook
       
       def _shebang(*args, &block) # :nodoc:
         str = capture_str { shebang(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Change file access and modification times.
+      def touch(file, options={})
+        execute 'touch', file, options
+        chain_proxy
+      end
+      
+      def _touch(*args, &block) # :nodoc:
+        str = capture_str { touch(*args, &block) }
         str.strip!
         str
       end

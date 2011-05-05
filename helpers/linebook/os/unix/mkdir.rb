@@ -1,4 +1,5 @@
-Make a directory.  Accepts a hash of command line options.
-(path, options={})
+Make a directory.
+
+(dir, options={})
 --
-  execute 'mkdir', path, options
+  execute 'mkdir', dir, options

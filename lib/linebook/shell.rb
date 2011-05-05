@@ -20,7 +20,7 @@ module Linebook
       unless_ _directory?(target) do 
         mkdir '-p', target
       end 
-      chmod options[:mode] || 755, target
+      chmod options[:mode] || 0755, target
       chown options[:owner], options[:group], target
       chain_proxy
     end
@@ -80,7 +80,7 @@ module Linebook
         current = target_path('tmp')
         recipe_name.split('/').each do |segment|
           current = File.join(current, segment)
-          directory current, :mode => 770
+          directory current, :mode => 0770
         end
         writeln "#{quote(recipe_path)} $*"
         check_status
