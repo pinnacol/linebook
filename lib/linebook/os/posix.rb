@@ -104,7 +104,7 @@ module Linebook
         end
         
         if body.nil?
-          str  = capture_str { indent { yield } }
+          str  = capture_str { indent { yield(*signature(Proc.new.arity)) } }
           body = "\n#{str.chomp("\n")}\n"
         end
         
@@ -126,6 +126,19 @@ module Linebook
       def function?(name)
         declaration = "#{name}()"
         functions.any? {|func| func.index(declaration) == 0 }
+      end
+      
+      # Returns an array of positional variables for use as inputs to a function
+      # block.  Splat blocks are supported; the splat variable (I think) behaves
+      # like $*.
+      def signature(arity)
+        variables = Array.new(arity.abs) {|i| "$#{i+1}" }
+        
+        if arity < 0
+          variables[-1] = "$(shift #{arity.abs - 1}; echo $*)"
+        end
+        
+        variables
       end
       
       CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/

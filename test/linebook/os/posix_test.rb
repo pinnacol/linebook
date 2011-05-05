@@ -279,6 +279,38 @@ class PosixTest < Test::Unit::TestCase
     }, *run_package
   end
   
+  def test_function_substitutes_positional_params_for_variable_names
+    setup_recipe do
+      function 'get' do |a, b|
+        writeln "echo \"got #{a}\""
+        writeln "echo \"got #{b}\""
+      end
+      writeln "get one two"
+    end
+    
+    assert_output_equal %q{
+      got one
+      got two
+    }, *run_package
+  end
+  
+  def test_function_supports_splat_signatures
+    setup_recipe do
+      function 'get' do |a, b, *c|
+        writeln "echo \"got #{a}\""
+        writeln "echo \"got #{b}\""
+        writeln "echo \"got #{c}\""
+      end
+      writeln "get one two three four five"
+    end
+    
+    assert_output_equal %q{
+      got one
+      got two
+      got three four five
+    }, *run_package
+  end
+  
   def test_function_allows_multiple_declarations_of_the_same_function
     setup_recipe do
       3.times do
