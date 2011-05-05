@@ -137,4 +137,6 @@ def signature(arity)
   variables
 end
 
-CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
+def trailer
+  /(\s*)\z/
+end

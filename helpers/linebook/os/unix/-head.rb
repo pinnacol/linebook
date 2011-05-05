@@ -17,3 +17,7 @@ def close
   
   super
 end
+
+def trailer
+  /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
+end

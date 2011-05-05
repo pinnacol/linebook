@@ -5,7 +5,7 @@ Makes a heredoc statement surrounding the contents of the block.  Options:
   quote       quotes the delimiter
 
 (options={})
-  tail = chain? ? rewrite(CHECK_STATUS) {|m| write ' '; m[1].lstrip } : nil
+  tail = chain? ? rewrite(trailer) {|m| write ' '; m[1].lstrip } : nil
   
   unless options.kind_of?(Hash)
     options = {:delimiter => options}

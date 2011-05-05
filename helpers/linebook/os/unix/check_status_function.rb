@@ -7,6 +7,7 @@ Defines the check status function.
       writeln "echo [#{actual}] #{program_name}:${4:-?}"
       exit_ error
     end
+    
     else_ do
       return_ actual
     end

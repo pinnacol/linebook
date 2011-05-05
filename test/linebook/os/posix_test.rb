@@ -63,76 +63,6 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
-  # check_status test
-  #
-  
-  def test_check_status_only_prints_if_check_status_function_is_present
-    assert_recipe %q{
-    } do
-      check_status
-    end
-    
-    assert_recipe_matches %q{
-      check_status 0 $? $? $LINENO
-    } do
-      check_status_function
-      check_status
-    end
-  end
-  
-  def test_check_status_silently_passes_if_error_status_is_as_expected
-    setup_recipe 'pass_true' do
-      check_status_function
-      
-      writeln 'true'
-      check_status
-      
-      writeln 'echo pass_true'
-    end
-    
-    setup_recipe 'pass_false' do
-      check_status_function
-      
-      writeln 'false'
-      check_status 1
-      
-      writeln 'echo pass_false'
-    end
-    
-    assert_output_equal %{
-      pass_true
-      pass_false
-    }, *run_package
-  end
-  
-  def test_check_status_exits_with_error_status_if_status_is_not_as_expected
-    setup_recipe 'fail_true' do
-      check_status_function
-      
-      writeln 'true'
-      check_status 1
-      
-      writeln 'echo flunk'
-    end
-    
-    setup_recipe 'fail_false' do
-      check_status_function
-      
-      writeln 'false'
-      check_status 0
-      
-      writeln 'echo flunk'
-    end
-    
-    # note the LINENO output is not directly tested here because as of 10.10
-    # sh on Ubuntu does not support LINENO
-    assert_alike %{
-      [0] :...:/fail_true:...:
-      [1] :...:/fail_false:...:
-    }, *run_package
-  end
-  
-  #
   # comment test
   #
   
@@ -339,97 +269,6 @@ class PosixTest < Test::Unit::TestCase
     end
     
     assert_equal 'function already defined: "say_hello"', err.message
-  end
-  
-  #
-  # execute test
-  #
-  
-  def test_execute_executes_cmd_and_checks_pass_status
-    setup_recipe do
-      check_status_function
-      
-      execute 'true'
-      writeln 'echo success'
-      
-      execute 'false'
-      writeln 'echo fail'
-    end
-    
-    assert_alike %{
-      success
-      [1] :...:/recipe:...:
-    }, *run_package
-  end
-  
-  def test_execute_sets_up_pipe_on_chain
-    assert_recipe %q{
-      cat file | grep a | grep b
-      ls "$path" | grep c
-    } do
-      execute('cat file').execute('grep a').execute('grep b')
-      execute('ls', '$path').execute('grep c')
-    end
-  end
-  
-  def test_execute_chains_work_with_check_status
-    assert_recipe_matches %q{
-      cat file | grep a | grep b
-      check_status 0 $? $? $LINENO
-      
-      ls "$path" | grep c
-      check_status 0 $? $? $LINENO
-      
-    } do
-      check_status_function
-      execute('cat file').execute('grep a').execute('grep b')
-      execute('ls', '$path').execute('grep c')
-    end
-  end
-  
-  def test_execute_chains_work_with_indent_and_check_status
-    assert_recipe_matches %q{
-      out
-        a | b | c
-        check_status 0 $? $? $LINENO
-        
-      out
-    } do
-      check_status_function
-      writeln "out"
-      indent do
-        execute('a').execute('b').execute('c')
-      end
-      writeln "out"
-    end
-  end
-  
-  def test_execute_chains_work_with_to_from_and_check_status
-    assert_recipe_matches %q{
-      grep "abc" < source > target
-      check_status 0 $? $? $LINENO
-    } do
-      check_status_function
-      execute('grep', 'abc').from('source').to('target')
-    end
-  end
-  
-  def test_execute_chains_work_with_to_heredoc_and_check_status
-    assert_recipe_matches %q{
-      grep "abc" > target << DOC
-      a
-      b
-      c
-      DOC
-      check_status 0 $? $? $LINENO
-    } do
-      check_status_function
-      execute('grep', 'abc').to('target').heredoc('DOC') do
-        writeln "a"
-        writeln "b"
-        writeln "c"
-      end
-    end
   end
   
   #
@@ -773,17 +612,6 @@ class PosixTest < Test::Unit::TestCase
       chain :redirect, nil, 'source', '<'
       writeln "cat b"
       chain :redirect, nil, 'target', '>>'
-    end
-  end
-  
-  def test_redirect_works_with_check_status
-    assert_recipe_matches %q{
-      cat source 2>&1
-      check_status 0 $? $? $LINENO
-    } do
-      check_status_function
-      execute 'cat source'
-      chain :redirect, 2, 1
     end
   end
   

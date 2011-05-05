@@ -146,7 +146,9 @@ module Linebook
         variables
       end
       
-      CHECK_STATUS = /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
+      def trailer
+        /(\s*)\z/
+      end
       
       # Adds a redirect to append stdout to a file.
       def append(path=nil)
@@ -171,46 +173,6 @@ module Linebook
       
       def _break_(*args, &block) # :nodoc:
         str = capture_str { break_(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Adds a check that ensures the last exit status is as indicated. Note that no
-      # check will be added unless check_status_function is added beforehand.
-      def check_status(expect_status=0, fail_status='$?')
-        #  <% if function?('check_status') %>
-        #  check_status <%= expect_status %> $? <%= fail_status %> $LINENO
-        #  
-        #  <% end %>
-        if function?('check_status') 
-        write "check_status "; write(( expect_status ).to_s); write " $? "; write(( fail_status ).to_s); write " $LINENO\n"
-        write "\n"
-        end 
-        chain_proxy
-      end
-      
-      def _check_status(*args, &block) # :nodoc:
-        str = capture_str { check_status(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Defines the check status function.
-      def check_status_function()
-        function 'check_status' do |expected, actual, error, message|
-          if_ "[ #{actual} -ne #{expected} ]" do
-            writeln "echo [#{actual}] #{program_name}:${4:-?}"
-            exit_ error
-          end
-          else_ do
-            return_ actual
-          end
-        end
-        chain_proxy
-      end
-      
-      def _check_status_function(*args, &block) # :nodoc:
-        str = capture_str { check_status_function(*args, &block) }
         str.strip!
         str
       end
@@ -291,29 +253,6 @@ module Linebook
         str
       end
       
-      # Executes a command and checks the output status.  Quotes all non-option args
-      # that aren't already quoted. Accepts a trailing hash which will be transformed
-      # into command line options.
-      def execute(command, *args)
-        if chain?
-          rewrite(CHECK_STATUS)
-          write ' | '
-        end
-        #  <%= format_cmd(command, *args) %>
-        #  
-        #  <% check_status %>
-        write(( format_cmd(command, *args) ).to_s)
-        write "\n"
-        check_status 
-        chain_proxy
-      end
-      
-      def _execute(*args, &block) # :nodoc:
-        str = capture_str { execute(*args, &block) }
-        str.strip!
-        str
-      end
-      
       # Makes an exit statement.
       def exit_(status=0)
         #  exit <%= status %>
@@ -362,7 +301,7 @@ module Linebook
       #   outdent     add '-' before the delimiter
       #   quote       quotes the delimiter
       def heredoc(options={})
-        tail = chain? ? rewrite(CHECK_STATUS) {|m| write ' '; m[1].lstrip } : nil
+        tail = chain? ? rewrite(trailer) {|m| write ' '; m[1].lstrip } : nil
         
         unless options.kind_of?(Hash)
           options = {:delimiter => options}
@@ -419,7 +358,7 @@ module Linebook
         source = source.nil? || source.kind_of?(Fixnum) ? source : "#{source} "
         target = target.nil? || target.kind_of?(Fixnum) ? "&#{target}" : " #{target}"
         
-        match = chain? ? rewrite(CHECK_STATUS) : nil
+        match = chain? ? rewrite(trailer) : nil
         write " #{source}#{redirection}#{target}"
         write match[1] if match
         chain_proxy

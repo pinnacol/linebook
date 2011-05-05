@@ -28,6 +28,9 @@ module Linebook
         super
       end
       
+      def trailer
+        /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
+      end
       # Executes cat.
       def cat(*files)
         execute 'cat', *files
@@ -58,6 +61,46 @@ module Linebook
       
       def _cd(*args, &block) # :nodoc:
         str = capture_str { cd(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Adds a check that ensures the last exit status is as indicated. Note that no
+      # check will be added unless check_status_function is added beforehand.
+      def check_status(expect_status=0, fail_status='$?')
+        #  <% if function?('check_status') %>
+        #  check_status <%= expect_status %> $? <%= fail_status %> $LINENO
+        #  
+        #  <% end %>
+        if function?('check_status') 
+        write "check_status "; write(( expect_status ).to_s); write " $? "; write(( fail_status ).to_s); write " $LINENO\n"
+        write "\n"
+        end 
+        chain_proxy
+      end
+      
+      def _check_status(*args, &block) # :nodoc:
+        str = capture_str { check_status(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Defines the check status function.
+      def check_status_function()
+        function 'check_status' do |expected, actual, error, message|
+          if_ "[ #{actual} -ne #{expected} ]" do
+            writeln "echo [#{actual}] #{program_name}:${4:-?}"
+            exit_ error
+          end
+          else_ do
+            return_ actual
+          end
+        end
+        chain_proxy
+      end
+      
+      def _check_status_function(*args, &block) # :nodoc:
+        str = capture_str { check_status_function(*args, &block) }
         str.strip!
         str
       end
@@ -159,6 +202,29 @@ module Linebook
       
       def _executable?(*args, &block) # :nodoc:
         str = capture_str { executable?(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Executes a command and checks the output status.  Quotes all non-option args
+      # that aren't already quoted. Accepts a trailing hash which will be transformed
+      # into command line options.
+      def execute(command, *args)
+        if chain?
+          rewrite(trailer)
+          write ' | '
+        end
+        #  <%= format_cmd(command, *args) %>
+        #  
+        #  <% check_status %>
+        write(( format_cmd(command, *args) ).to_s)
+        write "\n"
+        check_status 
+        chain_proxy
+      end
+      
+      def _execute(*args, &block) # :nodoc:
+        str = capture_str { execute(*args, &block) }
         str.strip!
         str
       end
