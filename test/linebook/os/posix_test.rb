@@ -333,6 +333,19 @@ class PosixTest < Test::Unit::TestCase
     }, *run_package
   end
   
+  def test_function_defines_a_method_to_execute_the_function
+    setup_recipe do
+      function 'say_hello' do
+        writeln 'echo "hello $1"'
+      end
+      say_hello 'world'
+    end
+    
+    assert_output_equal %q{
+      hello world
+    }, *run_package
+  end
+  
   def test_function_substitutes_positional_params_for_variable_names
     setup_recipe do
       function 'get' do |a, b|

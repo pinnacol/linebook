@@ -107,36 +107,33 @@ module Linebook
       end
       
       # Defines a function from the block.  The block content is indented and
-      # cleaned up some to make a nice function definition.  To avoid formatting,
-      # provide the body directly.
-      #
-      # A body and block given together raises an error. Raises an error if the
-      # function is already defined with a different body.
-      def function(name, body=nil)
-        if body && block_given?
-          raise "define functions with body or block"
-        end
+      # cleaned up some to make a nice function definition.
+      def function(name, method_name=name)
+        str = capture_str { indent { yield(*signature(Proc.new.arity)) } }
+        function = %{#{name}() {\n#{str.chomp("\n")}\n}}
         
-        if body.nil?
-          str  = capture_str { indent { yield(*signature(Proc.new.arity)) } }
-          body = "\n#{str.chomp("\n")}\n"
-        end
-        
-        function = "#{name}() {#{body}}"
-        
-        if current = functions.find {|func| func.index("#{name}()") == 0 }
-          if current != function
+        if function?(name)
+          unless functions.include?(function)
             raise "function already defined: #{name.inspect}"
+          end
+        else
+          functions << function
+          
+          if method_name
+            instance_eval %{
+              def self.#{method_name}(*args)
+                execute '#{method_name}', *args
+                chain_proxy
+              end
+            }
           end
         end
         
-        functions << function
         writeln function
-        
         name
       end
       
-      # Returns true if the function is defined.
+      # Returns true if a function with the given name is defined.
       def function?(name)
         declaration = "#{name}()"
         functions.any? {|func| func.index(declaration) == 0 }
@@ -211,7 +208,7 @@ module Linebook
       
       # Defines the check status function.
       def check_status_function()
-        function 'check_status' do |expected, actual, error, message|
+        function('check_status', nil) do |expected, actual, error, message|
           message.default = '?'
           
           if_ actual.ne(expected) do
@@ -387,11 +384,13 @@ module Linebook
         #  <%= delimiter %><% end %>
         #  
         #  <%= tail %>
+        #  
         write "<<"; write(( options[:outdent] ? '-' : ' ').to_s); write(( options[:quote] ? "\"#{delimiter}\"" : delimiter ).to_s);  outdent(" # :#{delimiter}:") do ; write "\n"
         yield 
         write(( delimiter ).to_s);  end 
         write "\n"
         write(( tail ).to_s)
+      
         chain_proxy
       end
       
