@@ -32,25 +32,6 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
-  # blank test
-  #
-  
-  def test_blank_check_returns_false_for_non_empty_or_whitespace_string
-    assert_equal false, recipe.blank?('abc')
-  end
-  
-  class ToEmptyStr
-    def to_s; ''; end
-  end
-  
-  def test_blank_check_returns_true_for_objects_that_to_s_to_a_whitespace_string
-    assert_equal true, recipe.blank?(nil)
-    assert_equal true, recipe.blank?('')
-    assert_equal true, recipe.blank?('   ')
-    assert_equal true, recipe.blank?(ToEmptyStr.new)
-  end
-  
-  #
   # break test
   #
   
@@ -60,6 +41,109 @@ class PosixTest < Test::Unit::TestCase
     } do
       break_
     end
+  end
+  
+  #
+  # check_status test
+  #
+  
+  def test_check_status_only_prints_if_check_status_function_is_present
+    assert_recipe %q{
+    } do
+      check_status
+    end
+    
+    assert_recipe_matches %q{
+      check_status 0 $? $? $LINENO
+    } do
+      check_status_function
+      check_status
+    end
+  end
+  
+  def test_check_status_silently_passes_if_error_status_is_as_expected
+    setup_recipe 'pass_true' do
+      check_status_function
+      
+      writeln 'true'
+      check_status
+      
+      writeln 'echo pass_true'
+    end
+    
+    setup_recipe 'pass_false' do
+      check_status_function
+      
+      writeln 'false'
+      check_status 1
+      
+      writeln 'echo pass_false'
+    end
+    
+    assert_output_equal %{
+      pass_true
+      pass_false
+    }, *run_package
+  end
+  
+  def test_check_status_exits_with_error_status_if_status_is_not_as_expected
+    setup_recipe 'fail_true' do
+      check_status_function
+      
+      writeln 'true'
+      check_status 1
+      
+      writeln 'echo flunk'
+    end
+    
+    setup_recipe 'fail_false' do
+      check_status_function
+      
+      writeln 'false'
+      check_status 0
+      
+      writeln 'echo flunk'
+    end
+    
+    # note the LINENO output is not directly tested here because as of 10.10
+    # sh on Ubuntu does not support LINENO
+    assert_alike %{
+      [0] :...:/fail_true:...:
+      [1] :...:/fail_false:...:
+    }, *run_package
+  end
+  
+  def test_redirect_works_with_check_status
+    assert_recipe_matches %q{
+      cat source 2>&1
+      check_status 0 $? $? $LINENO
+    } do
+      check_status_function
+      execute 'cat source'
+      chain :redirect, 2, 1
+    end
+  end
+  
+  #
+  # command_str test
+  #
+  
+  def test_command_str_formats_a_command
+    cmd  = recipe.command_str('command', 'one', 'two', 'three', 'a' => true, 'b' => true, 'c' => true)
+    assert_equal 'command -a -b -c "one" "two" "three"', cmd
+  end
+  
+  def test_command_str_does_not_quote_quoted_args
+    assert_equal %{command_name "one" 'two'}, recipe.command_str('command_name', '"one"', "'two'")
+  end
+  
+  def test_command_str_quotes_partially_quoted_args
+    assert_equal %{command_name "'one" "two'" "th'ree"}, recipe.command_str('command_name', "'one", "two'", "th'ree")
+  end
+  
+  def test_command_str_skips_nil_args
+    cmd = recipe.command_str 'which', nil, 'name'
+    assert_equal 'which "name"', cmd
   end
   
   #
@@ -115,12 +199,103 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # execute test
+  #
+  
+  def test_execute_executes_cmd_and_checks_pass_status
+    setup_recipe do
+      check_status_function
+      
+      execute 'true'
+      writeln 'echo success'
+      
+      execute 'false'
+      writeln 'echo fail'
+    end
+    
+    assert_alike %{
+      success
+      [1] :...:/recipe:...:
+    }, *run_package
+  end
+  
+  def test_execute_sets_up_pipe_on_chain
+    assert_recipe %q{
+      cat file | grep a | grep b
+      ls "$path" | grep c
+    } do
+      execute('cat file').execute('grep a').execute('grep b')
+      execute('ls', '$path').execute('grep c')
+    end
+  end
+  
+  def test_execute_chains_work_with_check_status
+    assert_recipe_matches %q{
+      cat file | grep a | grep b
+      check_status 0 $? $? $LINENO
+      
+      ls "$path" | grep c
+      check_status 0 $? $? $LINENO
+      
+    } do
+      check_status_function
+      execute('cat file').execute('grep a').execute('grep b')
+      execute('ls', '$path').execute('grep c')
+    end
+  end
+  
+  def test_execute_chains_work_with_indent_and_check_status
+    assert_recipe_matches %q{
+      out
+        a | b | c
+        check_status 0 $? $? $LINENO
+        
+      out
+    } do
+      check_status_function
+      writeln "out"
+      indent do
+        execute('a').execute('b').execute('c')
+      end
+      writeln "out"
+    end
+  end
+  
+  def test_execute_chains_work_with_to_from_and_check_status
+    assert_recipe_matches %q{
+      grep "abc" < source > target
+      check_status 0 $? $? $LINENO
+    } do
+      check_status_function
+      execute('grep', 'abc').from('source').to('target')
+    end
+  end
+  
+  def test_execute_chains_work_with_to_heredoc_and_check_status
+    assert_recipe_matches %q{
+      grep "abc" > target << DOC
+      a
+      b
+      c
+      DOC
+      check_status 0 $? $? $LINENO
+    } do
+      check_status_function
+      execute('grep', 'abc').to('target').heredoc('DOC') do
+        writeln "a"
+        writeln "b"
+        writeln "c"
+      end
+    end
+  end
+  
+  #
   # exit_ test
   #
   
   def test_exit__adds_an_exit_0_statement
     assert_recipe %q{
-      exit 0
+      exit
       exit 8
     } do
       exit_
@@ -129,67 +304,16 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
-  # format_cmd test
+  # from test
   #
   
-  def test_format_cmd_formats_a_command
-    cmd  = recipe.format_cmd('command', 'one', 'two', 'three', 'a' => true, 'b' => true, 'c' => true)
-    assert_equal 'command -a -b -c "one" "two" "three"', cmd
-  end
-  
-  def test_format_cmd_does_not_quote_quoted_args
-    assert_equal %{command_name "one" 'two'}, recipe.format_cmd('command_name', '"one"', "'two'")
-  end
-  
-  def test_format_cmd_quotes_partially_quoted_args
-    assert_equal %{command_name "'one" "two'" "th'ree"}, recipe.format_cmd('command_name', "'one", "two'", "th'ree")
-  end
-  
-  def test_format_cmd_skips_nil_args
-    cmd = recipe.format_cmd 'which', nil, 'name'
-    assert_equal 'which "name"', cmd
-  end
-  
-  #
-  # format_options test
-  #
-  
-  def test_format_options_formats_key_value_options_to_options_array
-    assert_equal ['--key "value"'], recipe.format_options('--key' => '"value"')
-  end
-  
-  def test_format_options_quotes_values
-    assert_equal ['--key "value"'], recipe.format_options('--key' => 'value')
-  end
-  
-  def test_format_options_stringifies_values
-    assert_equal ['--key "value"'], recipe.format_options('--key' => :value)
-  end
-  
-  def test_format_options_omits_value_for_true
-    assert_equal ['--key'], recipe.format_options('--key' => true)
-  end
-  
-  def test_format_options_omits_options_with_false_or_nil_values
-    assert_equal [], recipe.format_options('--key' => false)
-    assert_equal [], recipe.format_options('--key' => nil)
-  end
-  
-  def test_format_options_guesses_option_prefix_for_keys_that_need_them
-    assert_equal ['--long', '-s'], recipe.format_options('long' => true, 's' => true)
-  end
-  
-  def test_format_options_reformats_symbol_keys_with_dashes
-    assert_equal ['--long-opt'], recipe.format_options(:long_opt => true)
-  end
-  
-  def test_format_options_sorts_options_such_that_short_options_win
-    assert_equal %w{
-      --a-long --b-long --c-long -a -b -c
-    }, recipe.format_options(
-      'a' => true, 'b' => true, 'c' => true,
-      'a-long' => true, 'b-long' => true, 'c-long' => true
-    )
+  def test_from_chains_stdin_assignment_from_file
+    assert_recipe %q{
+      cat < source
+    } do
+      writeln "cat"
+      chain :from, 'source'
+    end
   end
   
   #
@@ -269,33 +393,6 @@ class PosixTest < Test::Unit::TestCase
     end
     
     assert_equal 'function already defined: "say_hello"', err.message
-  end
-  
-  #
-  # export test
-  #
-  
-  def test_export_exports_variables
-    assert_recipe %q{
-      export ONE="A"
-      export TWO="B C"
-    } do
-      export 'ONE', 'A'
-      export 'TWO', 'B C'
-    end
-  end
-  
-  #
-  # from test
-  #
-  
-  def test_from_chains_stdin_assignment_from_file
-    assert_recipe %q{
-      cat < source
-    } do
-      writeln "cat"
-      chain :from, 'source'
-    end
   end
   
   #
@@ -446,36 +543,6 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
-  # unless_ test
-  #
-  
-  def test_unless__reverses_condition
-    assert_recipe %q{
-      if ! condition
-      then
-      fi
-      
-    } do
-      unless_('condition') {}
-    end
-  end
-  
-  def test_unless__with_else_
-    assert_recipe %q{
-      if ! A
-      then
-        a
-      else
-        b
-      fi
-      
-    } do
-      unless_('A') { write  'a' }
-      else_ { write  'b' }
-    end
-  end
-  
-  #
   # if_ test
   #
   
@@ -534,6 +601,68 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
+  # option? test
+  #
+  
+  def test_option_check_returns_true_if_arg_begins_with_plus_or_minus
+    assert_equal true,  recipe.option?("--option")
+    assert_equal true,  recipe.option?("-o")
+    assert_equal true,  recipe.option?("+o")
+    assert_equal false, recipe.option?("arg")
+  end
+  
+  #
+  # options_str test
+  #
+  
+  def test_options_str_formats_key_value_options_to_options_array
+    assert_equal ['--key "value"'], recipe.options_str('--key' => '"value"')
+  end
+  
+  def test_options_str_quotes_values
+    assert_equal ['--key "value"'], recipe.options_str('--key' => 'value')
+  end
+  
+  def test_options_str_stringifies_values
+    assert_equal ['--key "value"'], recipe.options_str('--key' => :value)
+  end
+  
+  def test_options_str_omits_value_for_true
+    assert_equal ['--key'], recipe.options_str('--key' => true)
+  end
+  
+  def test_options_str_omits_options_with_false_or_nil_values
+    assert_equal [], recipe.options_str('--key' => false)
+    assert_equal [], recipe.options_str('--key' => nil)
+  end
+  
+  def test_options_str_guesses_option_prefix_for_keys_that_need_them
+    assert_equal ['--long', '-s'], recipe.options_str('long' => true, 's' => true)
+  end
+  
+  def test_options_str_reformats_symbol_keys_with_dashes
+    assert_equal ['--long-opt'], recipe.options_str(:long_opt => true)
+  end
+  
+  def test_options_str_sorts_options_such_that_short_options_win
+    assert_equal %w{
+      --a-long --b-long --c-long -a -b -c
+    }, recipe.options_str(
+      'a' => true, 'b' => true, 'c' => true,
+      'a-long' => true, 'b-long' => true, 'c-long' => true
+    )
+  end
+  
+  #
+  # option_quote test
+  #
+  
+  def test_option_quote_does_not_quote_options
+    assert_equal %{--option}, recipe.option_quote("--option")
+    assert_equal %{-o}, recipe.option_quote("-o")
+  end
+  
+  #
   # quote test
   #
   
@@ -541,34 +670,9 @@ class PosixTest < Test::Unit::TestCase
     assert_equal %{"abc"}, recipe.quote("abc")
   end
   
-  def test_quote_does_not_quote_options
-    assert_equal %{--option}, recipe.quote("--option")
-    assert_equal %{-o}, recipe.quote("-o")
-  end
-  
   def test_quote_does_not_double_quote
     assert_equal %{"abc"}, recipe.quote('"abc"')
     assert_equal %{'abc'}, recipe.quote("'abc'")
-  end
-  
-  def test_quote_stringifies_args
-    assert_equal %{"sym"}, recipe.quote(:sym)
-  end
-  
-  #
-  # quote? test
-  #
-  
-  def test_quote_check_returns_true_if_arg_is_not_quoted
-    assert_equal true,  recipe.quote?("abc")
-    assert_equal false, recipe.quote?("'abc'")
-    assert_equal false, recipe.quote?('"abc"')
-  end
-  
-  def test_quote_check_returns_false_if_arg_is_an_option
-    assert_equal false, recipe.quote?("--option")
-    assert_equal false, recipe.quote?("-o")
-    assert_equal false, recipe.quote?("+o")
   end
   
   #
@@ -621,7 +725,7 @@ class PosixTest < Test::Unit::TestCase
   
   def test_return__adds_a_return_statement
     assert_recipe %q{
-      return 0
+      return
       return 8
     } do
       return_
@@ -674,15 +778,32 @@ class PosixTest < Test::Unit::TestCase
   end
   
   #
-  # unset test
+  # unless_ test
   #
   
-  def test_unset_unsets_a_list_of_variables
+  def test_unless__reverses_condition
     assert_recipe %q{
-      unset ONE
-      unset TWO
+      if ! condition
+      then
+      fi
+      
     } do
-      unset 'ONE', 'TWO'
+      unless_('condition') {}
+    end
+  end
+  
+  def test_unless__with_else_
+    assert_recipe %q{
+      if ! A
+      then
+        a
+      else
+        b
+      fi
+      
+    } do
+      unless_('A') { write  'a' }
+      else_ { write  'b' }
     end
   end
   

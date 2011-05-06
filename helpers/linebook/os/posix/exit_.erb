@@ -1,5 +1,9 @@
 Cause the shell to exit.
 
-(status=0)
+(status=nil)
 --
+<% if status.nil? %>
+exit
+<% else %>
 exit <%= status %>
+<% end %>

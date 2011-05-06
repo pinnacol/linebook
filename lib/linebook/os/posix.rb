@@ -17,8 +17,8 @@ module Linebook
     # provides a nice index of the relevant information.
     #
     module Posix
-      require 'linecook/os/posix/variable'
-      require 'linecook/os/posix/utilities'
+      require 'linebook/os/posix/variable'
+      require 'linebook/os/posix/utilities'
       include Utilities
       
       # Returns "$0", the program name.
@@ -28,7 +28,7 @@ module Linebook
       
       # Encloses the arg in quotes, unless already quoted (see quoted?).
       def quote(str)
-        quoted?(str) ? str : "\"#{arg}\""
+        quoted?(str) ? str : "\"#{str}\""
       end
       
       # Returns true if the str is quoted (either by quotes or apostrophes).
@@ -332,10 +332,18 @@ module Linebook
       end
       
       # Cause the shell to exit.
-      def exit_(status=0)
+      def exit_(status=nil)
+        #  <% if status.nil? %>
+        #  exit
+        #  <% else %>
         #  exit <%= status %>
+        #  <% end %>
         #  
+        if status.nil? 
+        write "exit\n"
+        else 
         write "exit "; write(( status ).to_s); write "\n"
+        end 
       
         chain_proxy
       end

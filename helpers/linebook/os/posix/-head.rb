@@ -1,5 +1,5 @@
-require 'linecook/os/posix/variable'
-require 'linecook/os/posix/utilities'
+require 'linebook/os/posix/variable'
+require 'linebook/os/posix/utilities'
 include Utilities
 
 # Returns "$0", the program name.
@@ -9,7 +9,7 @@ end
 
 # Encloses the arg in quotes, unless already quoted (see quoted?).
 def quote(str)
-  quoted?(str) ? str : "\"#{arg}\""
+  quoted?(str) ? str : "\"#{str}\""
 end
 
 # Returns true if the str is quoted (either by quotes or apostrophes).

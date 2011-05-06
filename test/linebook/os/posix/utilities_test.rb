@@ -1,12 +1,12 @@
-require File.expand_path('../../../test_helper', __FILE__)
-require 'linebook/os/unix'
+require File.expand_path('../../../../test_helper', __FILE__)
+require 'linebook/os/posix'
 
-class UnixTest < Test::Unit::TestCase
+class UtilitiesTest < Test::Unit::TestCase
   include Linecook::Test
   
   def setup
     super
-    use_helpers Linebook::Os::Unix
+    use_helpers Linebook::Os::Posix
   end
   
   #
@@ -56,83 +56,24 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
-  # check_status test
+  # chgrp test
   #
   
-  def test_check_status_only_prints_if_check_status_function_is_present
+  # Don't know how to encapsulate test chgrp at this point... technically user
+  # management commands do not have to exist yet!
+  
+  def test_chgrp_sets_up_chgrp
+    assert_recipe_matches %q{
+      chgrp "group" "file"
+    } do
+      chgrp 'group', 'file'
+    end
+  end
+  
+  def test_chgrp_does_nothing_for_nil_group
     assert_recipe %q{
     } do
-      check_status
-    end
-    
-    assert_recipe_matches %q{
-      check_status 0 $? $? $LINENO
-    } do
-      check_status_function
-      check_status
-    end
-  end
-  
-  def test_check_status_silently_passes_if_error_status_is_as_expected
-    setup_recipe 'pass_true' do
-      check_status_function
-      
-      writeln 'true'
-      check_status
-      
-      writeln 'echo pass_true'
-    end
-    
-    setup_recipe 'pass_false' do
-      check_status_function
-      
-      writeln 'false'
-      check_status 1
-      
-      writeln 'echo pass_false'
-    end
-    
-    assert_output_equal %{
-      pass_true
-      pass_false
-    }, *run_package
-  end
-  
-  def test_check_status_exits_with_error_status_if_status_is_not_as_expected
-    setup_recipe 'fail_true' do
-      check_status_function
-      
-      writeln 'true'
-      check_status 1
-      
-      writeln 'echo flunk'
-    end
-    
-    setup_recipe 'fail_false' do
-      check_status_function
-      
-      writeln 'false'
-      check_status 0
-      
-      writeln 'echo flunk'
-    end
-    
-    # note the LINENO output is not directly tested here because as of 10.10
-    # sh on Ubuntu does not support LINENO
-    assert_alike %{
-      [0] :...:/fail_true:...:
-      [1] :...:/fail_false:...:
-    }, *run_package
-  end
-  
-  def test_redirect_works_with_check_status
-    assert_recipe_matches %q{
-      cat source 2>&1
-      check_status 0 $? $? $LINENO
-    } do
-      check_status_function
-      execute 'cat source'
-      chain :redirect, 2, 1
+      chgrp nil, 'file'
     end
   end
   
@@ -183,14 +124,14 @@ class UnixTest < Test::Unit::TestCase
     assert_recipe_matches %q{
       chown "owner:group" "file"
     } do
-      chown 'owner', 'group', 'file'
+      chown 'owner:group', 'file'
     end
   end
   
-  def test_chown_does_nothing_for_nil_user_and_group
+  def test_chown_does_nothing_for_nil_owner
     assert_recipe %q{
     } do
-      chown nil, nil, 'file'
+      chown nil, 'file'
     end
   end
   
@@ -254,97 +195,6 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
-  # execute test
-  #
-  
-  def test_execute_executes_cmd_and_checks_pass_status
-    setup_recipe do
-      check_status_function
-      
-      execute 'true'
-      writeln 'echo success'
-      
-      execute 'false'
-      writeln 'echo fail'
-    end
-    
-    assert_alike %{
-      success
-      [1] :...:/recipe:...:
-    }, *run_package
-  end
-  
-  def test_execute_sets_up_pipe_on_chain
-    assert_recipe %q{
-      cat file | grep a | grep b
-      ls "$path" | grep c
-    } do
-      execute('cat file').execute('grep a').execute('grep b')
-      execute('ls', '$path').execute('grep c')
-    end
-  end
-  
-  def test_execute_chains_work_with_check_status
-    assert_recipe_matches %q{
-      cat file | grep a | grep b
-      check_status 0 $? $? $LINENO
-      
-      ls "$path" | grep c
-      check_status 0 $? $? $LINENO
-      
-    } do
-      check_status_function
-      execute('cat file').execute('grep a').execute('grep b')
-      execute('ls', '$path').execute('grep c')
-    end
-  end
-  
-  def test_execute_chains_work_with_indent_and_check_status
-    assert_recipe_matches %q{
-      out
-        a | b | c
-        check_status 0 $? $? $LINENO
-        
-      out
-    } do
-      check_status_function
-      writeln "out"
-      indent do
-        execute('a').execute('b').execute('c')
-      end
-      writeln "out"
-    end
-  end
-  
-  def test_execute_chains_work_with_to_from_and_check_status
-    assert_recipe_matches %q{
-      grep "abc" < source > target
-      check_status 0 $? $? $LINENO
-    } do
-      check_status_function
-      execute('grep', 'abc').from('source').to('target')
-    end
-  end
-  
-  def test_execute_chains_work_with_to_heredoc_and_check_status
-    assert_recipe_matches %q{
-      grep "abc" > target << DOC
-      a
-      b
-      c
-      DOC
-      check_status 0 $? $? $LINENO
-    } do
-      check_status_function
-      execute('grep', 'abc').to('target').heredoc('DOC') do
-        writeln "a"
-        writeln "b"
-        writeln "c"
-      end
-    end
-  end
-  
-  #
   # executable? test
   #
   
@@ -391,6 +241,20 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
+  # export test
+  #
+  
+  def test_export_exports_variables
+    assert_recipe %q{
+      export ONE="A"
+      export TWO="B C"
+    } do
+      export 'ONE', 'A'
+      export 'TWO', 'B C'
+    end
+  end
+  
+  #
   # file? test
   #
   
@@ -411,24 +275,6 @@ class UnixTest < Test::Unit::TestCase
     assert_output_equal %{
       file
       link
-    }, *run_package
-  end
-  
-  #
-  # gsub test
-  #
-  
-  def test_gsub_makes_the_substitution_on_all_lines_of_the_input
-    setup_recipe do
-      gsub('a', 'A').heredoc do
-        writeln 'a b a b'
-        writeln 'b a b a'
-      end
-    end
-    
-    assert_output_equal %{
-      A b A b
-      b A b A
     }, *run_package
   end
   
@@ -599,46 +445,6 @@ class UnixTest < Test::Unit::TestCase
   end
   
   #
-  # set_date test
-  #
-  
-  def test_set_date_sets_the_system_date_to_the_specified_time
-    time = Time.now
-    
-    setup_recipe do
-      path = capture_path('set_date.sh') do
-        set_date time
-      end
-      
-      writeln %{chmod +x "#{path}"}
-      writeln %{su root "#{path}" > /dev/null}
-      writeln "date '+%Y-%m-%d %H:%M'"
-    end
-    
-    assert_output_equal %{
-      #{time.strftime("%Y-%m-%d %H:%M")}
-    }, *run_package
-  end
-  
-  def test_set_date_adjusts_to_utc
-    time  = Time.now
-    
-    setup_recipe do
-      path = capture_path('set_date.sh') do
-        set_date time.dup.utc
-      end
-      
-      writeln %{chmod +x "#{path}"}
-      writeln %{su root "#{path}" > /dev/null}
-      writeln "date '+%Y-%m-%d %H:%M'"
-    end
-    
-    assert_output_equal %{
-      #{time.strftime("%Y-%m-%d %H:%M")}
-    }, *run_package
-  end
-  
-  #
   # touch test
   #
   
@@ -658,6 +464,18 @@ class UnixTest < Test::Unit::TestCase
     assert_output_equal %{
       success
     }, *run_package
+  end
+  
+  #
+  # unset test
+  #
+  
+  def test_unset_unsets_a_list_of_variables
+    assert_recipe %q{
+      unset "ONE" "TWO"
+    } do
+      unset 'ONE', 'TWO'
+    end
   end
   
   #
