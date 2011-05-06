@@ -2,36 +2,33 @@
 
 module Linebook
   module Os
-    # Defines basic POSIX utilities, and POSIX-compliant functionality. See the
-    # online documentation of {POSIX Shell Command Language
-    # }[http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html]
-    # and {Special Built-in
-    # Utilites}[http://pubs.opengroup.org/onlinepubs/009695399/idx/sbi.html]
+    # Defines POSIX-compliant functionality, based on the {IEEE 1003.1-2008
+    # standard }[http://pubs.opengroup.org/onlinepubs/9699919799].  See the online
+    # documentation for:
+    #
+    # * {POSIX Shell Command Language
+    #   }[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/xcu_chap02.html]
+    # * {Special Built-in Utilites
+    #   }[http://pubs.opengroup.org/onlinepubs/9699919799/idx/sbi.html]
+    # * {Standard Utilties
+    #   }[http://pubs.opengroup.org/onlinepubs/9699919799/idx/utilities.html]
+    #
+    # In addition, the {Shell Hater's Handbook}[http://shellhaters.heroku.com/]
+    # provides a nice index of the relevant information.
+    #
     module Posix
+      require 'linecook/os/posix/variable'
+      require 'linecook/os/posix/utilities'
+      include Utilities
+      
       # Returns "$0", the program name.
       def program_name
         Variable.new(0)
       end
       
-      # Returns true if the obj converts to a string which is whitespace or empty.
-      def blank?(obj)
-        # shortcut for nil...
-        obj.nil? || obj.to_s.strip.empty?
-      end
-      
-      # Encloses the arg in quotes if the arg is not quoted and is quotable. 
-      # Stringifies arg using to_s.
-      def quote(arg)
-        arg = arg.to_s
-        quoted?(arg) || !quote?(arg) ? arg : "\"#{arg}\""
-      end
-      
-      # Returns true if the str is not an option (ie it begins with - or +), and is
-      # not already quoted (either by quotes or apostrophes).  The intention is to
-      # check whether a string _should_ be quoted.
-      def quote?(str)
-        c = str[0]
-        c == ?- || c == ?+ || quoted?(str) ? false : true
+      # Encloses the arg in quotes, unless already quoted (see quoted?).
+      def quote(str)
+        quoted?(str) ? str : "\"#{arg}\""
       end
       
       # Returns true if the str is quoted (either by quotes or apostrophes).
@@ -39,15 +36,27 @@ module Linebook
         str =~ /\A".*"\z/ || str =~ /\A'.*'\z/ ? true : false
       end
       
+      # Encloses the arg in quotes unless the arg is an option or already quoted
+      # (see option? and quoted?).
+      def option_quote(str)
+        option?(str) ? str : quote(str)
+      end
+      
+      # Returns true if the str is an option (ie it begins with - or +).
+      def option?(str)
+        c = str[0]
+        c == ?- || c == ?+
+      end
+      
       # Formats a command line command.  Arguments are quoted. If the last arg is a
       # hash, then it will be formatted into options using format_options and
       # prepended to args.
-      def format_cmd(command, *args)
+      def command_str(command, *args)
         opts = args.last.kind_of?(Hash) ? args.pop : {}
         args.compact!
-        args.collect! {|arg| quote(arg) }
+        args.collect! {|arg| option_quote(arg.to_s) }
         
-        args = format_options(opts) + args
+        args = options_str(opts) + args
         args.unshift(command)
         args.join(' ')
       end
@@ -66,7 +75,7 @@ module Linebook
       # symbols) such that underscores are converted to dashes, ie :some_key =>
       # 'some-key'.  Note that options are sorted, such that short options appear
       # after long options, and so should 'win' given typical option processing.
-      def format_options(opts)
+      def options_str(opts)
         options = []
         
         opts.each do |(key, value)|
@@ -134,8 +143,7 @@ module Linebook
       end
       
       # Returns an array of positional variables for use as inputs to a function
-      # block.  Splat blocks are supported; the splat variable (I think) behaves
-      # like $*.
+      # block.  Splat blocks are supported; the splat expression behaves like $*.
       def signature(arity)
         variables = Array.new(arity.abs) {|i| Variable.new(i + 1) }
         
@@ -151,95 +159,8 @@ module Linebook
       end
       
       def trailer
-        /(\s*)\z/
+        /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
       end
-      
-      class Variable
-        attr_accessor :varname
-        attr_accessor :default
-        
-        def initialize(varname, default=nil)
-          @varname = varname.to_s
-          @default = default
-        end
-        
-        def lstrip(pattern)
-          "${#{varname}##{pattern}}"
-        end
-        
-        def llstrip(pattern)
-          "${#{varname}###{pattern}}"
-        end
-        
-        def rstrip(pattern)
-          "${#{varname}%#{pattern}}"
-        end
-        
-        def rrstrip(pattern)
-          "${#{varname}%%#{pattern}}"
-        end
-        
-        def sub(pattern, replacement)
-          "${#{varname}/#{pattern}/#{replacement}}"
-        end
-        
-        def gsub(pattern, replacement)
-          "${#{varname}//#{pattern}/#{replacement}}"
-        end
-        
-        def length
-          "${##{varname}}"
-        end
-        
-        def substring(offset, length=nil)
-          length ? "${#{varname}:#{offset}:#{length}}": "${#{varname}:#{offset}}"
-        end
-        
-        def eq(another)
-          "[ #{self} -eq #{another} ]"
-        end
-        
-        def ne(another)
-          "[ #{self} -ne #{another} ]"
-        end
-        
-        def gt(another)
-          "[ #{self} -gt #{another} ]"
-        end
-        
-        def lt(another)
-          "[ #{self} -lt #{another} ]"
-        end
-        
-        def ==(another)
-          "[ #{self} = #{another} ]"
-        end
-        
-        # def !=(another)
-        #   "[ #{self} != #{another} ]"
-        # end
-        
-        def >(another)
-          "[ #{self} > #{another} ]"
-        end
-        
-        def <(another)
-          "[ #{self} < #{another} ]"
-        end
-        
-        def null?
-          "[ -z #{self} ]"
-        end
-        
-        def not_null?
-          "[ -n #{self} ]"
-        end
-        
-        def to_s
-          default.nil? ? "$#{varname}" : "${#{varname}:-#{default}}"
-        end
-      end
-      
       
       # Adds a redirect to append stdout to a file.
       def append(path=nil)
@@ -253,7 +174,7 @@ module Linebook
         str
       end
       
-      # Adds a break statement.
+      # Exit from for, while, or until loop.
       def break_()
         #  break
         #  
@@ -264,6 +185,49 @@ module Linebook
       
       def _break_(*args, &block) # :nodoc:
         str = capture_str { break_(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Adds a check that ensures the last exit status is as indicated. Note that no
+      # check will be added unless check_status_function is added beforehand.
+      def check_status(expect_status=0, fail_status='$?')
+        #  <% if function?('check_status') %>
+        #  check_status <%= expect_status %> $? <%= fail_status %> $LINENO
+        #  
+        #  <% end %>
+        if function?('check_status') 
+        write "check_status "; write(( expect_status ).to_s); write " $? "; write(( fail_status ).to_s); write " $LINENO\n"
+        write "\n"
+        end 
+        chain_proxy
+      end
+      
+      def _check_status(*args, &block) # :nodoc:
+        str = capture_str { check_status(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Defines the check status function.
+      def check_status_function()
+        function 'check_status' do |expected, actual, error, message|
+          message.default = '?'
+          
+          if_ actual.ne(expected) do
+            writeln %{echo [#{actual}] #{program_name}:#{message}}
+            exit_ error
+          end
+          
+          else_ do
+            return_ actual
+          end
+        end
+        chain_proxy
+      end
+      
+      def _check_status_function(*args, &block) # :nodoc:
+        str = capture_str { check_status_function(*args, &block) }
         str.strip!
         str
       end
@@ -283,7 +247,7 @@ module Linebook
         str
       end
       
-      # Makes a continue statement.
+      # Continue for, while, or until loop.
       def continue_()
         #  continue
         #  
@@ -344,7 +308,30 @@ module Linebook
         str
       end
       
-      # Makes an exit statement.
+      # Executes a command and checks the output status. Quotes all non-option args
+      # that aren't already quoted. Accepts a trailing hash which will be transformed
+      # into command line options.
+      def execute(command, *args)
+        if chain?
+          rewrite(trailer)
+          write ' | '
+        end
+        #  <%= command_str(command, *args) %>
+        #  
+        #  <% check_status %>
+        write(( command_str(command, *args) ).to_s)
+        write "\n"
+        check_status 
+        chain_proxy
+      end
+      
+      def _execute(*args, &block) # :nodoc:
+        str = capture_str { execute(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Cause the shell to exit.
       def exit_(status=0)
         #  exit <%= status %>
         #  
@@ -355,21 +342,6 @@ module Linebook
       
       def _exit_(*args, &block) # :nodoc:
         str = capture_str { exit_(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Exports a variable.
-      def export(key, value)
-        #  export <%= key %>=<%= quote(value) %>
-        #  
-        write "export "; write(( key ).to_s); write "="; write(( quote(value) ).to_s); write "\n"
-      
-        chain_proxy
-      end
-      
-      def _export(*args, &block) # :nodoc:
-        str = capture_str { export(*args, &block) }
         str.strip!
         str
       end
@@ -461,11 +433,19 @@ module Linebook
         str
       end
       
-      # Makes a return statement.
-      def return_(status=0)
+      # Return from a function.
+      def return_(status=nil)
+        #  <% if status.nil? %>
+        #  return
+        #  <% else %>
         #  return <%= status %>
+        #  <% end %>
         #  
+        if status.nil? 
+        write "return\n"
+        else 
         write "return "; write(( status ).to_s); write "\n"
+        end 
       
         chain_proxy
       end
@@ -476,21 +456,21 @@ module Linebook
         str
       end
       
-      # Sets the options to on (true) or off (false) as specified.
-      def set(options)
-        #  <% options.keys.sort_by {|opt| opt.to_s }.each do |opt| %>
-        #  set <%= options[opt] ? '-' : '+' %>o <%= opt %>
-        #  <% end %>
+      # Write a comment to delimit sections.  The comment takes the format:
+      # 
+      #   #### name ###
+      def section(name="")
+        n = (78 - name.length)/2
+        str = "-" * n
+        #  #<%= str %><%= name %><%= str %><%= "-" if name.length % 2 == 1 %>
         #  
-        options.keys.sort_by {|opt| opt.to_s }.each do |opt| 
-        write "set "; write(( options[opt] ? '-' : '+' ).to_s); write "o "; write(( opt ).to_s); write "\n"
-        end 
+        write "#"; write(( str ).to_s); write(( name ).to_s); write(( str ).to_s); write(( "-" if name.length % 2 == 1 ).to_s); write "\n"
       
         chain_proxy
       end
       
-      def _set(*args, &block) # :nodoc:
-        str = capture_str { set(*args, &block) }
+      def _section(*args, &block) # :nodoc:
+        str = capture_str { section(*args, &block) }
         str.strip!
         str
       end
@@ -515,23 +495,6 @@ module Linebook
       
       def _unless_(*args, &block) # :nodoc:
         str = capture_str { unless_(*args, &block) }
-        str.strip!
-        str
-      end
-      
-      # Unsets a list of variables.
-      def unset(*keys)
-        #  <% keys.each do |key| %>
-        #  unset <%= key %>
-        #  <% end %>
-        keys.each do |key| 
-        write "unset "; write(( key ).to_s); write "\n"
-        end 
-        chain_proxy
-      end
-      
-      def _unset(*args, &block) # :nodoc:
-        str = capture_str { unset(*args, &block) }
         str.strip!
         str
       end

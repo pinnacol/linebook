@@ -1,0 +1,9 @@
+Set the export attribute for variables.
+
+(key, value=nil)
+--
+<% if value.nil? %>
+export <%= key %>
+<% else %>
+export <%= key %>=<%= quote(value) %>
+<% end %>

@@ -1,28 +1,15 @@
+require 'linecook/os/posix/variable'
+require 'linecook/os/posix/utilities'
+include Utilities
 
 # Returns "$0", the program name.
 def program_name
   Variable.new(0)
 end
 
-# Returns true if the obj converts to a string which is whitespace or empty.
-def blank?(obj)
-  # shortcut for nil...
-  obj.nil? || obj.to_s.strip.empty?
-end
-
-# Encloses the arg in quotes if the arg is not quoted and is quotable. 
-# Stringifies arg using to_s.
-def quote(arg)
-  arg = arg.to_s
-  quoted?(arg) || !quote?(arg) ? arg : "\"#{arg}\""
-end
-
-# Returns true if the str is not an option (ie it begins with - or +), and is
-# not already quoted (either by quotes or apostrophes).  The intention is to
-# check whether a string _should_ be quoted.
-def quote?(str)
-  c = str[0]
-  c == ?- || c == ?+ || quoted?(str) ? false : true
+# Encloses the arg in quotes, unless already quoted (see quoted?).
+def quote(str)
+  quoted?(str) ? str : "\"#{arg}\""
 end
 
 # Returns true if the str is quoted (either by quotes or apostrophes).
@@ -30,15 +17,27 @@ def quoted?(str)
   str =~ /\A".*"\z/ || str =~ /\A'.*'\z/ ? true : false
 end
 
+# Encloses the arg in quotes unless the arg is an option or already quoted
+# (see option? and quoted?).
+def option_quote(str)
+  option?(str) ? str : quote(str)
+end
+
+# Returns true if the str is an option (ie it begins with - or +).
+def option?(str)
+  c = str[0]
+  c == ?- || c == ?+
+end
+
 # Formats a command line command.  Arguments are quoted. If the last arg is a
 # hash, then it will be formatted into options using format_options and
 # prepended to args.
-def format_cmd(command, *args)
+def command_str(command, *args)
   opts = args.last.kind_of?(Hash) ? args.pop : {}
   args.compact!
-  args.collect! {|arg| quote(arg) }
+  args.collect! {|arg| option_quote(arg.to_s) }
   
-  args = format_options(opts) + args
+  args = options_str(opts) + args
   args.unshift(command)
   args.join(' ')
 end
@@ -57,7 +56,7 @@ end
 # symbols) such that underscores are converted to dashes, ie :some_key =>
 # 'some-key'.  Note that options are sorted, such that short options appear
 # after long options, and so should 'win' given typical option processing.
-def format_options(opts)
+def options_str(opts)
   options = []
   
   opts.each do |(key, value)|
@@ -125,8 +124,7 @@ def function?(name)
 end
 
 # Returns an array of positional variables for use as inputs to a function
-# block.  Splat blocks are supported; the splat variable (I think) behaves
-# like $*.
+# block.  Splat blocks are supported; the splat expression behaves like $*.
 def signature(arity)
   variables = Array.new(arity.abs) {|i| Variable.new(i + 1) }
   
@@ -142,92 +140,5 @@ def signature(arity)
 end
 
 def trailer
-  /(\s*)\z/
+  /(\s*(?:\ncheck_status.*?\n\s*)?)\z/
 end
-
-class Variable
-  attr_accessor :varname
-  attr_accessor :default
-  
-  def initialize(varname, default=nil)
-    @varname = varname.to_s
-    @default = default
-  end
-  
-  def lstrip(pattern)
-    "${#{varname}##{pattern}}"
-  end
-  
-  def llstrip(pattern)
-    "${#{varname}###{pattern}}"
-  end
-  
-  def rstrip(pattern)
-    "${#{varname}%#{pattern}}"
-  end
-  
-  def rrstrip(pattern)
-    "${#{varname}%%#{pattern}}"
-  end
-  
-  def sub(pattern, replacement)
-    "${#{varname}/#{pattern}/#{replacement}}"
-  end
-  
-  def gsub(pattern, replacement)
-    "${#{varname}//#{pattern}/#{replacement}}"
-  end
-  
-  def length
-    "${##{varname}}"
-  end
-  
-  def substring(offset, length=nil)
-    length ? "${#{varname}:#{offset}:#{length}}": "${#{varname}:#{offset}}"
-  end
-  
-  def eq(another)
-    "[ #{self} -eq #{another} ]"
-  end
-  
-  def ne(another)
-    "[ #{self} -ne #{another} ]"
-  end
-  
-  def gt(another)
-    "[ #{self} -gt #{another} ]"
-  end
-  
-  def lt(another)
-    "[ #{self} -lt #{another} ]"
-  end
-  
-  def ==(another)
-    "[ #{self} = #{another} ]"
-  end
-  
-  # def !=(another)
-  #   "[ #{self} != #{another} ]"
-  # end
-  
-  def >(another)
-    "[ #{self} > #{another} ]"
-  end
-  
-  def <(another)
-    "[ #{self} < #{another} ]"
-  end
-  
-  def null?
-    "[ -z #{self} ]"
-  end
-  
-  def not_null?
-    "[ -n #{self} ]"
-  end
-  
-  def to_s
-    default.nil? ? "$#{varname}" : "${#{varname}:-#{default}}"
-  end
-end
-

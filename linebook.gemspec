@@ -34,8 +34,9 @@ Gem::Specification.new do |s|
     lib/linebook.rb
     lib/linebook/os/linux.rb
     lib/linebook/os/posix.rb
+    lib/linebook/os/posix/utilities.rb
+    lib/linebook/os/posix/variable.rb
     lib/linebook/os/ubuntu.rb
-    lib/linebook/os/unix.rb
     lib/linebook/shell.rb
     lib/linebook/shell/bash.rb
     lib/linebook/version.rb

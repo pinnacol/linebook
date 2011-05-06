@@ -1,5 +1,12 @@
-require 'linebook/os/unix'
-include Unix
+require 'linebook/os/posix'
+include Posix
+
+def guess_target_name(source_name)
+  target_dir  = File.dirname(target_name)
+  name = File.basename(source_name)
+  
+  _package_.next_target_name(target_dir == '.' ? name : File.join(target_dir, name))
+end
 
 def capture_script(options={})
   unless options.kind_of?(Hash)

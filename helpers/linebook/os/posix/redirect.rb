@@ -1,4 +1,5 @@
 Makes a redirect statement.
+
 (source, target, redirection='>')
 --
   source = source.nil? || source.kind_of?(Fixnum) ? source : "#{source} "

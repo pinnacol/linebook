@@ -1,6 +1,0 @@
-Sets the system time.
-
-(time=Time.now) 
---
-date -u <%= time.dup.utc.strftime("%m%d%H%M%Y.%S") %>
-<% check_status %>

@@ -1,4 +1,9 @@
-Makes a return statement.
-(status=0)
+Return from a function.
+
+(status=nil)
 --
+<% if status.nil? %>
+return
+<% else %>
 return <%= status %>
+<% end %>
