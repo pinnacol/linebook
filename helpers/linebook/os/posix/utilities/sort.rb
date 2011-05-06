@@ -1,5 +1,5 @@
 Sort, merge, or sequence check text files.
 
-(*file)
+(*files)
 --
   execute 'sort', *files

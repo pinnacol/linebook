@@ -497,7 +497,7 @@ module Linebook
         end
         
         # Sort, merge, or sequence check text files.
-        def sort(*file)
+        def sort(*files)
           execute 'sort', *files
           chain_proxy
         end
@@ -545,8 +545,8 @@ module Linebook
         end
         
         # Translate characters.
-        def tr(string, *options)
-          execute 'tr', string, *options
+        def tr(string1, string2=nil, *options)
+          execute 'tr', string1, string2, *options
           chain_proxy
         end
         

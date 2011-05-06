@@ -10,6 +10,53 @@ class UtilitiesTest < Test::Unit::TestCase
   end
   
   #
+  # pipeline test
+  #
+  
+  def test_tomayko_word_count
+    setup_recipe do
+      function :word_count do |n|
+        tr("A-Za-z", '\n', :c => true).
+        grep('^$', :v => true).
+        sort.
+        uniq(:c => true).
+        sort(:r => true, :n => true).
+        head(:n => n)
+      end
+      
+      word_count(5).heredoc do
+        writeln %{
+The Project Gutenberg EBook of A Modest Proposal, by Jonathan Swift
+
+Title: A Modest Proposal
+       For preventing the children of poor people in Ireland,
+       from being a burden on their parents or country, and for
+       making them beneficial to the publick - 1729
+
+Author: Jonathan Swift
+
+Posting Date: July 27, 2008 [EBook #1080]
+Release Date: October 1997
+
+Language: English
+
+A MODEST PROPOSAL
+
+For preventing the children of poor people in Ireland...
+}
+      end
+    end
+    
+    _assert_output_equal %{
+      3 the
+      3 of
+      3 A
+      2 Swift
+      2 Proposal
+}.sub("\n", ''), *run_package
+  end
+  
+  #
   # cat test
   #
   

@@ -1,5 +1,5 @@
 Translate characters.
 
-(string, *options)
+(string1, string2=nil, *options)
 --
-  execute 'tr', string, *options
+  execute 'tr', string1, string2, *options
