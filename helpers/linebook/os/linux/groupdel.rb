@@ -1,4 +1,5 @@
-Removes the group.
-(name, options={})
+Delete a group.
+
+(group)
 --
-  execute 'groupdel', name, options
+  execute 'groupdel', group

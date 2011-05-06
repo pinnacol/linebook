@@ -140,7 +140,7 @@ class LinuxTest < Test::Unit::TestCase
     end
     
     assert_output_equal %{
-      #{TEST_GROUP_TWO} #{TEST_GROUP}
+      #{TEST_USER} : #{TEST_GROUP_TWO} #{TEST_GROUP}
     }, *run_package
   end
   

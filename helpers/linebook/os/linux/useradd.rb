@@ -1,4 +1,5 @@
-Adds the user.
-(name, options={}) 
+Create a new user or update default new user information.
+
+(login, options={}) 
 --
-  execute 'useradd', name, options
+  execute 'useradd', login, options

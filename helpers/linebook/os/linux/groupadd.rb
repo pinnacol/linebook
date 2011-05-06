@@ -1,4 +1,5 @@
-Adds the group.
-(name, options={})
+Create a new group.
+
+(group, options={})
 --
-  execute 'groupadd', name, options
+  execute 'groupadd', group, options

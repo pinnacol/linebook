@@ -2,6 +2,12 @@
 
 module Linebook
   module Os
+    # Defines Linux-compliant functionality, based on the {Linux Standard Base
+    # Core Specification 4.1 }[http://refspecs.linuxfoundation.org/lsb.shtml]. 
+    # See the online documentation for {Commands and Utilties
+    # }[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-ge
+    # neric/cmdbehav.html]
+    #
     # == login vs su
     #
     # The login and su methods both provide a way to switch users.  Login
@@ -117,9 +123,9 @@ module Linebook
         str
       end
       
-      # Adds the group.
-      def groupadd(name, options={})
-        execute 'groupadd', name, options
+      # Create a new group.
+      def groupadd(group, options={})
+        execute 'groupadd', group, options
         chain_proxy
       end
       
@@ -129,9 +135,9 @@ module Linebook
         str
       end
       
-      # Removes the group.
-      def groupdel(name, options={})
-        execute 'groupdel', name, options
+      # Delete a group.
+      def groupdel(group)
+        execute 'groupdel', group
         chain_proxy
       end
       
@@ -141,13 +147,21 @@ module Linebook
         str
       end
       
-      def groups(user, options={})
-        #  id -Gn <%= quote(user) %>
-        #  
-        #  
-        write "id -Gn "; write(( quote(user) ).to_s); write "\n"
-        write "\n"
+      # Modify a group.
+      def groupmod(group, options={})
+        execute 'groupmod', group, options
+        chain_proxy
+      end
       
+      def _groupmod(*args, &block) # :nodoc:
+        str = capture_str { groupmod(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Display a group.
+      def groups(user)
+        execute 'groups', user
         chain_proxy
       end
       
@@ -157,8 +171,9 @@ module Linebook
         str
       end
       
-      def install(source, target, options={})
-        execute 'install', source, target, options
+      # Copy files and set attributes.
+      def install(source, dest, options={})
+        execute 'install', source, dest, options
         chain_proxy
       end
       
@@ -221,9 +236,9 @@ module Linebook
         str
       end
       
-      # Adds the user.
-      def useradd(name, options={}) 
-        execute 'useradd', name, options
+      # Create a new user or update default new user information.
+      def useradd(login, options={}) 
+        execute 'useradd', login, options
         chain_proxy
       end
       
@@ -233,17 +248,29 @@ module Linebook
         str
       end
       
-      # Removes the user.
-      def userdel(name, options={}) 
+      # Delete a user account and related files.
+      def userdel(login, options={}) 
         # TODO - look into other things that might need to happen before:
         # * kill processes belonging to user
         # * remove at/cron/print jobs etc. 
-        execute 'userdel', name, options
+        execute 'userdel', login, options
         chain_proxy
       end
       
       def _userdel(*args, &block) # :nodoc:
         str = capture_str { userdel(*args, &block) }
+        str.strip!
+        str
+      end
+      
+      # Modify a user account.
+      def usermod(login, options={})
+        execute 'usermod', login, options
+        chain_proxy
+      end
+      
+      def _usermod(*args, &block) # :nodoc:
+        str = capture_str { usermod(*args, &block) }
         str.strip!
         str
       end

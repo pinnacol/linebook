@@ -329,6 +329,18 @@ module Linebook
           str
         end
         
+        # Return user identity.
+        def id(user, options={})
+          execute 'id', user, options
+          chain_proxy
+        end
+        
+        def _id(*args, &block) # :nodoc:
+          str = capture_str { id(*args, &block) }
+          str.strip!
+          str
+        end
+        
         # Checks that file exists and is a symbolic link.
         def link?(file)
           #  [ -L "<%= file %>" ]

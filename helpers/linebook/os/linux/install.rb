@@ -1,3 +1,5 @@
-(source, target, options={})
+Copy files and set attributes.
+
+(source, dest, options={})
 --
-  execute 'install', source, target, options
+  execute 'install', source, dest, options

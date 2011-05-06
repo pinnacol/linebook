@@ -1,3 +1,9 @@
+# Defines Linux-compliant functionality, based on the {Linux Standard Base
+# Core Specification 4.1 }[http://refspecs.linuxfoundation.org/lsb.shtml]. 
+# See the online documentation for {Commands and Utilties
+# }[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-ge
+# neric/cmdbehav.html]
+#
 # == login vs su
 #
 # The login and su methods both provide a way to switch users.  Login
