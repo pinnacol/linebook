@@ -1,9 +1,9 @@
 = Switch Users
 
-The login and su methods in the Linux module both provide a way to switch
-users. Login simulates a login and therefore you end up in the user home
-directory with the ENV as setup during login. By contrast su switches users
-such that it preserves exported ENV variables, including the pwd.
+The login and su methods in the Linebook::Os::Linux module both provide a way
+to switch users. Login simulates a login and therefore you end up in the user
+home directory with the ENV as setup during login. By contrast su switches
+users such that it preserves exported ENV variables, including the pwd.
 
 Say you were the linecook user:
 

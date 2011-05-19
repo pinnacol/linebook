@@ -25,6 +25,11 @@ Gem::Specification.new do |s|
     History
     README
     License.txt
+    HowTo/Switch\ Users
+    HowTo/Setup/Debian
+    HowTo/Setup/openSUSE
+    HowTo/Setup/SLES
+    HowTo/Setup/Ubuntu
   }
   
   # list the files you want to include here.
