@@ -1,6 +1,9 @@
 require 'linebook/os/posix'
 include Posix
 
+require 'linebook/os/linux/utilities'
+include Utilities
+
 def guess_target_name(source_name)
   target_dir  = File.dirname(target_name)
   name = File.basename(source_name)
