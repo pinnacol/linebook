@@ -123,7 +123,7 @@ end
 # Returns an array of positional variables for use as inputs to a function
 # block.  Splat blocks are supported; the splat expression behaves like $*.
 def signature(arity)
-  variables = Array.new(arity.abs) {|i| Variable.new(i + 1) }
+  variables = Array.new(arity.abs) {|i| var(i+1) }
   
   if arity < 0
     # This works for defaults...
@@ -134,6 +134,10 @@ def signature(arity)
   end
   
   variables
+end
+
+def var(name)
+  Variable.new(name)
 end
 
 def trailer

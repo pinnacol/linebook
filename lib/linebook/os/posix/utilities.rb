@@ -255,6 +255,7 @@ module Linebook
         end
         
         # Set the export attribute for variables.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_22]
         def export(key, value=nil)
           #  <% if value.nil? %>
           #  export <%= key %>
@@ -537,6 +538,7 @@ module Linebook
         #   set 'x' => true, 'v' => false
         # 
         # If a block is given then options will only be reset when the block completes.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_25]
         def set(options)
           if block_given?
             var = _package_.next_variable_name('set')
@@ -679,7 +681,7 @@ module Linebook
         end
         
         # Unset values and attributes of variables and functions.
-        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/unset.html]
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_29]
         def unset(*names)
           execute 'unset', *names
           chain_proxy

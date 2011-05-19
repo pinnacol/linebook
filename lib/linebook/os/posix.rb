@@ -142,7 +142,7 @@ module Linebook
       # Returns an array of positional variables for use as inputs to a function
       # block.  Splat blocks are supported; the splat expression behaves like $*.
       def signature(arity)
-        variables = Array.new(arity.abs) {|i| Variable.new(i + 1) }
+        variables = Array.new(arity.abs) {|i| var(i+1) }
         
         if arity < 0
           # This works for defaults...
@@ -153,6 +153,10 @@ module Linebook
         end
         
         variables
+      end
+      
+      def var(name)
+        Variable.new(name)
       end
       
       def trailer
@@ -172,6 +176,7 @@ module Linebook
       end
       
       # Exit from for, while, or until loop.
+      # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_15]
       def break_()
         #  break
         #  
@@ -245,6 +250,7 @@ module Linebook
       end
       
       # Continue for, while, or until loop.
+      # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_17]
       def continue_()
         #  continue
         #  
@@ -329,6 +335,7 @@ module Linebook
       end
       
       # Cause the shell to exit.
+      # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_21]
       def exit_(status=nil)
         #  <% if status.nil? %>
         #  exit
@@ -441,6 +448,7 @@ module Linebook
       end
       
       # Return from a function.
+      # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_24]
       def return_(status=nil)
         #  <% if status.nil? %>
         #  return

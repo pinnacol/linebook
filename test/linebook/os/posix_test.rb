@@ -873,15 +873,19 @@ class PosixTest < Test::Unit::TestCase
   end
   
   def test_while__read
-    assert_recipe %q{
-      while read xx yy
-      do
-        echo $xx $yy
-      done < file
-    } do
+    setup_recipe do
+      cat.to('file').heredoc do
+        writeln 'a b c'
+        writeln 'x y z'
+      end
       while_ _read('xx', 'yy') do
-        echo var('xx'), var('yy')
+        echo var('yy'), var('xx')
       end.from('file')
     end
+    
+    assert_output_equal %{
+      b c a
+      y z x
+    }, *run_package
   end
 end

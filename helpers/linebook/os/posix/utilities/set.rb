@@ -3,6 +3,7 @@ Set or unset options as specified. For example:
   set 'x' => true, 'v' => false
 
 If a block is given then options will only be reset when the block completes.
+{[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_25]
 
 (options)
 --

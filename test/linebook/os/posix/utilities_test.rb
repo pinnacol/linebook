@@ -422,7 +422,7 @@ For preventing the children of poor people in Ireland...
   
   def test_read
     assert_recipe %q{
-      read xx yy
+      read "xx" "yy"
     } do
       read 'xx', 'yy'
     end
