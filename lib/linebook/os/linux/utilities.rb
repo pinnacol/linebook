@@ -18,6 +18,7 @@ module Linebook
         end
         
         # Create a new group.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/groupadd.html]
         def groupadd(group, options={})
           execute 'groupadd', group, options
           chain_proxy
@@ -30,6 +31,7 @@ module Linebook
         end
         
         # Delete a group.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/groupdel.html]
         def groupdel(group)
           execute 'groupdel', group
           chain_proxy
@@ -42,6 +44,7 @@ module Linebook
         end
         
         # Modify a group.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/groupmod.html]
         def groupmod(group, options={})
           execute 'groupmod', group, options
           chain_proxy
@@ -54,6 +57,7 @@ module Linebook
         end
         
         # Display a group.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/groups.html]
         def groups(user)
           execute 'groups', user
           chain_proxy
@@ -65,7 +69,34 @@ module Linebook
           str
         end
         
+        # Compress or expand files.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/gzip.html]
+        def gzip(*files)
+          execute 'gzip', *files
+          chain_proxy
+        end
+        
+        def _gzip(*args, &block) # :nodoc:
+          str = capture_str { gzip(*args, &block) }
+          str.strip!
+          str
+        end
+        
+        # Show or set the system's host name.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/hostname.html]
+        def hostname(name=nil) 
+          execute 'hostname', name
+          chain_proxy
+        end
+        
+        def _hostname(*args, &block) # :nodoc:
+          str = capture_str { hostname(*args, &block) }
+          str.strip!
+          str
+        end
+        
         # Copy files and set attributes.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/install.html]
         def install(source, dest, options={})
           execute 'install', source, dest, options
           chain_proxy
@@ -77,8 +108,35 @@ module Linebook
           str
         end
         
+        # Generate or check MD5 message digests.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/md5sum.html]
+        def md5sum(*files) 
+          execute 'md5sum', *files
+          chain_proxy
+        end
+        
+        def _md5sum(*args, &block) # :nodoc:
+          str = capture_str { md5sum(*args, &block) }
+          str.strip!
+          str
+        end
+        
+        # Make temporary file name (unique)
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/mktemp.html]
+        def mktemp(template, options={})
+          execute 'mktemp', template, options
+          chain_proxy
+        end
+        
+        def _mktemp(*args, &block) # :nodoc:
+          str = capture_str { mktemp(*args, &block) }
+          str.strip!
+          str
+        end
+        
         # Switches to the specified user for the duration of a block.  The current ENV
         # and pwd are preserved.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/su.html]
         def su(user='root', options={})
           path = capture_script(options) do
             functions.each do |function|
@@ -92,6 +150,18 @@ module Linebook
         
         def _su(*args, &block) # :nodoc:
           str = capture_str { su(*args, &block) }
+          str.strip!
+          str
+        end
+        
+        # File archiver. {[Spec]}[http://pubs.opengroup.org/onlinepubs/007908799/xcu/tar.html]
+        def tar(key, *files)
+          execute 'tar', key, files
+          chain_proxy
+        end
+        
+        def _tar(*args, &block) # :nodoc:
+          str = capture_str { tar(*args, &block) }
           str.strip!
           str
         end
@@ -110,6 +180,7 @@ module Linebook
         end
         
         # Create a new user or update default new user information.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/useradd.html]
         def useradd(login, options={}) 
           execute 'useradd', login, options
           chain_proxy
@@ -122,6 +193,7 @@ module Linebook
         end
         
         # Delete a user account and related files.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/userdel.html]
         def userdel(login, options={}) 
           # TODO - look into other things that might need to happen before:
           # * kill processes belonging to user
@@ -137,6 +209,7 @@ module Linebook
         end
         
         # Modify a user account.
+        # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/usermod.html]
         def usermod(login, options={})
           execute 'usermod', login, options
           chain_proxy

@@ -6,6 +6,7 @@ module Linebook
       module Utilities
         # Return non-directory portion of a pathname. If a suffix is provided and
         # present, then it will be removed.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/basename.html]
         def basename(string, suffix=nil)
           execute 'basename', string, suffix
           chain_proxy
@@ -18,6 +19,7 @@ module Linebook
         end
         
         # Concatenate and print files.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/cat.html]
         def cat(*files)
           execute 'cat', *files
           chain_proxy
@@ -30,6 +32,7 @@ module Linebook
         end
         
         # Change the working directory, for the duration of a block if given.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/cd.html]
         def cd(directory=nil, options={})
           if block_given?
             var = _package_.next_variable_name('cd')
@@ -52,6 +55,7 @@ module Linebook
         end
         
         # Change the file group ownership
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/chgrp.html]
         def chgrp(group, *files)
           unless group.nil?
             execute 'chgrp', group, *files
@@ -68,6 +72,7 @@ module Linebook
         # Change the file modes. The mode may be specified as a String or a Fixnum. If a
         # Fixnum is provided, then it will be formatted into an octal string using
         # sprintf "%o".
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/chmod.html]
         def chmod(mode, *files)
           unless mode.nil?
             if mode.kind_of?(Fixnum)
@@ -85,6 +90,7 @@ module Linebook
         end
         
         # Change the file ownership.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/chown.html]
         def chown(owner, *files)
           unless owner.nil?
             execute 'chown', owner, *files
@@ -99,6 +105,7 @@ module Linebook
         end
         
         # Compare two files.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/cmp.html]
         def cmp(file1, file2, options={})
           execute 'cmp', file1, file2, options
           chain_proxy
@@ -111,6 +118,7 @@ module Linebook
         end
         
         # Select or reject lines common to two files.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/comm.html]
         def comm(file1, file2, options={})
           execute 'comm', file1, file2, options
           chain_proxy
@@ -123,6 +131,7 @@ module Linebook
         end
         
         # Copy files.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/cp.html]
         def cp(source_file, target_file, options={})
           execute 'cp', source_file, target_file, options
           chain_proxy
@@ -135,6 +144,7 @@ module Linebook
         end
         
         # Cut out selected fields of each line of a file.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/cut.html]
         def cut(*files)
           execute 'cut', *files
           chain_proxy
@@ -147,6 +157,7 @@ module Linebook
         end
         
         # Writes the date and time.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/date.html]
         def date(options={})
           execute 'date', options
           chain_proxy
@@ -174,6 +185,7 @@ module Linebook
         end
         
         # Return the directory portion of a pathname.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/dirname.html]
         def dirname(string)
           execute 'dirname', string
           chain_proxy
@@ -186,6 +198,7 @@ module Linebook
         end
         
         # Write arguments to standard output.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/echo.html]
         def echo(*string)
           execute 'echo', *string
           chain_proxy
@@ -229,6 +242,7 @@ module Linebook
         end
         
         # Convert tabs to spaces.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/expand.html]
         def expand(*files)
           execute 'expand', *files
           chain_proxy
@@ -279,6 +293,7 @@ module Linebook
         end
         
         # Filter for folding lines.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/fold.html]
         def fold(*files)
           execute 'fold', *files
           chain_proxy
@@ -291,6 +306,7 @@ module Linebook
         end
         
         # Search a file for a pattern.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/grep.html]
         def grep(pattern_list, *files)
           execute 'grep', pattern_list, *files
           chain_proxy
@@ -318,6 +334,7 @@ module Linebook
         end
         
         # Copy the first part of files.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/head.html]
         def head(*files)
           execute 'head', *files
           chain_proxy
@@ -330,6 +347,7 @@ module Linebook
         end
         
         # Return user identity.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/id.html]
         def id(user, options={})
           execute 'id', user, options
           chain_proxy
@@ -357,6 +375,7 @@ module Linebook
         end
         
         # Link files.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/ln.html]
         def ln(source_file, target_file, options={})
           execute 'ln', source_file, target_file, options
           chain_proxy
@@ -369,6 +388,7 @@ module Linebook
         end
         
         # List directory contents.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/ls.html]
         def ls(*files)
           execute 'ls', *files
           chain_proxy
@@ -381,6 +401,7 @@ module Linebook
         end
         
         # Make directories.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/mkdir.html]
         def mkdir(*dirs)
           execute 'mkdir', *dirs
           chain_proxy
@@ -393,6 +414,7 @@ module Linebook
         end
         
         # Move files.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/mv.html]
         def mv(source_file, target_file, options={})
           execute 'mv', source_file, target_file, options
           chain_proxy
@@ -405,6 +427,7 @@ module Linebook
         end
         
         # Merge corresponding or subsequent lines of files.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/paste.html]
         def paste(*files)
           execute 'paste', *files
           chain_proxy
@@ -416,7 +439,21 @@ module Linebook
           str
         end
         
+        # Check pathnames.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/pathchk.html]
+        def pathchk(*pathnames)
+          execute 'pathchk', *pathnames
+          chain_proxy
+        end
+        
+        def _pathchk(*args, &block) # :nodoc:
+          str = capture_str { pathchk(*args, &block) }
+          str.strip!
+          str
+        end
+        
         # Return working directory name.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/pwd.html]
         def pwd(options={})
           execute 'pwd', options
           chain_proxy
@@ -424,6 +461,19 @@ module Linebook
         
         def _pwd(*args, &block) # :nodoc:
           str = capture_str { pwd(*args, &block) }
+          str.strip!
+          str
+        end
+        
+        # Read a line from standard input.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/read.html]
+        def read(*vars)
+          execute 'read', *vars
+          chain_proxy
+        end
+        
+        def _read(*args, &block) # :nodoc:
+          str = capture_str { read(*args, &block) }
           str.strip!
           str
         end
@@ -444,6 +494,7 @@ module Linebook
         end
         
         # Remove directory entries.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/rm.html]
         def rm(*files)
           execute 'rm', *files
           chain_proxy
@@ -456,6 +507,7 @@ module Linebook
         end
         
         # Remove directories.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/rmdir.html]
         def rmdir(*dirs)
           execute 'rm', *dirs
           chain_proxy
@@ -468,6 +520,7 @@ module Linebook
         end
         
         # Stream editor.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/sed.html]
         def sed(script, *files)
           execute 'sed', script, *files
           chain_proxy
@@ -509,6 +562,7 @@ module Linebook
         end
         
         # Sort, merge, or sequence check text files.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/sort.html]
         def sort(*files)
           execute 'sort', *files
           chain_proxy
@@ -521,6 +575,7 @@ module Linebook
         end
         
         # Split files into pieces.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/split.html]
         def split(file, *options)
           execute 'split', file, *options
           chain_proxy
@@ -533,6 +588,7 @@ module Linebook
         end
         
         # Copy the last part of a file.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/tail.html]
         def tail(file, options={})
           execute 'tail', file, options
           chain_proxy
@@ -545,6 +601,7 @@ module Linebook
         end
         
         # Change file access and modification times.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/touch.html]
         def touch(*files)
           execute 'touch', *files
           chain_proxy
@@ -557,6 +614,7 @@ module Linebook
         end
         
         # Translate characters.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/tr.html]
         def tr(string1, string2=nil, *options)
           execute 'tr', string1, string2, *options
           chain_proxy
@@ -569,6 +627,7 @@ module Linebook
         end
         
         # Topological sort.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/tsort.html]
         def tsort(file)
           execute 'tsort', file
           chain_proxy
@@ -580,7 +639,21 @@ module Linebook
           str
         end
         
-        # Convert paces to tabs.
+        # Return system name.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/uname.html]
+        def uname(options={})
+          execute 'uname', options
+          chain_proxy
+        end
+        
+        def _uname(*args, &block) # :nodoc:
+          str = capture_str { uname(*args, &block) }
+          str.strip!
+          str
+        end
+        
+        # Convert spaces to tabs.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/unexpand.html]
         def unexpand(*files)
           execute 'unexpand', *files
           chain_proxy
@@ -593,6 +666,7 @@ module Linebook
         end
         
         # Report or filter out repeated lines in a file.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/uniq.html]
         def uniq(*options)
           execute 'uniq', *options
           chain_proxy
@@ -605,6 +679,7 @@ module Linebook
         end
         
         # Unset values and attributes of variables and functions.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/unset.html]
         def unset(*names)
           execute 'unset', *names
           chain_proxy
@@ -617,6 +692,7 @@ module Linebook
         end
         
         # Word, line, and byte or character count.
+        # {[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/wc.html]
         def wc(*files)
           execute 'wc', *files
           chain_proxy

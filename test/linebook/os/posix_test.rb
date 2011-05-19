@@ -871,4 +871,17 @@ class PosixTest < Test::Unit::TestCase
       while_('condition') { write  'content' }
     end
   end
+  
+  def test_while__read
+    assert_recipe %q{
+      while read xx yy
+      do
+        echo $xx $yy
+      done < file
+    } do
+      while_ _read('xx', 'yy') do
+        echo var('xx'), var('yy')
+      end.from('file')
+    end
+  end
 end

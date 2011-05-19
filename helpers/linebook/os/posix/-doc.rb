@@ -4,7 +4,7 @@
 #
 # * {POSIX Shell Command Language
 #   }[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/xcu_chap02.html]
-# * {Special Built-in Utilites
+# * {Special Built-in Utilities
 #   }[http://pubs.opengroup.org/onlinepubs/9699919799/idx/sbi.html]
 # * {Standard Utilties
 #   }[http://pubs.opengroup.org/onlinepubs/9699919799/idx/utilities.html]

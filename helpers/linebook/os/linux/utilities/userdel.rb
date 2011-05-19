@@ -1,4 +1,5 @@
 Delete a user account and related files.
+{[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/userdel.html]
 
 (login, options={}) 
 --

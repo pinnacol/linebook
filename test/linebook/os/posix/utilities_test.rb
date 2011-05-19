@@ -417,6 +417,18 @@ For preventing the children of poor people in Ireland...
   end
   
   #
+  # read test
+  #
+  
+  def test_read
+    assert_recipe %q{
+      read xx yy
+    } do
+      read 'xx', 'yy'
+    end
+  end
+  
+  #
   # readable? test
   #
   

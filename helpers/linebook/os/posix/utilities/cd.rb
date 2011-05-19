@@ -1,4 +1,5 @@
 Change the working directory, for the duration of a block if given.
+{[Spec]}[http://pubs.opengroup.org/onlinepubs/9699919799/utilities/cd.html]
 
 (directory=nil, options={})
 --

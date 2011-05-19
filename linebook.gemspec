@@ -38,6 +38,7 @@ Gem::Specification.new do |s|
     cookbook
     lib/linebook.rb
     lib/linebook/os/linux.rb
+    lib/linebook/os/linux/utilities.rb
     lib/linebook/os/posix.rb
     lib/linebook/os/posix/utilities.rb
     lib/linebook/os/posix/variable.rb
