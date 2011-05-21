@@ -1,7 +1,7 @@
 require File.expand_path('../../../../test_helper', __FILE__)
 require 'linebook/os/posix'
 
-class UtilitiesTest < Test::Unit::TestCase
+class PosixUtilitiesTest < Test::Unit::TestCase
   include Linecook::Test
   
   def setup
