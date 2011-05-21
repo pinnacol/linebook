@@ -1,0 +1,55 @@
+#!/bin/sh
+
+assert_status_equal () {
+  expected=$1; actual=$2; lineno=$3
+
+  if [ $actual -eq $expected ]
+  then
+    printf '.'
+  else
+    printf 'F'
+    echo "$TEST_CASE:$TEST" 1>&2
+    echo "expected exit status $expected but was $actual" 1>&2
+    echo "[$0:$lineno]\n" 1>&2
+  fi
+}
+
+setup () {
+  VAR=0
+}
+
+teardown () {
+  VAR=
+}
+
+TEST_CASE=One
+
+TEST=test_one
+setup
+true
+assert_status_equal 0 $? $LINENO
+teardown
+
+TEST=test_two
+setup
+true
+assert_status_equal 0 $? $LINENO
+teardown
+
+TEST=test_three
+setup
+false
+assert_status_equal 0 $? $LINENO
+teardown
+
+TEST=test_four
+setup
+true
+assert_status_equal 0 $? $LINENO
+teardown
+
+TEST=test_five
+setup
+false
+assert_status_equal 0 $? $LINENO
+teardown
