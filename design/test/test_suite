@@ -7,6 +7,7 @@ count_char () {
   grep -o "$1" "$2" | wc -l | tr -d " "
 }
 
+echo "Started"
 START_TIME=$SECONDS
 for test_case in $(dirname $0)/test/*_test
 do
@@ -16,14 +17,13 @@ do
   fi
 done
 END_TIME=$SECONDS
+echo
+echo "Finished in $(($END_TIME - $START_TIME))s"
 
 if [ -f "$MESSAGES" ] && [ -f "$RESULTS" ]
 then
   echo
-  echo
   cat "$MESSAGES"
-  echo "$(count_char "\." "$RESULTS") pass, $(count_char "F" "$RESULTS") fail ($(($END_TIME - $START_TIME))s elapsed)"
+  echo "$(count_char "\." "$RESULTS") pass, $(count_char "F" "$RESULTS") fail"
   rm "$MESSAGES" "$RESULTS"
-else
-  echo "no tests found"
 fi

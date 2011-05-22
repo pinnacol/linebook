@@ -10,7 +10,7 @@ TEST_CASE=$(basename $0)
 #
 
 test_assert_equal_pass () {
-assert_equal 0 "$(
+  assert_equal 0 "$(
 echo 'hello world'
 echo 'hello world'
 echo 'hello world'
@@ -22,7 +22,7 @@ stdout
 }
 
 test_assert_equal_fail_by_status () {
-assert_equal 1 "$(
+  assert_equal 1 "$(
 echo 'hello world'
 echo 'hello world'
 echo 'hello world'
@@ -34,7 +34,7 @@ stdout
 }
 
 test_assert_equal_fail_by_output () {
-assert_equal 0 "$(
+  assert_equal 0 "$(
 echo 'hello world'
 echo 'ellow world'
 echo 'hello world'
@@ -59,7 +59,7 @@ test_assert_status_equal_pass () {
 #
 
 test_assert_output_equal_pass () {
-assert_output_equal "$(
+  assert_output_equal "$(
 echo 'hello world'
 echo 'hello world'
 echo 'hello world'
@@ -70,4 +70,4 @@ hello world
 stdout
 }
 
-run_tests "$0"
+run_test_case "$0"
