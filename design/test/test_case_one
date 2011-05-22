@@ -1,55 +1,51 @@
 #!/bin/sh
+. ${0%/test_case_one}/test_helper
 
-assert_status_equal () {
-  expected=$1; actual=$2; lineno=$3
-
-  if [ $actual -eq $expected ]
-  then
-    printf '.'
-  else
-    printf 'F'
-    echo "$TEST_CASE:$TEST" 1>&2
-    echo "expected exit status $expected but was $actual" 1>&2
-    echo "[$0:$lineno]\n" 1>&2
-  fi
-}
+########################################################################
+TEST_CASE=One
+########################################################################
 
 setup () {
-  VAR=0
+  VAR=
 }
 
 teardown () {
   VAR=
 }
 
-TEST_CASE=One
+test_one () {
+  setup
+  true
+  assert_status_equal 0 $? $LINENO
+  teardown
+}
 
-TEST=test_one
-setup
-true
-assert_status_equal 0 $? $LINENO
-teardown
+test_two () {
+  setup
+  true
+  assert_status_equal 0 $? $LINENO
+  teardown
+}
 
-TEST=test_two
-setup
-true
-assert_status_equal 0 $? $LINENO
-teardown
+test_three () {
+  setup
+  false
+  assert_status_equal 0 $? $LINENO
+  teardown
+}
 
-TEST=test_three
-setup
-false
-assert_status_equal 0 $? $LINENO
-teardown
+test_four () {
+  setup
+  true
+  assert_status_equal 0 $? $LINENO
+  teardown
+}
 
-TEST=test_four
-setup
-true
-assert_status_equal 0 $? $LINENO
-teardown
+test_five () {
+  setup
+  false
+  assert_status_equal 0 $? $LINENO
+  teardown
+}
 
-TEST=test_five
-setup
-false
-assert_status_equal 0 $? $LINENO
-teardown
+run_tests "$0"
