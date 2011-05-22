@@ -1,10 +1,15 @@
+fail () {
+  echo "$TEST_CASE:$lineno $TEST_NAME" 1>&2
+  echo "$1\n" 1>&2
+  return 1
+}
+
 assert_status_equal () {
   expected=$1; actual=$2; lineno=$3
 
   if [ $actual -ne $expected ]
   then
-    fail "expected exit status $expected but was $actual\n"
-    return 1
+    fail "expected exit status $expected but was $actual"
   fi
 }
 
@@ -16,7 +21,7 @@ assert_output_equal () {
     echo -e "$expected" > "$0_$2_expected.txt"
     echo -e "$actual"   > "$0_$2_actual.txt"
     
-    fail "unequal output:\n$(diff "$0_$2_expected.txt" "$0_$2_actual.txt")\n"
+    fail "unequal output:\n$(diff "$0_$2_expected.txt" "$0_$2_actual.txt")"
     
     rm "$0_$2_expected.txt" "$0_$2_actual.txt"
     return 1
@@ -28,10 +33,6 @@ assert_equal () {
   assert_output_equal "$2" $3
 }
 
-fail () {
-  echo "$TEST_CASE:$lineno $TEST_NAME" 1>&2
-  echo "$1" 1>&2
-}
 run_tests () {
   test_file=$1
   
