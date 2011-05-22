@@ -1,12 +1,8 @@
 assert_status_equal () {
   expected=$1; actual=$2; lineno=$3
 
-  if [ $actual -eq $expected ]
+  if [ $actual -ne $expected ]
   then
-    printf '.'
-    return 0
-  else
-    printf 'F'
     echo "$TEST_CASE:$lineno $TEST_NAME" 1>&2
     echo "expected exit status $expected but was $actual\n" 1>&2
     
@@ -17,15 +13,11 @@ assert_status_equal () {
 assert_output_equal () {
   expected=$(cat); actual=$1; lineno=$2
 
-  if [ "$actual" == "$expected" ]
+  if [ "$actual" != "$expected" ]
   then
-    printf '.'
-    return 0
-  else
     echo -e "$expected" > "$0_$2_expected.txt"
     echo -e "$actual"   > "$0_$2_actual.txt"
     
-    printf 'F'
     echo "$TEST_CASE:$lineno $TEST_NAME" 1>&2
     echo "unequal output:\n$(diff "$0_$2_expected.txt" "$0_$2_actual.txt")\n" 1>&2
     
@@ -42,9 +34,11 @@ assert_equal () {
 run_tests () {
   test_file=$1
   
-  eval "$(
-  grep -oE "^ *${NAME:-test_\w+} +\(\)" "$test_file" | 
-  tr -d " ()" | 
-  sed "s/^\([A-Za-z0-9_]\{1,\}\)/TEST_NAME=\1 \1/"
-  )"
+  for test_method in $(grep -oE "^ *${NAME:-test_\w+} +\(\)" "$test_file" | tr -d " ()")
+  do
+    if TEST_NAME="$test_method" "$test_method"
+    then printf '.'
+    else printf 'F'
+    fi
+  done
 }
