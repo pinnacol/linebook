@@ -3,19 +3,27 @@
 # Test Suite
 MESSAGES=messages
 RESULTS=results
-
-START_TIME=$SECONDS
-${0%/test_suite}/test_case_one 2>>"$MESSAGES" | tee -a "$RESULTS"
-${0%/test_suite}/test_case_two 2>>"$MESSAGES" | tee -a "$RESULTS"
-END_TIME=$SECONDS
-
 count_char () {
   grep -o "$1" "$2" | wc -l | tr -d " "
 }
 
-echo
-echo
-cat "$MESSAGES"
-echo "$(count_char "\." "$RESULTS") pass, $(count_char "F" "$RESULTS") fail ($(($END_TIME - $START_TIME))s elapsed)"
-rm "$MESSAGES" "$RESULTS"
+START_TIME=$SECONDS
+for test_case in $(dirname $0)/test/*_test
+do
+  if [ -f "$test_case" ]
+  then
+    "$test_case" 2>>"$MESSAGES" | tee -a "$RESULTS"
+  fi
+done
+END_TIME=$SECONDS
 
+if [ -f "$MESSAGES" ] && [ -f "$RESULTS" ]
+then
+  echo
+  echo
+  cat "$MESSAGES"
+  echo "$(count_char "\." "$RESULTS") pass, $(count_char "F" "$RESULTS") fail ($(($END_TIME - $START_TIME))s elapsed)"
+  rm "$MESSAGES" "$RESULTS"
+else
+  echo "no tests found"
+fi
