@@ -8,7 +8,7 @@ module Linebook
       
       # Installs a package using apt-get.
       def package(name, version=nil, options={:q => true, :y => true})
-        name = "#{name}=#{version}" unless blank?(version)
+        name = "#{name}=#{version}" unless version.to_s.strip.empty?
         execute "apt-get install", name, options
         chain_proxy
       end
