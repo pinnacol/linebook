@@ -50,7 +50,7 @@ module Linebook
       def login(user='root', options={})
         current = functions
         begin
-          @functions = []
+          @functions = nil
           
           path = capture_script(options) { yield }
           execute 'su', user, path, :l => true

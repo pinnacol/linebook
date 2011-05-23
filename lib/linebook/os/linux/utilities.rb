@@ -139,7 +139,7 @@ module Linebook
         # {[Spec]}[http://refspecs.linuxfoundation.org/LSB_4.1.0/LSB-Core-generic/LSB-Core-generic/su.html]
         def su(user='root', options={})
           path = capture_script(options) do
-            functions.each do |function|
+            functions.each_value do |function|
               writeln function
             end
             yield

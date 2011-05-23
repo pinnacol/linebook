@@ -101,9 +101,9 @@ module Linebook
         options.sort
       end
       
-      # An array of functions defined for self.
+      # A hash of functions defined for self.
       def functions
-        @functions ||= []
+        @functions ||= {}
       end
       
       # Defines a function from the block.  The block content is indented and
@@ -113,11 +113,11 @@ module Linebook
         function = %{#{name}() {\n#{str.chomp("\n")}\n}}
         
         if function?(name)
-          unless functions.include?(function)
+          unless functions[name] == function
             raise "function already defined: #{name.inspect}"
           end
         else
-          functions << function
+          functions[name] = function
           
           if method_name
             instance_eval %{
@@ -135,8 +135,7 @@ module Linebook
       
       # Returns true if a function with the given name is defined.
       def function?(name)
-        declaration = "#{name}()"
-        functions.any? {|func| func.index(declaration) == 0 }
+        functions.has_key?(name)
       end
       
       # Returns an array of positional variables for use as inputs to a function

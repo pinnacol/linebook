@@ -5,7 +5,7 @@ and pwd are preserved.
 (user='root', options={})
 --
   path = capture_script(options) do
-    functions.each do |function|
+    functions.each_value do |function|
       writeln function
     end
     yield
