@@ -9,16 +9,18 @@ Gem::Specification.new do |s|
   s.author   = 'Simon Chiang'
   s.email    = 'simon.a.chiang@gmail.com'
   s.homepage = 'http://rubygems.org/gems/linebook'
-  s.summary  = 'The Linecook standard library'
-  s.description = 'The standard library for Linecook, and a namespace for distributing Linecook cookbooks.'
-
+  s.summary  = 'The standard library for Linecook'
+  s.description = %w{
+  The standard library for Linecook, providing helpers for POSIX and Linux.
+  }.join(' ')
+  
   s.rubyforge_project = ''
   s.require_path = 'lib'
   s.has_rdoc = true
   s.rdoc_options.concat %W{--main README -S -N --title Linebook}
   
   # add dependencies
-  s.add_dependency('linecook', '~> 1.1')
+  s.add_dependency('linecook', '~> 1.2')
   
   # list extra rdoc files here.
   s.extra_rdoc_files = %W{

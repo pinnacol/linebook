@@ -366,7 +366,7 @@ class PosixTest < Test::Unit::TestCase
       function 'get' do |a, b, *c|
         writeln "echo \"got #{a}\""
         writeln "echo \"got #{b}\""
-        writeln "echo \"got #{c}\""
+        writeln "echo \"got #{c.join}\""
       end
       writeln "get one two three four five"
     end

@@ -1,5 +1,4 @@
 pkg/*
-*.gem
 .bundle
 rdoc/
 coverage/
@@ -8,3 +7,4 @@ log
 vm
 config/ssh
 .rvmrc
+*.rbc

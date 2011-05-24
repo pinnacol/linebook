@@ -1,6 +1,6 @@
 require 'rake'
 require 'rake/rdoctask'
-require 'rake/gempackagetask'
+require 'rubygems/package_task'
 
 #
 # Gem tasks
@@ -13,7 +13,7 @@ def gemspec
   end
 end
 
-Rake::GemPackageTask.new(gemspec) do |pkg|
+Gem::PackageTask.new(gemspec) do |pkg|
   pkg.need_tar = true
 end
 
@@ -29,6 +29,8 @@ task :print_manifest do
   
   (cookbook_files + cookbook_file).each do |file|
     next unless File.file?(file)
+    next if File.extname(file) == '.rbc'
+    
     path = File.expand_path(file)
     files[path] = ['', file] unless files.has_key?(path)
   end
@@ -113,6 +115,11 @@ end
 # Test tasks
 #
 
+def current_ruby
+  name = `rvm current`
+  $?.exitstatus == 0 ? name.split("\n").last : RUBY_VERSION
+end
+
 desc 'Default: Run tests.'
 task :default => :test
 
@@ -121,6 +128,7 @@ task :quicktest => :build do
   tests = Dir.glob('test/**/*_test.rb')
   tests.delete_if {|test| test =~ /_test\/test_/ }
   
+  puts "Using: #{current_ruby}"
   if ENV['RCOV'] == 'true'
     FileUtils.rm_rf File.expand_path('../coverage', __FILE__)
     sh('rcov', '-w', '--text-report', '--exclude', '^/', *tests)
@@ -133,10 +141,12 @@ desc 'Run the tests vs each vm in config/ssh'
 task :multitest do
   require 'thread'
   
+  puts "Using: #{current_ruby}"
+  
   hosts = `bundle exec linecook state --hosts`.split("\n")
   hosts.collect! {|line| line.split(':').at(0) }
   
-  log_dir = File.expand_path('../log', __FILE__)
+  log_dir = File.expand_path("../log/#{current_ruby}", __FILE__)
   unless File.exists?(log_dir)
     FileUtils.mkdir_p(log_dir)
   end
