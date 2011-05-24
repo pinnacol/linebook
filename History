@@ -1,3 +1,11 @@
+== 0.8.0 2011/05/23
+
+Updated to linecook-1.2.0. Added many utility commands for Posix/Linux, and
+wrapped Unix into Posix module. Standardized the behavior of the commands.
+Added definition of functions and variables.
+
+Very likely breaks most of what was in use in 0.7.0.
+
 == 0.7.0 2011/04/26
 
 Updated to linecook-1.0.0
