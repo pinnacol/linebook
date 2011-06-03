@@ -30,7 +30,6 @@ Gem::Specification.new do |s|
     HowTo/Switch\ Users
     HowTo/Setup/Debian
     HowTo/Setup/openSUSE
-    HowTo/Setup/SLES
     HowTo/Setup/Ubuntu
   }
   
